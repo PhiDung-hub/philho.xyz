@@ -2,15 +2,15 @@ import useSWR from 'swr'
 
 import fetcher from '@/lib/fetcher'
 
-import MetricCard from '@/components/Metrics/Card'
-import { useStyles } from '@/components/Metrics/Metrics.styles'
-import { Github } from '@/components/Metrics/types'
+import MetricCard from './Card'
+import { useStyles } from './Metrics.styles'
+import { Github } from './types'
 
 export default function GitHubCard() {
   const { data } = useSWR<Github>('/api/github', fetcher)
   const stars = new Number(data?.stars)
   const followers = new Number(data?.followers)
-  const link = 'https://github.com/tszhong0411'
+  const link = 'https://github.com/PhiDung-hub'
   const { classes } = useStyles()
 
   return (

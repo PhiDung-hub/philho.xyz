@@ -47,7 +47,7 @@ export default function Typography({ children }: PropsWithChildren) {
           transition: 'border-color 0.3s ease 0s, color 0.3s ease 0s',
 
           '&:hover': {
-            borderBottomColor: '#fa3838',
+            borderBottomColor: '#ff3838',
           },
         },
         '& pre': {

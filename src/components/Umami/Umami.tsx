@@ -1,6 +1,7 @@
 import Script from 'next/script'
 
 const UmamiScript = () => {
+  // About Umami tracking: https://umami.is/docs/about
   return (
     <>
       <Script
