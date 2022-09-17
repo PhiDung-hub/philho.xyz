@@ -47,7 +47,7 @@ export default function Hero() {
             </Text>
           </div>
         </Grid.Col>
-        <Grid.Col span={6}>
+        <Grid.Col span={12} md={6}>
           <CustomCard
             title={cards_data.project.title}
             description={cards_data.project.description}
@@ -55,7 +55,7 @@ export default function Hero() {
             className="py-4 md:px-4"
           />
         </Grid.Col>
-        <Grid.Col span={6}>
+        <Grid.Col span={12} md={6}>
           <CustomCard
             title={cards_data.blog.title}
             description={cards_data.blog.description}
