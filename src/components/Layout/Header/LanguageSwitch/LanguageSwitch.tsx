@@ -10,7 +10,7 @@ import { useStyles } from '@/components/Layout/Header/Header.styles'
 
 export default function LanguageSwitch() {
   const router = useRouter()
-  const [locale, setLocale] = useLocalStorage({ key: 'locale' })
+  const [locale, setLocale] = useLocalStorage({ key: 'locales' })
   const { t } = useTranslation('common')
   const { classes } = useStyles()
 
