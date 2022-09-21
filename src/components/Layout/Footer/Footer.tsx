@@ -13,7 +13,7 @@ const siteMetadata = {
 export default function Footer() {
 
   return (
-    <footer className="fixed bottom-0 left-[50%] translate-x-[-50%] w-5/6 md:w-3/5">
+    <footer className="w-5/6 md:w-3/5 self-center">
       <Divider my='xl' />
       <div className="mt-5 flex flex-col items-center">
         <div className="flex mb-4 space-x-3">

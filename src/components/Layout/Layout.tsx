@@ -40,20 +40,15 @@ const Layout = (props: PropsWithChildren<NextSeoProps>) => {
         }}
         additionalLinkTags={[...Favicons]}
         {...props}
-      />
-      <Header />
-      <Container
-        sx={(theme) => ({
-          padding: '24px 30px',
-          [theme.fn.largerThan('sm')]: {
-            padding: '48px 32px',
-          },
-        })}
-      >
-        {props.children}
-      </Container>
-      <Footer />
-    </>
+        />
+      <div className="flex min-h-screen flex-col justify-between pt-9 md:pt-7 w-screen items-start">
+        <Header />
+        <Container className="w-screen px-6 sm:px-10 py-8 sm:py-9">
+          {props.children}
+        </Container>
+        <Footer />
+      </div>
+      </>
   )
 }
 

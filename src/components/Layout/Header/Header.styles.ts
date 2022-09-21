@@ -5,7 +5,7 @@ export const HEADER_BREAKPOINT = 860
 
 export const useStyles = createStyles((theme) => ({
   header: {
-    position: 'sticky',
+    position: 'fixed',
     top: 0,
     display: 'flex',
     justifyContent: 'space-between',
@@ -19,7 +19,10 @@ export const useStyles = createStyles((theme) => ({
     height: HEADER_HEIGHT,
     padding: '0 30px',
     maxWidth: 960,
+    width: "100%",
     margin: '0 auto',
+    left: "50%",
+    translate: "-50%",
 
     [theme.fn.largerThan('sm')]: {
       padding: '0 32px',
