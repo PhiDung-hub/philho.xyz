@@ -1,6 +1,5 @@
 import { Divider } from '@mantine/core';
 
-import { useStyles } from './Footer.styles';
 import SocialIcon from '../social-icons';
 
 const siteMetadata = {
@@ -12,19 +11,17 @@ const siteMetadata = {
 }
 
 export default function Footer() {
-  const { classes } = useStyles()
 
   return (
-    <footer className={classes.footer}>
+    <footer className="fixed bottom-0 left-[50%] translate-x-[-50%] w-5/6 md:w-3/5">
       <Divider my='xl' />
-      <div className="mt-16 flex flex-col items-center">
+      <div className="mt-5 flex flex-col items-center">
         <div className="flex mb-4 space-x-3">
-          <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} size={20} />
-          <SocialIcon kind="github" href={siteMetadata.github} size={20} />
-          <SocialIcon kind="linkedin" href={siteMetadata.linkedin} size={20} />
-          <SocialIcon kind="twitter" href={siteMetadata.twitter} size={20} />
-
-          <SocialIcon kind="instagram" href={siteMetadata.instagram} size={20} />
+          <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`}  />
+          <SocialIcon kind="github" href={siteMetadata.github} />
+          <SocialIcon kind="linkedin" href={siteMetadata.linkedin} />
+          <SocialIcon kind="twitter" href={siteMetadata.twitter} />
+          <SocialIcon kind="instagram" href={siteMetadata.instagram} />
         </div>
         <div className="mb-8 flex space-x-2 text-sm text-gray-500 dark:text-gray-400">
           <div>{'Phil Ho '}</div>
