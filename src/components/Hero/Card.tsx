@@ -32,8 +32,8 @@ const Card = ({
       className={`${className} overflow-hidden`}
       ref={ref}
     >
-      <div className={`rounded-md ${onlyImg ? 'bg-none' : 'p-0.5 dark:p-px'} bg-gradient-to-r from-indigo-400
-via-purple-400 to-pink-400 h-full -z-10`}>
+      <div className={`rounded-md ${onlyImg ? 'bg-none' : 'p-0.5 dark:p-px bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400'}
+h-full -z-10`}>
         <CustomLink href={href} aria-label={`Link to ${title}`}>
           <animated.div
             style={{ transform: props.xys.to(trans) }}
@@ -42,7 +42,7 @@ via-purple-400 to-pink-400 h-full -z-10`}>
               const rect = ref.current.getBoundingClientRect()
               set(calc(e.clientX, e.clientY, rect, onlyImg))
             }}
-            className={`will-change-transform overflow-hidden relative rounded-md bg-violet-50 dark:bg-slate-800
+            className={`will-change-transform overflow-hidden relative rounded-md ${onlyImg ? 'bg-transparent' : 'bg-violet-50 dark:bg-slate-800'}
 after:absolute after:inset-0 after:z-10 after:bg-cover after:bg-no-repeat after:opacity-0 after:pointer-events-none
 after:mix-blend-hard-light after:will-change-auto after:bg-texture-pattern after:transition-opacity after:duration-500
 hover:after:opacity-100 hover:after:animate-hue-animation h-full z-20`}
@@ -51,32 +51,13 @@ hover:after:opacity-100 hover:after:animate-hue-animation h-full z-20`}
             {onlyImg && <>{children}</>}
             {!onlyImg && (
               <div className="p-5">
-                <h2 className="mb-2 text-2xl font-bold leading-7 tracking-tight">{title}</h2>
+                <h2 className="mb-2 text-2xl m-0 leading-7 tracking-tight">{title}</h2>
                 <div className="min-h-[120px] md:h-[120px] mb-5 prose text-gray-600 max-w-none dark:text-gray-400">
                   {description}
                 </div>
-                <div className="text-3xl text-primary-800 hover:text-primary-600 dark:hover:text-primary-400">
-                  <svg
-                    className="rotate-180"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M6.75 8.75V17.25H15.25"
-                    />
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M7 17L17.25 6.75"
-                    />
+                <div className="text-xl p-0 text-primary-700 hover:text-primary-600 dark:hover:text-primary-400">
+                  <svg className="" width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+                    <path stroke="currentColor" strokeLinecap='round' strokeWidth={1.0} d="M14 4h-13v18h20v-11h1v12h-22v-20h14v1zm10 5h-1v-6.293l-11.646 11.647-.708-.708 11.647-11.646h-6.293v-1h8v8z"/>
                   </svg>
                 </div>
               </div>

@@ -2,7 +2,7 @@
   "latestPosts": "Latest posts",
   "search": "Search articles",
   "noPostsFound": "No posts found.",
-  "blogDesc": "I started writing articles in December 2020, mainly for software sharing and skills sharing. In total, I have written {{count}} articles on my blog. You can search by title in the search bar below.",
+  "blogDesc": "These are articles I wrote. In total, I have written {{count}} articles on my blog.",
   "prev": "Previous article",
   "next": "Next article",
   "editOnGithub": "Edit on Github",

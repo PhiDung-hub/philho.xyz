@@ -21,7 +21,7 @@ import { links } from '@/components/Layout/Header/links'
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
-    key: 'theme',
+    key: 'mantine-corlor-Scheme',
     defaultValue: 'dark',
     getInitialValueInEffect: true,
   })

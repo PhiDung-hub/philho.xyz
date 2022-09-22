@@ -41,9 +41,9 @@ const Layout = (props: PropsWithChildren<NextSeoProps>) => {
         additionalLinkTags={[...Favicons]}
         {...props}
         />
-      <div className="flex min-h-screen flex-col justify-between pt-9 md:pt-7 w-screen items-start">
-        <Header />
-        <Container className="w-screen px-6 sm:px-10 py-8 sm:py-9">
+      <Header />
+      <div className="flex min-h-[90vh] flex-col justify-between w-full items-start">
+        <Container className="w-screen px-6 sm:px-8 py-8 sm:py-9">
           {props.children}
         </Container>
         <Footer />

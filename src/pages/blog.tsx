@@ -1,5 +1,4 @@
 import { Input, List, Text } from '@mantine/core'
-import { IconSearch } from '@tabler/icons'
 import { GetStaticProps } from 'next'
 import useTranslation from 'next-translate/useTranslation'
 import React from 'react'
@@ -26,12 +25,10 @@ export default function Blog({ posts }: { posts: PostFrontMatter[] }) {
         description={t('blogDesc', { count: posts.length })}
       >
         <Input
-          icon={<IconSearch size={15} />}
-          placeholder={t('search')}
+          placeholder='Search'
           type='text'
-          radius='md'
           aria-label={t('search')}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
         />
         <List listStyleType='none'>
           {!filteredPosts.length && (
