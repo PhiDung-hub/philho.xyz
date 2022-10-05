@@ -73,7 +73,10 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
             colorScheme,
             fontFamily:
               'Sora,Noto Sans TC,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
-            primaryColor: 'red',
+            colors: {
+              'navy': ['#e8f2ff', '#c8d6ea', '#a7bad7', '#859ec6', '#6383b5', '#4a699c', '#39527a', '#283a58', '#162337', '#030c18']
+            },
+            primaryColor: 'blue',
             breakpoints: {
               xs: 375,
               sm: 640,
@@ -89,28 +92,28 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
                 searchIcon={<IconSearch size={18} />}
                 searchPlaceholder='Search'
                 shortcut={['mod + k', 'mod + p']}
-                nothingFoundMessage='Nothing found'
+                nothingFoundMessage='Nothing found ☹'
                 actions={Actions()}
                 radius='md'
                 highlightQuery
               >
                 <Global
-                  styles={() => ({
+                  styles={(theme) => ({
                     html: {
                       scrollBehavior: 'smooth',
                     },
                     '::selection': {
-                      background: 'rgb(249, 6, 6, 0.05)',
-                      color: '#AF0F0F',
+                      background: theme.colorScheme === "dark" ? 'rgb(45, 66, 99, 0.5)' : "rgb(45, 66, 99, 0.9)",
+                      color: theme.colorScheme === "dark" ? "#ECDBBA" : "#ECDBBA",
                     },
                     '::-webkit-scrollbar': {
-                      width: 7,
+                      width: 10,
                       height: 5,
                     },
                     '::-webkit-scrollbar-thumb': {
-                      background: '#ef4444',
+                      background: '#2D4263',
                       transition: '0.25s',
-                      borderRadius: 2,
+                      borderRadius: 5,
                     },
                     '::-webkit-scrollbar-track': {
                       background: '0 0',

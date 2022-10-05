@@ -32,22 +32,21 @@ import ViewCounter from '@/components/ViewCounter'
 
 import { useStyles } from '@/layouts/blog.styles'
 
-const editUrl = (slug: string, locale: string) =>
-  `https://github.com/tszhong0411/honghong.me/blob/main/src/data/blog/${locale}/${slug}.mdx`
+const editUrl = () => `https://github.com/Phidung-hub`
 
 const twitterShare = (slug: string, title: string) =>
   `https://twitter.com/intent/tweet?text=${title}&url=${encodeURIComponent(
-    `https://honghong.me/blog/${slug}`
+    `https://philho.xyz/blog/${slug}`
   )}`
 
 const facebookShare = (slug: string) =>
   `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-    `https://honghong.me/blog/${slug}`
+    `https://philho.xyz/blog/${slug}`
   )}`
 
 const redditShare = (slug: string, title: string) =>
   `https://www.reddit.com/submit?title=${title}&url=${encodeURIComponent(
-    `https://honghong.me/blog/${slug}`
+    `https://philho.xyz/blog/${slug}`
   )}`
 
 export default function BlogLayout({
@@ -107,11 +106,11 @@ export default function BlogLayout({
       openGraph={{
         description: summary,
         type: 'article',
-        title: `${title} | 小康 Blog`,
+        title: `${title} | Phil Ho's 10 cents.`,
         article: {
           publishedTime: ISOPublishedTime,
           modifiedTime: ISOModifiedTime,
-          authors: ['https://honghong.me'],
+          authors: ['https://philho.xyz'],
         },
         images: [
           {
@@ -125,17 +124,17 @@ export default function BlogLayout({
       }}
     >
       <ArticleJsonLd
-        url={`https://honghong.me${router.asPath}`}
+        url={`https://philho.xyz${router.asPath}`}
         title={title}
         datePublished={date}
         modifiedTime={ISOModifiedTime}
         description={summary}
         authorName={{
-          name: '小康',
-          url: 'https://honghong.me',
+          name: 'Phil',
+          url: 'https://philho.xyz',
         }}
-        publisherLogo='https://honghong.me/static/images/logo/logo-black.png'
-        publisherName='小康'
+        publisherLogo='https://philho.xyz/static/images/logo/logo-black.png'
+        publisherName='Phil'
         type='Article'
         images={[ogImage]}
       />
@@ -165,7 +164,7 @@ export default function BlogLayout({
       <div className={classes.postBottom}>
         <div>
           <Link
-            href={editUrl(slug, locale)}
+            href={editUrl()}
             sx={() => ({
               fontSize: 14,
               color: dark ? 'white' : 'black',
@@ -212,7 +211,7 @@ export default function BlogLayout({
         </div>
       </div>
       <Divider mb={32} />
-      <Comment />
+      {/* <Comment /> */}
       <ReadingProgressBar />
       <ScrollTopAndComment />
     </Layout>

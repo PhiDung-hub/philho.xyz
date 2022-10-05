@@ -13,7 +13,7 @@ const siteMetadata = {
 export default function Footer() {
 
   return (
-    <footer className="w-5/6 md:w-3/5 max-w-[960px] self-center">
+    <footer className="w-5/6 md:w-3/5 max-w-[1260px] self-center">
       <Divider my='xl' />
       <div className="mt-5 flex flex-col items-center">
         <div className="flex mb-4 space-x-3">
@@ -23,7 +23,7 @@ export default function Footer() {
           <SocialIcon kind="twitter" href={siteMetadata.twitter} />
           <SocialIcon kind="instagram" href={siteMetadata.instagram} />
         </div>
-        <div className="mb-8 flex space-x-2 text-sm text-gray-500 dark:text-gray-400">
+        <div className="mb-8 flex space-x-2 text-sm text-gray-600 dark:text-gray-200">
           <div>{'Phil Ho '}</div>
           <div>{` © ${new Date().getFullYear()}`}</div>
         </div>

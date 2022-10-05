@@ -18,7 +18,7 @@ export const useStyles = createStyles((theme) => ({
     }`,
     height: HEADER_HEIGHT,
     padding: '0 30px',
-    maxWidth: 960,
+    maxWidth: 1260,
     margin: '0 auto',
 
     [theme.fn.largerThan('sm')]: {

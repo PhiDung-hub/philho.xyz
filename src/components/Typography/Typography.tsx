@@ -39,7 +39,7 @@ export default function Typography({ children }: PropsWithChildren) {
           },
         },
         '& a': {
-          color: dark ? '#fb5151' : '#f90606',
+          color: dark ? theme.colorScheme[6] : theme.colorScheme[1],
           fontWeight: 500,
           touchAction: 'manipulation',
           textDecoration: 'none !important',
@@ -47,7 +47,7 @@ export default function Typography({ children }: PropsWithChildren) {
           transition: 'border-color 0.3s ease 0s, color 0.3s ease 0s',
 
           '&:hover': {
-            borderBottomColor: '#ff3838',
+            borderBottomColor: theme.colors.blue[8],
           },
         },
         '& pre': {
@@ -84,22 +84,21 @@ export default function Typography({ children }: PropsWithChildren) {
           },
         },
         '& li::marker': {
-          color: dark ? '#fb5151' : '#f90606',
+          color: dark ? '#C84B31' : '#fb5150',
         },
         '& code': {
           lineHeight: '1.45rem',
           fontFamily: 'Fira Code, Noto Sans TC, Inter',
           borderRadius: 8,
-          color: dark ? '#fb6a6a' : '#f90606',
+          color: dark ? '#C84B31' : '#fb6a6a',
           backgroundColor: dark
             ? 'rgba(43, 48, 59, 0.6)'
             : 'rgba(240, 241, 244, 0.6)',
           padding: '2px 8px',
           fontSize: 14,
           border: `1px solid ${dark ? '#2b303b' : 'rgba(249, 6, 6, 0.05)'}`,
-          boxShadow: `0.5px 1px 1px ${
-            dark ? 'rgba(2, 2, 3, 0.33)' : 'rgba(201, 203, 207, 0.33)'
-          }`,
+          boxShadow: `0.5px 1px 1px ${dark ? 'rgba(2, 2, 3, 0.33)' : 'rgba(201, 203, 207, 0.33)'
+            }`,
         },
         '& :is(h2, h3)': {
           position: 'relative',

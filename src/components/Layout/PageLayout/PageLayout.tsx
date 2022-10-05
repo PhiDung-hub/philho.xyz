@@ -11,7 +11,7 @@ export default function PageLayout({
   const { classes } = useStyles()
 
   return (
-    <div className={classes.layout}>
+    <div className={classes.layout} style={{maxWidth:"1260px"}}>
       <Title order={1} className={classes.title}>
         {title}
       </Title>

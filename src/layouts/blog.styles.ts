@@ -5,7 +5,7 @@ export const useStyles = createStyles((theme) => ({
     fontWeight: 600,
     lineHeight: 1.6818,
     letterSpacing: 0,
-    color: theme.colorScheme === 'dark' ? '#e8e8fd' : '#04052f',
+    color: theme.colorScheme === 'dark' ? '#ECDBBA' : '#191919',
     fontSize: 32,
   },
 
@@ -39,7 +39,7 @@ export const useStyles = createStyles((theme) => ({
       width: '100%',
 
       [theme.fn.largerThan('lg')]: {
-        width: '40em',
+        width: '940px',
       },
     },
   },

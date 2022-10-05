@@ -6,6 +6,10 @@ export const useStyles = createStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    [theme.fn.largerThan('lg')]: {
+      width: "",
+      height: "",
+    }
   },
 
   title: {

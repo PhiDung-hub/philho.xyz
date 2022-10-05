@@ -11,7 +11,7 @@ export default function ScrollTopAndComment() {
       <Transition transition='slide-up' mounted={scroll.y > 0}>
         {(transitionStyles) => (
           <Stack spacing='xs' style={transitionStyles}>
-            <Button
+            {/*<Button
               onClick={() =>
                 scrollTo({
                   y: document.getElementById('comment').offsetTop - 60,
@@ -22,7 +22,7 @@ export default function ScrollTopAndComment() {
               radius='md'
             >
               <IconBrandHipchat size={25} />
-            </Button>
+            </Button>*/}
             <Button
               onClick={() => scrollTo({ y: 0 })}
               sx={{ width: 40, height: 40 }}
