@@ -20,7 +20,7 @@ export default function Header() {
   const items = ({ animation }) =>
     links.map((link, index) => (
       <Link key={index} href={link.href}>
-        <motion.a
+        <motion.div
           className={cx(classes.link, {
             [classes.linkActive]: asPath === link.href,
           })}
@@ -37,7 +37,7 @@ export default function Header() {
           }}
         >
           {link.text}
-        </motion.a>
+        </motion.div>
       </Link>
     ))
 

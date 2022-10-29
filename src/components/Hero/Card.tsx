@@ -54,7 +54,7 @@ hover:after:opacity-100 hover:after:animate-hue-animation h-full z-20`}
           >
             {!!imgSrc && (
               <NextImage
-                alt={title}
+                alt={title ?? "No title"}
                 src={imgSrc}
                 className='object-center'
                 width={imgWidth}

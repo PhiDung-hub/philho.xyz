@@ -56,9 +56,8 @@ export default function PostsList({ post }: { post: PostFrontMatter }) {
 
   return (
     <List.Item my={80}>
-      <Link href={`/blog/${slug}`}>
-        <motion.a
-          ref={ref}
+      <Link ref={ref} href={`/blog/${slug}`}>
+        <motion.div
           className={classes.article}
           initial='offscreen'
           whileInView='onscreen'
@@ -99,7 +98,7 @@ export default function PostsList({ post }: { post: PostFrontMatter }) {
             <Title order={2}>{title}</Title>
             <Text>{summary}</Text>
           </motion.div>
-        </motion.a>
+        </motion.div>
       </Link>
     </List.Item>
   )

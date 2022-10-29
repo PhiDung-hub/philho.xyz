@@ -22,9 +22,9 @@ module.exports = nextTranslate(
       ],
     },
 
-    experimental: {
-      appDir: true
-    },
+    /* experimental: { */
+    /*   appDir: true */
+    /* }, */
 
     // SVGR
     webpack(config) {

@@ -33,6 +33,7 @@ const CustomLink = React.forwardRef<
       <Link
         href={href}
         as={as}
+        ref={ref}
         replace={replace}
         scroll={scroll}
         shallow={shallow}
@@ -40,10 +41,9 @@ const CustomLink = React.forwardRef<
         prefetch={prefetch}
         locale={locale}
         legacyBehavior={legacyBehavior}
+        {...rest}
       >
-        <Anchor href={href} ref={ref} {...rest}>
-          {children}
-        </Anchor>
+        {children}
       </Link>
     )
   }

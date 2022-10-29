@@ -45,7 +45,7 @@ export default function Home({ posts }: { posts: PostFrontMatter[] }) {
             </motion.div>
           }
           noIcon
-          underline={false}
+          /* underline={false} */
         >
           {t('allPosts')}
         </Button>

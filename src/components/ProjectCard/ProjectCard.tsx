@@ -22,7 +22,7 @@ const ProjectsCard = ({ title, description, href }: ProjectCardProps) => {
         mt='md'
         radius='md'
         noIcon
-        underline={false}
+        /* underline={false} */
       >
         {t('visit')}
       </Button>
