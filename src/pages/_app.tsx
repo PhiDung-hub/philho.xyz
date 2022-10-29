@@ -39,7 +39,6 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
     themeTailwind(colorScheme);
   }, [colorScheme]);
 
-
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
 

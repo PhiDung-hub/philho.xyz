@@ -21,7 +21,6 @@ import { isProd } from '@/lib/isProduction'
 import { BlogPostProps } from '@/lib/types'
 import useScrollSpy from '@/hooks/useScrollspy'
 
-import Comment from '@/components/Comment'
 import Layout from '@/components/Layout'
 import Link from '@/components/Link'
 import ReadingProgressBar from '@/components/ReadingProgressBar'

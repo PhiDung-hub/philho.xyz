@@ -5,7 +5,7 @@ import CustomCard from './Card'
 const cards_data = {
   project: {
     title: 'Projects',
-    description: "Fun things I built for my personal use, might not be the best but It's improving. "
+    description: "Fun things that I'm working on."
   },
   blog: {
     title: 'Blog',
@@ -43,7 +43,7 @@ export default function Hero() {
               weight={500}
               color={dark ? theme.colors.gray[6] : theme.colors.gray[8]}
             >
-              A builder on Ethereum and Algorand
+              A builder on Ethereum.
             </Text>
           </div>
         </Grid.Col>

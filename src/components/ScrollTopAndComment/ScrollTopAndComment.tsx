@@ -1,6 +1,6 @@
 import { Affix, Button, Stack, Transition } from '@mantine/core'
 import { useWindowScroll } from '@mantine/hooks'
-import { IconArrowUp, IconBrandHipchat } from '@tabler/icons'
+import { IconArrowUp } from '@tabler/icons'
 import React from 'react'
 
 export default function ScrollTopAndComment() {

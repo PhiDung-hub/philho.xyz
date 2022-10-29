@@ -43,7 +43,7 @@ const Layout = (props: PropsWithChildren<NextSeoProps>) => {
       />
       <Header />
       <div className="flex min-h-[95vh] flex-col justify-between w-full items-start">
-        <Container className="w-screen px-6 sm:px-8 py-8 sm:py-9 max-w-[1260px]">
+        <Container className="w-screen px-6 sm:px-8 py-8 sm:py-9 lg:max-w-[1260px]">
           {props.children}
         </Container>
         <Footer />

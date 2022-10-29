@@ -1,0 +1,91 @@
+---
+title: Rust notes - 01
+date: '2021-02-18T00:00:00Z'
+modifiedTime: '2022-10-22T00:00:00Z'
+summary: Basics introduction about Rust set up
+image: 'rust/cover.webp'
+---
+
+## Introduction to Rust
+
+Rust is a programming language that helps you write faster and more reliable software. Through sophisticated design, Rust gives you low-level control without the hassle associated with it. Read the nice intro [here](https://doc.rust-lang.org/book/ch00-00-introduction.html)
+
+## Get started
+
+The most useful resource to kickstart rust development is [Rust book](https://doc.rust-lang.org/book/v)
+
+### If you run on Linux, MacOS, or any WSL2 Linux Distro
+
+For such Unix based platforms, rust installation is 1 click (or Ctrl-Shift-V) away. Copy and run this command in your terminal.
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+**Through out this tutorial, all commands will be explained in details. Ignore them if you just want to get things run**
+
+_The above command use `curl`, a Command Line Interface (CLI) tool to get data from URL via various potocol.
+For the command above, by looking at the flag, we can determine it run on [HTTPS](https://www.cloudflare.com/learning/ssl/what-is-https/)
+(`--proto '=https'`), using [TLS V1.2](https://datatracker.ietf.org/doc/html/rfc5246) security protocol (`--tlsv1.2`), run with silent,
+fail silent mode on target [https://sh.rust.rs](https://sh.rust.rs). This will download a bash script (`.sh`) then finally execute it
+using the pipe operator `|`. In the next parts of the series, I assume readers are familiar with `curl`. You can reference
+[Basic usage](https://everything.curl.dev/cmdline) and [flags](https://gist.github.com/eneko/dc2d8edd9a4b25c5b0725dd123f98b10) at any time._
+
+Most of the time, you will have `curl` installed by default (else, get your by following [this instruction](https://help.ubidots.com/en/articles/2165289-learn-how-to-install-run-curl-on-windows-macosx-linux)) and above command will get you `rustup`. Along side, you should be equipped with `cargo` and `rustc` then you are good to go. More about all these tools will be discussed in future series. For now, we know:
+
+- [`rustup`](https://rust-lang.github.io/rustup/) - Toolchain manager for rust programmign language, it enables you to switch between or update `rustc` & `cargo`.
+- [`cargo`](https://doc.rust-lang.org/cargo/) - The package manager for rust, similar to what `yarn` or `npm` do for `node.js`.
+- [`rustc`](https://doc.rust-lang.org/stable/rustc/) - The rust compiler, it producees binary code from your source code. This is similar `gcc/g++` for C++, most of the time you don't invoke it directly but rather run & build rust program through a build tool (like `cmake`). For rust, our friend is `cargo`.
+
+### If you prefer Windows but not WSL2
+
+Won't be that hard, download the installer by following [this instruction](https://www.rust-lang.org/tools/install). You should be ready in no time.
+
+### If you want to build from source
+
+Clone the rustup repo [here](https://github.com/rust-lang/rustup). If you didn't have `cargo`, double check `rustup-init.sh` script, execute it, then `cargo run --release`, else just run the command. More info [here](https://rust-lang.github.io/rustup/installation/other.html#msvc). **Becareful! This will supersede any pre-existing tools chains**.
+
+## What's to expect?
+
+We will scan through some of important concepts & features of Rust. A good place to references is [Rust standard library](https://doc.rust-lang.org/stable/std)
+
+### String
+
+At least multiple types of strings in Rust.
+
+1. `str` - string slice, we don't normally use this, [refence here](https://doc.rust-lang.org/std/primitive.str.html)
+2. `&str` - borrowed string slice, made up of a pointer to an array of bytes. Data in `&str` is immutable. String CAN'T be index by
+   character position (because Unicode characters may contain multiple bytes, what display is unicode graphemes instead of scalar/utf-8).
+3. `String` - a vector of bytes, contains data, len, and capacity. Data in `String` is mutable.
+
+| Example  | Description       | Rules |
+| -------- | ----------------- | ----- |
+| $value   | Lowercase         | ✅    |
+| $Value   | Uppercase         | ✅    |
+| $\_value | Underscore        | ✅    |
+| $1value  | Start from number | ❌    |
+
+### Ownership
+
+Ownership is what makes Rust compiler run on steroids. It's one of the safest system programming languages out there. There are 3 rules regarding ownership:
+
+1. Each value has an owner
+2. Only one owner - it can be borrowed.
+3. If lifetime of value expired (go out of scope), it ownership is dropped.
+
+An example of ownership:
+
+```rust
+int main() {
+  let s1 = String::from("hello");
+  let s2 = s1; // Value is moved here
+  // println!("{}", s1); // Invalid since s2 ownerd the value now
+  print("{}", s2); // This is ok
+}
+```
+
+By applying
+
+## References
+
+- [O'Reilly rust crash course](https://learning.oreilly.com/videos/ultimate-rust-crash/9781800563902/)

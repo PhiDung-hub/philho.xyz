@@ -41,7 +41,7 @@ const CustomLink = React.forwardRef<
         locale={locale}
         legacyBehavior={legacyBehavior}
       >
-        <Anchor ref={ref} {...rest}>
+        <Anchor href={href} ref={ref} {...rest}>
           {children}
         </Anchor>
       </Link>

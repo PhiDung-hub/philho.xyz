@@ -14,7 +14,7 @@ import Layout from '@/components/Layout'
 import Link from '@/components/Link'
 import PostsList from '@/components/PostsList'
 
-export const MAX_DISPLAY = 3
+export const MAX_DISPLAY = 5
 
 export default function Home({ posts }: { posts: PostFrontMatter[] }) {
   const { t } = useTranslation('common')
