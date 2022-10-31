@@ -14,7 +14,8 @@ import Image, { ImageProps } from 'next/image'
 import React from 'react'
 
 import CustomLink from '@/components/Link'
-import Pre from '@/components/Pre'
+
+import Pre from './Pre'
 
 const PostImage = (props: ImageProps) => (
   <Box

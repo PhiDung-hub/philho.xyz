@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 
 import { useStyles } from '@/components/Layout/Header/HeaderLogo/HeaderLogo.styles'
@@ -8,7 +9,8 @@ export default function HeaderLogo() {
 
   return (
     <Link href='/' className={classes.link}>
-      <span className={classes.text}>Phil Ho</span>
+      <Image src="/static/images/blog.png" width="48" height="48" alt="Logo image"/>
+      <span className={classes.text}>Phil.dev</span>
     </Link>
   )
 }

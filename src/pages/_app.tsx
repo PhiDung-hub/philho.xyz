@@ -6,7 +6,6 @@ import {
 } from '@mantine/core'
 import { useHotkeys, useLocalStorage } from '@mantine/hooks'
 import { ModalsProvider } from '@mantine/modals'
-import { NotificationsProvider } from '@mantine/notifications'
 import { SpotlightProvider } from '@mantine/spotlight'
 import { IconSearch } from '@tabler/icons'
 import type { AppProps } from 'next/app'
@@ -18,6 +17,30 @@ import '@/styles/globals.css'
 
 import { links } from '@/components/Layout/Header/links'
 
+const navy: [
+  string?,
+  string?,
+  string?,
+  string?,
+  string?,
+  string?,
+  string?,
+  string?,
+  string?,
+  string?
+] = [
+    '#e8f2ff',
+    '#c8d6ea',
+    '#a7bad7',
+    '#859ec6',
+    '#6383b5',
+    '#4a699c',
+    '#39527a',
+    '#283a58',
+    '#162337',
+    '#030c18',
+  ]
+
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -27,18 +50,17 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   })
   const router = useRouter()
   const themeTailwind = (theme: ColorScheme) => {
-    const root = window.document.documentElement.classList;
+    const root = window.document.documentElement.classList
     if (theme === 'dark') {
-      root.add('dark');
+      root.add('dark')
     } else {
       root.remove('dark')
     }
   }
 
   useEffect(() => {
-    themeTailwind(colorScheme);
-  }, [colorScheme]);
-
+    themeTailwind(colorScheme)
+  }, [colorScheme])
 
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'))
@@ -74,7 +96,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
             fontFamily:
               'Sora,Noto Sans TC,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
             colors: {
-              'navy': ['#e8f2ff', '#c8d6ea', '#a7bad7', '#859ec6', '#6383b5', '#4a699c', '#39527a', '#283a58', '#162337', '#030c18']
+              navy,
             },
             primaryColor: 'blue',
             breakpoints: {
@@ -87,46 +109,46 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           }}
         >
           <ModalsProvider>
-            <NotificationsProvider>
-              <SpotlightProvider
-                searchIcon={<IconSearch size={18} />}
-                searchPlaceholder='Search'
-                shortcut={['mod + k', 'mod + p']}
-                nothingFoundMessage='Nothing found ☹'
-                actions={Actions()}
-                radius='md'
-                highlightQuery
-              >
-                <Global
-                  styles={(theme) => ({
-                    html: {
-                      scrollBehavior: 'smooth',
-                    },
-                    '::selection': {
-                      background: theme.colorScheme === "dark" ? 'rgb(45, 66, 99, 0.5)' : "rgb(45, 66, 99, 0.9)",
-                      color: theme.colorScheme === "dark" ? "#ECDBBA" : "#ECDBBA",
-                    },
-                    '::-webkit-scrollbar': {
-                      width: 10,
-                      height: 5,
-                    },
-                    '::-webkit-scrollbar-thumb': {
-                      background: '#2D4263',
-                      transition: '0.25s',
-                      borderRadius: 5,
-                    },
-                    '::-webkit-scrollbar-track': {
-                      background: '0 0',
-                    },
-                    'input:-webkit-autofill, input:-webkit-autofill:focus': {
-                      transition:
-                        'background-color 600000s 0s, color 600000s 0s',
-                    },
-                  })}
-                />
-                <Component {...pageProps} />
-              </SpotlightProvider>
-            </NotificationsProvider>
+            <SpotlightProvider
+              searchIcon={<IconSearch size={18} />}
+              searchPlaceholder='Search'
+              shortcut={['mod + k', 'mod + p']}
+              nothingFoundMessage='Nothing found ☹'
+              actions={Actions()}
+              radius='md'
+              highlightQuery
+            >
+              <Global
+                styles={(theme) => ({
+                  html: {
+                    scrollBehavior: 'smooth',
+                  },
+                  '::selection': {
+                    background:
+                      theme.colorScheme === 'dark'
+                        ? 'rgb(45, 66, 99, 0.5)'
+                        : 'rgb(45, 66, 99, 0.9)',
+                    color: theme.colorScheme === 'dark' ? '#ECDBBA' : '#ECDBBA',
+                  },
+                  '::-webkit-scrollbar': {
+                    width: 10,
+                    height: 5,
+                  },
+                  '::-webkit-scrollbar-thumb': {
+                    background: '#2D4263',
+                    transition: '0.25s',
+                    borderRadius: 5,
+                  },
+                  '::-webkit-scrollbar-track': {
+                    background: '0 0',
+                  },
+                  'input:-webkit-autofill, input:-webkit-autofill:focus': {
+                    transition: 'background-color 600000s 0s, color 600000s 0s',
+                  },
+                })}
+              />
+              <Component {...pageProps} />
+            </SpotlightProvider>
           </ModalsProvider>
         </MantineProvider>
       </ColorSchemeProvider>

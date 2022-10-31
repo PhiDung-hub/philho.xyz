@@ -13,7 +13,8 @@ export const useStyles = createStyles((theme) => ({
   },
   text: {
     color: theme.colorScheme === 'dark' ? 'white' : 'black',
-    lineHeight: '28px',
-    fontWeight: 300,
+    lineHeight: '40px',
+    fontSize: 24,
+    fontWeight: 800,
   },
 }))

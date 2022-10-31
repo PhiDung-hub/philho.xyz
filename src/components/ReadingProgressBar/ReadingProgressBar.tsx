@@ -16,5 +16,5 @@ export default function ReadingProgressBar() {
     return () => window.removeEventListener('scroll', scrollHeight)
   })
 
-  return <NavigationProgress autoReset={false} transitionDuration={0} />
+  return <NavigationProgress autoReset={false} transitionDuration={1} />
 }

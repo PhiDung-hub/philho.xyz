@@ -28,11 +28,17 @@ export default async function handler(
     }
 
     if (req.method === 'GET') {
-      const views = await prisma.views.findUnique({
+      let views = await prisma.views.findUnique({
         where: {
           slug,
         },
       })
+
+      if (!views) {
+        views = await prisma.views.create({
+          data: { slug, count: 0 },
+        })
+      }
 
       return res.status(200).json({ total: views.count.toString() })
     }
