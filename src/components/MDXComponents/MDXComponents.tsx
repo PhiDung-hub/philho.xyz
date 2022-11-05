@@ -28,7 +28,7 @@ const PostImage = (props: ImageProps) => (
   >
     <Center>
       <Image
-        alt={props.alt ?? "No title"}
+        alt={props.alt ?? 'No title'}
         src={props.src}
         blurDataURL={`/_next/image?url=${props.src}&w=16&q=1`}
         placeholder='blur'
