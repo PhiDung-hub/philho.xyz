@@ -1,23 +1,24 @@
 import { Container } from '@mantine/core'
 import { useRouter } from 'next/router'
-import { NextSeo, NextSeoProps } from 'next-seo'
+import { NextSeo } from 'next-seo'
 import useTranslation from 'next-translate/useTranslation'
-import React, { PropsWithChildren } from 'react'
+import React  from 'react'
 
 import { Favicons } from './Favicons'
 import Footer from './Footer'
 import Header from './Header'
+import {LayoutType} from "./types"
 
-
-const Layout = (props: PropsWithChildren<NextSeoProps>) => {
+const Layout: React.FC<LayoutType> = (props) => {
   const { t } = useTranslation('common')
   const router = useRouter()
 
   return (
     <>
       <NextSeo
-        defaultTitle='Phil Ho – Developer'
-        description={t('Seo.defaultDesc')}
+        defaultTitle='Phil Ho'
+        title={props.title}
+        description={props.description ?? ('Seo.defaultDesc')}
         canonical={`https://philho.xyz${router.asPath}`}
         twitter={{
           cardType: 'summary_large_image',
@@ -39,11 +40,10 @@ const Layout = (props: PropsWithChildren<NextSeoProps>) => {
           ],
         }}
         additionalLinkTags={[...Favicons]}
-        {...props}
       />
       <Header />
-      <div className="flex min-h-[95vh] flex-col justify-between w-full items-start">
-        <Container className="w-screen px-6 sm:px-8 py-8 sm:py-9 lg:max-w-[1260px]">
+      <div className='flex min-h-[95vh] flex-col justify-between w-full items-start'>
+        <Container className='w-screen px-6 sm:px-8 py-8 sm:py-9 lg:max-w-[1260px]'>
           {props.children}
         </Container>
         <Footer />

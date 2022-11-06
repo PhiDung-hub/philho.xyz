@@ -5,14 +5,14 @@ const createSitemap = (
 ) => `<?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
         ${slugs
-          .map((slug) => {
-            return `
+    .map((slug) => {
+      return `
                 <url>
                     <loc>${`https://honghong.me/${formatSlug(slug)}`}</loc>
                 </url>
             `
-          })
-          .join('')}
+    })
+    .join('')}
     </urlset>
 `
 
