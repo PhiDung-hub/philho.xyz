@@ -1,0 +1,44 @@
+---
+title: The ERC777 Token
+date: '2022-10-05T00:00:00Z'
+modifiedTime: '2022-11-08T00:00:00Z'
+summary: ERC777 - tokens, ERC20, and beyond
+image: 'nvim/cover.webp'
+---
+
+
+## What is ERC777
+
+ERC777 is an upgraded token standard and it is fully backward compatible with the well-known ERC20 token standard.
+
+### Sending ETH + Data
+
+ERC20 - `token.transfer(receiver, amount)` has been upgraded to ERC777 - `token.send(receiver, amount, "")`. This make a token transfer event resemble an ETH 
+[`send()`](https://docs.soliditylang.org/en/v0.7.4/types.html#members-of-addresses) where we could send arbitrary data along with the transfer. This can be utilized to 
+adds functionalities when needed. In regular situation, it sgiykd be leave empty.
+
+## Registry (EIP-1820)
+
+This new [EIP-1820](https://eips.ethereum.org/EIPS/eip-1820) standard was created to enable <strong>hooks</strong> functionality, a major feature of ERC777 tokens. 
+For the reason for EIP1820 to exists, let's take a look at the very problem it solves - INSTROPECTION
+
+1. Smart contracts & regular account should be able to publish which functions (or standards) they support, either directly or via a proxy contract.
+2. Anyone can register an interface for their own account.
+
+<strong>&#8594; [1] is partly available & [2] is fully unavailable in ERC165. Futhermore, the registry contract also act as an ERC165 cache.
+The universal address in every Ethereum network for this registry contract is `0x1820a4b7618bde71dce8cdc73aab6c95905fad24`</strong>
+
+Two important functions of this contract is `setInterfaceImplementer(address _addr, bytes32 _interfaceHash, address _implement)` and 
+`getInterfaceImplementer(address _addr, bytes32 _interfaceHash) return (address)`
+
+## ERC777 hooks
+
+A hook = a callback functions which is executed every transfer event (<i>send from</i> and/or <i>transfer to</i>) happens for a specific address. 
+This is widely used to prevent accidental burning to wrong address (in case of ERC20, it's sending token to a contract address).
+In order to register for hooks, contracts operate with ERC777 must implement `ERC777TokensSender` and/or `ERC777TokensRecipient` interface.
+
+## A working example 
+
+
+
+

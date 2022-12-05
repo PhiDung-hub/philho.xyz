@@ -29,17 +29,17 @@ const navy: [
   string?,
   string?
 ] = [
-    '#e8f2ff',
-    '#c8d6ea',
-    '#a7bad7',
-    '#859ec6',
-    '#6383b5',
-    '#4a699c',
-    '#39527a',
-    '#283a58',
-    '#162337',
-    '#030c18',
-  ]
+  '#e8f2ff',
+  '#c8d6ea',
+  '#a7bad7',
+  '#859ec6',
+  '#6383b5',
+  '#4a699c',
+  '#39527a',
+  '#283a58',
+  '#162337',
+  '#030c18',
+]
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props

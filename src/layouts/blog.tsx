@@ -210,7 +210,6 @@ export default function BlogLayout({
         </div>
       </div>
       {/* <Divider mb={32} /> */}
-      {/* <Comment /> */}
       <ReadingProgressBar />
       <ScrollTopAndComment />
     </Layout>
