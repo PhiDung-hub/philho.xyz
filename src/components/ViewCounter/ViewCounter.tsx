@@ -4,10 +4,9 @@ import useTranslation from 'next-translate/useTranslation'
 import React from 'react'
 import useSWR from 'swr'
 
-import fetcher from '@/lib/fetcher'
-
 import { Views } from '@/components/Metrics/types'
 import { ViewCounterTypes } from '@/components/ViewCounter/types'
+import fetcher from '@/lib/fetcher'
 
 export default function ViewCounter({
   slug,

@@ -16,23 +16,25 @@ const components = {
   instagram: Instagram,
 }
 
-const SocialIcon = ({ kind, href}) => {
-  if (!href || (kind === 'mail' && !/^mailto:\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/.test(href)))
+const SocialIcon = ({ kind, href }) => {
+  if (
+    !href ||
+    (kind === 'mail' &&
+      !/^mailto:\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/.test(href))
+  )
     return null
 
   const SocialSvg = components[kind]
 
   return (
     <a
-      className="text-sm text-gray-500 transition hover:text-gray-600"
-      target="_blank"
-      rel="noopener noreferrer"
+      className='text-sm text-gray-500 transition hover:text-gray-600'
+      target='_blank'
+      rel='noopener noreferrer'
       href={href}
     >
-      <span className="sr-only">{kind}</span>
-      <SocialSvg
-        className="fill-current text-blue-500 dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 h-[20px] w-[20px]"
-      />
+      <span className='sr-only'>{kind}</span>
+      <SocialSvg className='fill-current text-blue-500 dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 h-[20px] w-[20px]' />
     </a>
   )
 }

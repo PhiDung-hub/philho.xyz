@@ -3,8 +3,8 @@ import { IconExternalLink } from '@tabler/icons'
 import Link, { LinkProps } from 'next/link'
 import React from 'react'
 
-import { useStyles } from '@/components/Link/Link.styles'
 import { CustomLinkProps } from '@/components/Link/types'
+import { useStyles } from './Link.styles'
 
 const CustomLink = React.forwardRef<
   HTMLAnchorElement,

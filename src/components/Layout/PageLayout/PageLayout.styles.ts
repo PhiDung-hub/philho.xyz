@@ -7,9 +7,9 @@ export const useStyles = createStyles((theme) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     [theme.fn.largerThan('lg')]: {
-      width: "",
-      height: "",
-    }
+      width: '',
+      height: '',
+    },
   },
 
   title: {

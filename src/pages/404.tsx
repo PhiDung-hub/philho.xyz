@@ -51,9 +51,9 @@ const useStyles = createStyles((theme) => ({
   },
 }))
 
-export default function FourZeroFour() {
+export default function Custom404() {
   const { classes } = useStyles()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   return (
     <Layout>

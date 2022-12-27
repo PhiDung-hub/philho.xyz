@@ -1,28 +1,31 @@
 import { Grid } from '@mantine/core'
-import { useRouter } from 'next/router'
 import useTranslation from 'next-translate/useTranslation'
-
-import { ProjectData } from '@/lib/types'
+import { useRouter } from 'next/router'
 
 import Layout from '@/components/Layout'
 import PageLayout from '@/components/Layout/PageLayout'
 import ProjectsCard from '@/components/ProjectCard'
 
+type ProjectData = {
+  title: string
+  description: string
+  href: string
+}
+
+type ProjectDataWithLocale = {
+  [key: string]: ProjectData[]
+}
+
 export default function Projects() {
   const { locale } = useRouter()
   const { t } = useTranslation('common')
 
-  const projectsData: ProjectData = {
+  const projectsData: ProjectDataWithLocale = {
     en: [
       {
         title: 'Personal portfolio',
         description: `Share my knowledge and experience`,
         href: '',
-      },
-      {
-        title: 'Kanban board',
-        description: "Kanban board while I'm working alone",
-        href: '/',
       },
     ],
   }
@@ -30,9 +33,9 @@ export default function Projects() {
   return (
     <Layout title='Projects' description={t('Seo.projectsDesc')}>
       <PageLayout title='Projects' description={t('Seo.projectsDesc')}>
-        <Grid >
-          {projectsData[locale]?.map((data) => (
-            <Grid.Col key={data.title} span={12} md={6}>
+        <Grid>
+          {projectsData[locale ?? 'en']?.map((data: ProjectData, idx: number) => (
+            <Grid.Col key={`projects-${idx}`} span={12} md={6}>
               <ProjectsCard
                 title={data.title}
                 description={data.description}

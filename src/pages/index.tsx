@@ -5,19 +5,17 @@ import { motion } from 'framer-motion'
 import { GetStaticProps } from 'next'
 import useTranslation from 'next-translate/useTranslation'
 import React from 'react'
-
-import { getAllPosts } from '@/lib/mdx'
-import { PostFrontMatter } from '@/lib/types'
-
 import Hero from '@/components/Hero'
 import Layout from '@/components/Layout'
 import Link from '@/components/Link'
 import PostsList from '@/components/PostsList'
+import { getAllPosts } from '@/lib/mdx'
+import { PostFrontMatter } from '@/lib/types'
 
 export const MAX_DISPLAY = 5
 
 export default function Home({ posts }: { posts: PostFrontMatter[] }) {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const { hovered, ref } = useHover<HTMLAnchorElement>()
 
   return (
@@ -25,14 +23,14 @@ export default function Home({ posts }: { posts: PostFrontMatter[] }) {
       <div>
         <div>
           <Hero />
-          <Title order={2}>{t('latestPosts')}</Title>
+          <Title order={3}>{t('latestPosts')}</Title>
         </div>
         <Divider my='xl' />
-        <List listStyleType='none'>
-          {posts.map((post) => (
-            <PostsList key={post.slug} post={post} />
-          ))}
-        </List>
+        {/* <List listStyleType='none'> */}
+        {/*   {posts.map((post) => ( */}
+        {/*     <PostsList key={post.slug} post={post} /> */}
+        {/*   ))} */}
+        {/* </List> */}
       </div>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
@@ -45,7 +43,6 @@ export default function Home({ posts }: { posts: PostFrontMatter[] }) {
             </motion.div>
           }
           noIcon
-          /* underline={false} */
         >
           {t('allPosts')}
         </Button>
@@ -55,7 +52,8 @@ export default function Home({ posts }: { posts: PostFrontMatter[] }) {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const posts = getAllPosts(locale).slice(0, MAX_DISPLAY)
+  /* const posts = getAllPosts(locale).slice(0, MAX_DISPLAY) */
+  const posts = null
 
   return {
     props: { posts },

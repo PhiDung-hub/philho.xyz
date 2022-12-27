@@ -5,11 +5,11 @@ import CustomCard from './Card'
 const cards_data = {
   project: {
     title: 'Projects',
-    description: "Fun things that I'm working on.",
+    description: "Things I'm working (worked) on.",
   },
   blog: {
     title: 'Blog',
-    description: 'Things that worth writing down.\n\n\n',
+    description: 'Things I noted down.',
   },
 }
 
@@ -42,10 +42,11 @@ export default function Hero() {
               weight={500}
               color={dark ? theme.colors.gray[6] : theme.colors.gray[8]}
             >
-              A builder on Ethereum.
+              Software Developer & DeFi Researcher from Singapore
             </Text>
           </div>
         </Grid.Col>
+
         <Grid.Col span={12} md={6}>
           <CustomCard
             title={cards_data.project.title}
@@ -54,11 +55,12 @@ export default function Hero() {
             className='py-4 md:px-4'
           />
         </Grid.Col>
+
         <Grid.Col span={12} md={6}>
           <CustomCard
             title={cards_data.blog.title}
             description={cards_data.blog.description}
-            href='/project'
+            href='/blog'
             className='py-4 md:px-4'
           />
         </Grid.Col>

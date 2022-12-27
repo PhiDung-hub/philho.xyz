@@ -1,13 +1,13 @@
 import { Container } from '@mantine/core'
-import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import useTranslation from 'next-translate/useTranslation'
-import React  from 'react'
+import { useRouter } from 'next/router'
+import React from 'react'
 
 import { Favicons } from './Favicons'
 import Footer from './Footer'
 import Header from './Header'
-import {LayoutType} from "./types"
+import { LayoutType } from './types'
 
 const Layout: React.FC<LayoutType> = (props) => {
   const { t } = useTranslation('common')
@@ -18,7 +18,7 @@ const Layout: React.FC<LayoutType> = (props) => {
       <NextSeo
         defaultTitle='Phil Ho'
         title={props.title}
-        description={props.description ?? ('Seo.defaultDesc')}
+        description={props.description ?? 'Seo.defaultDesc'}
         canonical={`https://philho.xyz${router.asPath}`}
         twitter={{
           cardType: 'summary_large_image',

@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  Alert as MantineAlert,
   AlertProps,
   Blockquote,
   Box,
   Center,
   Kbd,
+  Alert as MantineAlert,
   Table,
   TableProps,
   Text,
 } from '@mantine/core'
-import Image, { ImageProps } from 'next/image'
+import NextImage, { ImageProps } from 'next/image'
 import React from 'react'
+/* import { Components, TinaMarkdown, TinaMarkdownContent } from 'tinacms/dist/rich-text'; */
 
 import CustomLink from '@/components/Link'
 
@@ -27,9 +27,7 @@ const PostImage = (props: ImageProps) => (
     }}
   >
     <Center>
-      <Image
-        alt={props.alt ?? 'No title'}
-        src={props.src}
+      <NextImage
         blurDataURL={`/_next/image?url=${props.src}&w=16&q=1`}
         placeholder='blur'
         {...props}

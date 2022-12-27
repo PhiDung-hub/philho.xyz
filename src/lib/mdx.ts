@@ -1,18 +1,18 @@
-import fs from 'fs'
 import matter from 'gray-matter'
 import { s } from 'hastscript'
 import { serialize } from 'next-mdx-remote/serialize'
-import path from 'path'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
+import fs from 'fs'
+import path from 'path'
 
 import remarkImgToJsx from '@/lib/remark-img-to-jsx'
 import { FileType, PostItems } from '@/lib/types'
 
 const root = process.cwd()
 
-const FILE_PATH = path.join(root, 'src', 'data')
+const FILE_PATH = path.join(root, 'posts')
 
 export const dateSortDesc = (a: string, b: string) => {
   if (a > b) return -1
@@ -22,7 +22,7 @@ export const dateSortDesc = (a: string, b: string) => {
 
 export const formatSlug = (slug: string) => slug.replace(/\.mdx$/, '')
 
-export async function mdxToHtml(source: string, data: PostItems) {
+async function mdxToHtml(source: string, data: PostItems) {
   const mdxSource = await serialize(source, {
     mdxOptions: {
       remarkPlugins: [remarkGfm, remarkImgToJsx],
@@ -96,7 +96,7 @@ export const getContentBySlug = async (
 export const getAllPosts = (locale: string) => {
   const slugs = getFileSlugs('blog', locale)
 
-  const allFrontMatter = []
+  const allFrontMatter: any = []
 
   slugs.forEach((slug) => {
     const source = fs.readFileSync(
@@ -113,5 +113,5 @@ export const getAllPosts = (locale: string) => {
     })
   })
 
-  return allFrontMatter.sort((a, b) => dateSortDesc(a.date, b.date))
+  return allFrontMatter.sort((a: any, b: any) => dateSortDesc(a.date, b.date))
 }

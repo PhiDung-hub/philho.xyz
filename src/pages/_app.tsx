@@ -8,9 +8,9 @@ import { useHotkeys, useLocalStorage } from '@mantine/hooks'
 import { ModalsProvider } from '@mantine/modals'
 import { SpotlightProvider } from '@mantine/spotlight'
 import { IconSearch } from '@tabler/icons'
+import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
-import { SessionProvider } from 'next-auth/react'
 import { useEffect } from 'react'
 
 import '@/styles/globals.css'
@@ -133,15 +133,17 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
                   '::-webkit-scrollbar': {
                     width: 10,
                     height: 5,
+                    background: 'auto',
                   },
                   '::-webkit-scrollbar-thumb': {
-                    background: '#2D4263',
-                    transition: '0.25s',
-                    borderRadius: 5,
+                    background:
+                      theme.colorScheme === 'dark' ? '#2D4263' : '#444444',
+                    /* transition: '0.25s', */
+                    borderRadius: 2,
                   },
-                  '::-webkit-scrollbar-track': {
-                    background: '0 0',
-                  },
+                  /* '::-webkit-scrollbar-track': { */
+                  /*   background: '0 0', */
+                  /* }, */
                   'input:-webkit-autofill, input:-webkit-autofill:focus': {
                     transition: 'background-color 600000s 0s, color 600000s 0s',
                   },

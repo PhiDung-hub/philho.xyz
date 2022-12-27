@@ -7,7 +7,7 @@ import { PostFrontMatter } from '@/lib/types'
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const feed = new RSS({
     title: 'Phil Ho Portfolio',
-    description: "Blog and personal website",
+    description: 'Blog and personal website',
     site_url: 'https://honghong.me',
     feed_url: 'https://honghong.me/feed.en.xml',
     language: 'en',

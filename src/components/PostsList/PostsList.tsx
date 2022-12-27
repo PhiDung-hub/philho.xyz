@@ -6,10 +6,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 
+import { useStyles } from '@/components/PostsList/PostsList.styles'
 import formatDate from '@/lib/formatDate'
 import { PostFrontMatter } from '@/lib/types'
-
-import { useStyles } from '@/components/PostsList/PostsList.styles'
 
 import ViewCounter from '../ViewCounter'
 

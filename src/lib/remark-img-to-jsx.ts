@@ -1,7 +1,7 @@
-import fs from 'fs'
 import sizeOf from 'image-size'
 import { Node, Parent } from 'unist'
 import { visit } from 'unist-util-visit'
+import fs from 'fs'
 
 import { ImageNode } from '@/lib/types'
 

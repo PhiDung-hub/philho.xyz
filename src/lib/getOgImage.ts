@@ -1,9 +1,8 @@
+import puppeteer from 'puppeteer'
 import { createHash } from 'crypto'
 import fs from 'fs'
-import puppeteer from 'puppeteer'
 
 import { isProd } from '@/lib/isProduction'
-
 
 export const getOgImage = async (
   path: string,

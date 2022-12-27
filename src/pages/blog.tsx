@@ -3,12 +3,11 @@ import { GetStaticProps } from 'next'
 import useTranslation from 'next-translate/useTranslation'
 import React from 'react'
 
-import { getAllPosts } from '@/lib/mdx'
-import { PostFrontMatter } from '@/lib/types'
-
 import Layout from '@/components/Layout'
 import PageLayout from '@/components/Layout/PageLayout'
 import PostsList from '@/components/PostsList'
+import { getAllPosts } from '@/lib/mdx'
+import { PostFrontMatter } from '@/lib/types'
 
 export default function Blog({ posts }: { posts: PostFrontMatter[] }) {
   const { t } = useTranslation('common')
@@ -28,7 +27,9 @@ export default function Blog({ posts }: { posts: PostFrontMatter[] }) {
           placeholder='Search'
           type='text'
           aria-label={t('search')}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchValue(e.target.value)
+          }
         />
         <List listStyleType='none'>
           {!filteredPosts.length && (
@@ -45,10 +46,10 @@ export default function Blog({ posts }: { posts: PostFrontMatter[] }) {
   )
 }
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const posts = getAllPosts(locale)
-
-  return {
-    props: { posts },
-  }
-}
+/* export const getStaticProps: GetStaticProps = async ({ locale }) => { */
+/*   const posts = getAllPosts(locale) */
+/**/
+/*   return { */
+/*     props: { posts }, */
+/*   } */
+/* } */

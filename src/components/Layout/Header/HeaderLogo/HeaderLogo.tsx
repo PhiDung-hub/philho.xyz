@@ -9,7 +9,12 @@ export default function HeaderLogo() {
 
   return (
     <Link href='/' className={classes.link}>
-      <Image src="/static/images/blog.png" width="48" height="48" alt="Logo image"/>
+      <Image
+        src='/static/images/blog.png'
+        width='48'
+        height='48'
+        alt='Logo image'
+      />
       <span className={classes.text}>Phil.dev</span>
     </Link>
   )

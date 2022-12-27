@@ -1,16 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GetStaticProps } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
-
-import { getContentBySlug } from '@/lib/mdx'
-import { PageFrontMatter } from '@/lib/types'
 
 import Layout from '@/components/Layout'
 import PageLayout from '@/components/Layout/PageLayout'
 import MDXComponents from '@/components/MDXComponents'
 import Typography from '@/components/Typography'
+import { getContentBySlug } from '@/lib/mdx'
+import { PageFrontMatter } from '@/lib/types'
 
-export default function About({ page }) {
+export default function About({ page }: { page: any }) {
   const { title, description } = page.frontMatter as PageFrontMatter
 
   return (
@@ -32,7 +30,7 @@ export default function About({ page }) {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const page = await getContentBySlug('page', 'about' as string, locale)
+  const page = await getContentBySlug('page', 'about' as string, locale as any)
 
   return {
     props: { page },

@@ -97,8 +97,9 @@ export default function Typography({ children }: PropsWithChildren) {
           padding: '2px 8px',
           fontSize: 14,
           border: `1px solid ${dark ? '#2b303b' : 'rgba(249, 6, 6, 0.05)'}`,
-          boxShadow: `0.5px 1px 1px ${dark ? 'rgba(2, 2, 3, 0.33)' : 'rgba(201, 203, 207, 0.33)'
-            }`,
+          boxShadow: `0.5px 1px 1px ${
+            dark ? 'rgba(2, 2, 3, 0.33)' : 'rgba(201, 203, 207, 0.33)'
+          }`,
         },
         '& :is(h2, h3)': {
           position: 'relative',

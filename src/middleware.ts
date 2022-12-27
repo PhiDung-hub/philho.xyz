@@ -1,7 +1,7 @@
 import type { NextFetchEvent, NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
-export async function middleware(_req: NextRequest, _ev: NextFetchEvent) {
+export async function middleware(req: NextRequest, _ev: NextFetchEvent) {
   const ContentSecurityPolicy = `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app *.honghong.me data:;
@@ -20,17 +20,35 @@ export async function middleware(_req: NextRequest, _ev: NextFetchEvent) {
     ContentSecurityPolicy.replace(/\n/g, '')
   )
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  response.headers.set(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=()'
-  )
-  response.headers.set(
-    'Strict-Transport-Security',
-    'max-age=31536000; includeSubDomains; preload'
-  )
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-DNS-Prefetch-Control', 'on')
+  /* response.headers.set( */
+  /*   'Permissions-Policy', */
+  /*   'camera=(), microphone=(), geolocation=()' */
+  /* ) */
+  /* response.headers.set( */
+  /*   'Strict-Transport-Security', */
+  /*   'max-age=31536000; includeSubDomains; preload' */
+  /* ) */
+  /*   response.headers.set('X-Frame-Options', 'DENY') */
+  /*   response.headers.set('X-Content-Type-Options', 'nosniff') */
+  /*   response.headers.set('X-DNS-Prefetch-Control', 'on') */
 
-  return response
+  const { pathname } = req.nextUrl;
+
+  const node_env = process.env.NODE_ENV;
+  const baseURL = node_env === 'production' ? 'https://pharma-interface.vercel.app' : 'http://localhost:3000';
+
+  if (pathname === '/admin') {
+    return NextResponse.redirect(`${baseURL}/admin/index.html`);
+  }
+
+  if (pathname === '/product') {
+    return NextResponse.redirect(`${baseURL}/product/medicalEquipment`);
+  }
+
+  if (pathname === '/blog') {
+    return NextResponse.redirect(`${baseURL}/blog/health`);
+  }
+
+  return response;
+
 }

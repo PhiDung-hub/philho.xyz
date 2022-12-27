@@ -1,9 +1,9 @@
 import { Button, Menu, Tooltip } from '@mantine/core'
 import { useLocalStorage } from '@mantine/hooks'
 import { IconChevronDown, IconLanguage } from '@tabler/icons'
-import { useRouter } from 'next/router'
 import setLanguage from 'next-translate/setLanguage'
 import useTranslation from 'next-translate/useTranslation'
+import { useRouter } from 'next/router'
 import React from 'react'
 
 import { useStyles } from '@/components/Layout/Header/Header.styles'
