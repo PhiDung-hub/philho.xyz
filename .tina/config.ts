@@ -159,7 +159,7 @@ const customFilename = {
 };
 
 export default defineConfig({
-  branch: 'master',
+  branch: process.env.NEXT_PUBLIC_EDIT_BRANCH ?? "main",
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID as string,
   token: process.env.TINA_TOKEN as string,
   // guide: https://tina.io/docs/schema/
