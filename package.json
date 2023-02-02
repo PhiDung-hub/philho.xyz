@@ -3,24 +3,23 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm tinacms dev -c \"next dev\"",
-    "build": "pnpm tinacms build && next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@next/font": "13.1.1",
-    "@tinacms/cli": "^1.0.5",
     "@types/node": "18.11.18",
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.10",
+    "@visx/visx": "^2.18.0",
     "eslint": "8.30.0",
     "eslint-config-next": "13.1.1",
     "next": "13.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-is": "^18.2.0",
-    "tinacms": "^1.1.2",
     "typescript": "4.9.4"
   },
   "devDependencies": {
