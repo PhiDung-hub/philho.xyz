@@ -10,8 +10,7 @@ export default function Home() {
         </p>
       </div>
 
-      <div className={styles.center}>
-      </div>
+      <div className={styles.center}> </div>
     </main>
   );
 }

@@ -76,8 +76,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
-  padding: 4rem 0;
+  position: absolute;
+  height: 60vh;
 }
 
 .center::before {
