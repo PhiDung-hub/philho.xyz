@@ -1,16 +1,19 @@
-import styles from './page.module.css';
+import { ThemeToggler } from '~/components';
 
-// Routing fundamental: https://beta.nextjs.org/docs/routing/fundamentals#special-files
 export default function Home() {
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Hi, I&apos;m Phil 👋. This site is under construction. Revisit soon for more feature! 
-        </p>
+    <main>
+      <div className={`font-mono text-[1.2rem] animate-text-bounce`}>
+        <span>
+          Hi, I&apos;m Phil<strong className="text-[1.5rem] ml-1">👋</strong>. I{' '}
+        </span>
+        <span className="text-blue-700 change-text animate-pulse font-semibold"></span>
+        <span> technology related to </span>
+        <span className="text-rose-400 font-bold"> Blockchain & Distributed Systems | Numerical Simulation | Artifical Intelligence.</span>
       </div>
-
-      <div className={styles.center}> </div>
+      <div>
+        <ThemeToggler />
+      </div>
     </main>
   );
 }
