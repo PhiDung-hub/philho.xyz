@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://www.google.com/
+HostUrl=https://raw.githubusercontent.com/pola-rs/polars-static/master/web/polars-logo-rust.svg

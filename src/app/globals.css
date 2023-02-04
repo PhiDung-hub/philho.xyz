@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  @apply text-gray-900;
+  @apply bg-gray-50;
+  scroll-behavior: smooth;
+  --scrollbar-color: rgba(11, 150, 155, 0.9);
+  transition: all 0.3s linear;
+}
+
+::-webkit-scrollbar {
+  width: 0.75rem;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, transparent, var(--scrollbar-color));
+  border-radius: 6px;
+}
+
+html.dark {
+  @apply text-gray-50;
+  @apply bg-gray-900;
+  --scrollbar-color: rgba(200, 250, 255, 0.9);
+}
+
+@layer base {
+  .custom-container {
+    width: 100%;
+  }
+  @media (min-width: 640px) {
+    .custom-container {
+      max-width: 640px;
+    }
+  }
+  @media (min-width: 768px) {
+    .custom-container {
+      max-width: 768px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .custom-container {
+      max-width: 1024px;
+    }
+  }
+  @media (min-width: 1280px) {
+    .custom-container {
+      max-width: 1280px;
+    }
+  }
+}
+
+@layer utilities {
+  .animate-text-bounce {
+    animation: text-bounce 2s infinite;
+  }
+
+  @keyframes text-bounce {
+    0%,
+    100% {
+      transform: translateY(-0.5rem);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+
+  .animate-text-pulse {
+    animation: text-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes text-pulse {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .animate-text-change::before {
+    content: '';
+    animation: change infinite 6s;
+  }
+
+  @keyframes change {
+    0% {
+      content: 'l';
+    }
+    2% {
+      content: 'le';
+    }
+    4% {
+      content: 'lea';
+    }
+    6% {
+      content: 'lear';
+    }
+    8% {
+      content: 'learn';
+    }
+
+    30% {
+      content: '';
+    }
+
+    33.3% {
+      content: 'b';
+    }
+    35.3% {
+      content: 'bu';
+    }
+    37.3% {
+      content: 'bui';
+    }
+    39.3% {
+      content: 'buil';
+    }
+    41.3% {
+      content: 'build';
+    }
+
+    63% {
+      content: '';
+    }
+
+    66.6% {
+      content: 't';
+    }
+    68.6% {
+      content: 'te';
+    }
+    70.6% {
+      content: 'tes';
+    }
+    72.6% {
+      content: 'test';
+    }
+
+    100% {
+      transform: translateX(-50%);
+      content: '';
+    }
+  }
+}

@@ -1,19 +1,46 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+// const withBundleAnalyzer = require('@next/bundle-analyzer')({
+//   enabled: process.env.ANALYZE === 'true',
+// });
 
 // const { i18n } = require('./next-i18next.config');
 
+// webpack(config) {
+//   config.module.rules.push({
+//     test: /\.svg?$/,
+//     oneOf: [
+//       {
+//         use: [
+//           {
+//             loader: '@svgr/webpack',
+//             options: {
+//               prettier: false,
+//               svgo: true,
+//               svgoConfig: {
+//                 plugins: [{ removeViewBox: false }],
+//               },
+//               titleProp: true,
+//             },
+//           },
+//         ],
+//         issuer: {
+//           and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
+//         },
+//       },
+//     ],
+//   });
+//
+//   return config;
+// },
+//
+
 /** @type {import('next').NextConfig} */
-module.exports = withBundleAnalyzer({
-  // i18n,
+module.exports = {
   experimental: {
     appDir: true,
   },
   reactStrictMode: true,
-  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
   images: {
-    deviceSizes: [320, 640, 1080, 1200],
+    deviceSizes: [320, 640, 1080, 1200, 1440, 1560, 1920],
     remotePatterns: [
       {
         protocol: 'https',
@@ -22,23 +49,4 @@ module.exports = withBundleAnalyzer({
     ],
   },
   swcMinify: true,
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    config.module.rules.push({
-      test: /\.svg$/,
-      issuer: {
-        and: [/\.(js|ts)x?$/],
-      },
-      use: [{ loader: '@svgr/webpack' }, { loader: 'url-loader' }],
-    });
-
-    return config;
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/admin',
-        destination: '/admin/index.html',
-      },
-    ];
-  },
-});
+};

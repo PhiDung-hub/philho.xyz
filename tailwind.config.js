@@ -4,6 +4,7 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx}',
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
+    './layouts/**/*.{js,ts,jsx,tsx}',
 
     // Or if using `src` directory:
     './src/**/*.{js,ts,jsx,tsx}',
@@ -11,6 +12,10 @@ module.exports = {
   darkMode: 'class',
   theme: {
     fontFamily: {
+      logo: [
+        'ui-monospace',
+        'cursive',
+      ],
       mono: [
         'ui-monospace',
         'Menlo',
@@ -26,24 +31,7 @@ module.exports = {
         'monospace',
       ],
     },
-    extend: {
-      keyframes: {
-        'text-bounce': {
-          '0%, 100%': {
-            transform: 'translateY(-10%)',
-            'animation-timing-function': 'cubic-bezier(0.8, 0, 1, 1)',
-
-          },
-          '50%': {
-            transform: 'translateY(0)',
-            'animation-timing-function': 'cubic-bezier(0, 0, 0.2, 1)',
-          },
-        },
-      },
-      animation: {
-        'text-bounce': 'text-bounce 2s infinite',
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };
