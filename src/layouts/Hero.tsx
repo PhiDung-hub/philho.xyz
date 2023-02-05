@@ -4,7 +4,7 @@ import { SectionContainer } from '~/components';
 
 export default function Hero() {
   return (
-    <SectionContainer className="pt-40 pb-40">
+    <SectionContainer>
       <NextImage width={300} height={300} src="/photo.png" alt="Personal Photo" className="mx-auto rounded-full py-4" />
 
       <div className={`font-mono text-xl md:text-2xl animate-text-bounce p-5 w-full h-full text-center`}>
@@ -22,12 +22,12 @@ export default function Hero() {
         {cards.map(({ title, desc, href, style }, index) => (
           <NextLink key={`tech-skill-${index}`} href={href} passHref>
             <div
-              className={`shadow-sm py-4 px-8 md:px-8 xl:mx-12 rounded-lg w-[20rem] h-[10rem]
+              className={`shadow-sm mb-4 md:m-0 py-2 px-4 md:px-8 mx-auto md:mx-8 xl:mx-12 rounded-lg w-[15rem] md:w-[20rem] md:h-[10rem]
               font-semibold bg-blue-500 dark:bg-zinc-500 text-gray-50
               md:hover:scale-[1.02] group ${style}`}
             >
-              <div className="text-amber-200 dark:text-amber-500 font-bold text-2xl group-hover:animate-text-pulse">{title}</div>
-              <div className="pt-2">{desc}</div>
+              <div className="text-amber-200 dark:text-amber-500 font-bold text-xl md:text-2xl group-hover:animate-text-pulse">{title}</div>
+              <div className="pt-2 text-sm md:text-base">{desc}</div>
             </div>
           </NextLink>
         ))}
