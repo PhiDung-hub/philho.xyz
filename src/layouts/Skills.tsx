@@ -33,8 +33,14 @@ const techs = [
   {
     src: '/techs/foundry.png',
     title: 'Foundry',
-    href: 'https://github.com/foundry-rs/foundry',
+    href: 'https://book.getfoundry.sh/',
     style: 'shadow-orange-500',
+  },
+  {
+    src: '/techs/hardhat.png',
+    title: 'Hardhat',
+    href: 'https://hardhat.org/docs',
+    style: 'shadow-yellow-400',
   },
   {
     src: '/techs/tokio.png',
@@ -52,19 +58,13 @@ const techs = [
     src: '/techs/prisma.png',
     title: 'Prisma ORM',
     href: 'https://github.com/prisma/prisma',
-    style: 'shadow-blue-500',
+    style: 'shadow-sky-500',
   },
   {
-    src: '/techs/pandas.png',
-    title: 'Pandas',
-    href: 'https://pandas.pydata.org',
-    style: 'shadow-blue-500',
-  },
-  {
-    src: '/techs/react.png',
-    title: 'React',
-    href: 'https://reactjs.org/',
-    style: 'shadow-blue-500',
+    src: '/techs/nestjs.svg',
+    title: 'NestJS (Express)',
+    href: 'https://docs.nestjs.com/',
+    style: 'shadow-sky-500',
   },
   {
     src: '/techs/nextjs.png',
@@ -73,9 +73,33 @@ const techs = [
     style: 'shadow-gray-500',
   },
   {
+    src: '/techs/nginx.png',
+    title: 'NGINX (Open Source)',
+    href: 'https://nginx.org/en/docs/',
+    style: 'shadow-green-500',
+  },
+  {
     src: '/techs/threejs.png',
     title: 'Three JS',
     href: 'https://nextjs.org/',
     style: 'shadow-gray-500',
+  },
+  {
+    src: '/techs/pandas.png',
+    title: 'Pandas',
+    href: 'https://pandas.pydata.org',
+    style: 'shadow-blue-500',
+  },
+  {
+    src: '/techs/unity.webp',
+    title: 'Unity',
+    href: 'https://unity.com/',
+    style: 'shadow-blue-500',
+  },
+  {
+    src: '/techs/tensorflow.png',
+    title: 'Tensorflow (Core + TFP)',
+    href: 'https://www.tensorflow.org/about',
+    style: 'shadow-amber-500',
   },
 ];
