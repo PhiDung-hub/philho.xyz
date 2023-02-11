@@ -75,7 +75,7 @@ function NewWorldPharma() {
     <>
       <PortfolioEntryHeader
         entity="New World Pharma JSC"
-        entityHref="https://linkedin.com"
+        entityHref="https://newworldpharma.com.vn"
         location="Vietnam"
         positionType="Contract Developer"
         positionPeriod="October 2022 - February 2023"

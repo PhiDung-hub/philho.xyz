@@ -64,19 +64,19 @@ const techs = [
     src: '/techs/nestjs.svg',
     title: 'NestJS (Express)',
     href: 'https://docs.nestjs.com/',
-    style: 'shadow-sky-500',
+    style: 'shadow-red-500',
   },
   {
     src: '/techs/nextjs.png',
     title: 'Next JS',
     href: 'https://nextjs.org/',
-    style: 'shadow-gray-500',
+    style: 'shadow-lime-500',
   },
   {
     src: '/techs/nginx.png',
     title: 'NGINX (Open Source)',
     href: 'https://nginx.org/en/docs/',
-    style: 'shadow-green-500',
+    style: 'shadow-emerald-500',
   },
   {
     src: '/techs/threejs.png',
@@ -88,18 +88,18 @@ const techs = [
     src: '/techs/pandas.png',
     title: 'Pandas',
     href: 'https://pandas.pydata.org',
-    style: 'shadow-blue-500',
-  },
-  {
-    src: '/techs/unity.webp',
-    title: 'Unity',
-    href: 'https://unity.com/',
-    style: 'shadow-blue-500',
+    style: 'shadow-blue-700',
   },
   {
     src: '/techs/tensorflow.png',
     title: 'Tensorflow (Core + TFP)',
     href: 'https://www.tensorflow.org/about',
     style: 'shadow-amber-500',
+  },
+  {
+    src: '/techs/unity.webp',
+    title: 'Unity',
+    href: 'https://unity.com/',
+    style: 'shadow-gray-500',
   },
 ];
