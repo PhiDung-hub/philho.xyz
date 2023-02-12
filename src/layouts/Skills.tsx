@@ -1,12 +1,15 @@
 import React from 'react';
 import NextImage from 'next/image';
 import { SectionContainer } from '~/components';
+import { Tooltip, Button } from '~/components/third_party/flowbite-react';
 
 const Experience = () => {
   return (
     <SectionContainer className="flex flex-col justify-center">
       <div className="pb-4 xl:pb-8">
-        <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Technology</p>
+        <Tooltip content="Tooltip for this element">
+          <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Technology</p>
+        </Tooltip>
       </div>
 
       <div className="w-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 text-center py-8 px-12 sm:px-0">
@@ -15,11 +18,11 @@ const Experience = () => {
             href={href}
             rel="noreferrer nooppener"
             target="_blank"
+            className={`w-full shadow-md hover:scale-105 duration-500 py-4 rounded-lg ${style} bg-blue-100 dark:bg-blue-300 dark:text-violet-700`}
             key={`tech-skill-${index}`}
-            className={`shadow-md hover:scale-105 duration-500 py-4 rounded-lg ${style} bg-blue-100 dark:bg-blue-300 dark:text-violet-700`}
           >
             <NextImage src={src} alt="alt-text" className="mx-auto py-2 md:py-8 h-[6rem] md:h-[10rem]" width={100} height={100} />
-            <div className="mt-4 font-bold">{title}</div>
+            <p className="mt-4 font-bold mx-auto w-full">{title}</p>
           </a>
         ))}
       </div>

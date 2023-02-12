@@ -10,15 +10,15 @@ html {
   transition: all 0.5s linear;
   scrollbar-width: 10px;
   scrollbar-color: linear-gradient(to bottom, transparent, var(--scrollbar-color));
-  --bg-gradient: linear-gradient(to bottom, rgb(255, 248, 241), white);
-  --scrollbar-color: rgba(11, 150, 155, 0.9);
+  --bg-gradient: linear-gradient(to bottom, #FFF8F1, white);
+  --scrollbar-color: rgba(11, 80, 155, 0.9);
 }
 
 html.dark {
   @apply text-gray-200;
   @apply bg-gray-900;
-  @apply bg-gradient-to-b from-black to-gray-900;
-  --bg-gradient: linear-gradient(to bottom, rgb(0, 0, 0), #111827);
+  @apply bg-gradient-to-b from-[#02060F] to-gray-900;
+  --bg-gradient: linear-gradient(to bottom, #02060F, #111827);
   --scrollbar-color: rgba(200, 250, 255, 0.9);
 }
 

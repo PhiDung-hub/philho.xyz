@@ -1,8 +1,8 @@
-// const { i18n } = require('./next-i18next.config');
+const { withContentlayer } = require('next-contentlayer');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  pageExtensions: ["ts", "tsx", "js", "jsx", "mdx"],
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'mdx'],
   experimental: {
     appDir: true,
     mdxRs: true,
@@ -20,5 +20,4 @@ const nextConfig = {
   swcMinify: true,
 };
 
-const withMDX = require('@next/mdx')()
-module.exports = withMDX(nextConfig)
+module.exports = withContentlayer(nextConfig);

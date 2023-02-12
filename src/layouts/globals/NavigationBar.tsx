@@ -36,7 +36,7 @@ export default function NavigationBar() {
   return (
     <nav
       className={`top-0 w-full transition-all duration-500 ease-in-out z-[999] 
-        ${sticky == true ? 'sticky drop-shadow-md bg-gray-100 dark:bg-gray-800' : 'absolute bg-transparent h-32 pt-4'}`}
+        ${sticky == true ? 'sticky drop-shadow-md bg-gray-50 dark:bg-gray-800' : 'absolute bg-transparent h-32 pt-4'}`}
     >
       <div className="custom-container flex justify-between items-center mx-auto py-4">
         <NextLink id="nav-logo" href="/">

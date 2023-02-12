@@ -70,7 +70,7 @@ function NTUCourseworkProject() {
           previewImageHref="https://github.com/PhiDung-hub/TF_Probabilty"
           openGraphHref="/projects/probabilitic_ML.jpg"
           header="Tensorflow Probibility"
-          desc="An exploration of Tensorflow Probability library, constructing various probabilistic models for computer vision tasks."
+          desc="An exploration of Tensorflow Probability library by constructing various probabilistic models for computer vision tasks."
         />
       </div>
     </div>

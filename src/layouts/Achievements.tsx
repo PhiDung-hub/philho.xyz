@@ -43,7 +43,7 @@ export default function Achievements() {
             target="_blank"
             className="text-blue-700 dark:text-blue-200 hover:animate-text-pulse"
           >
-            press release
+            the press release
           </a>
         </PortfolioBulletPoint>
       </PortfolioBulletPointsWrapper>

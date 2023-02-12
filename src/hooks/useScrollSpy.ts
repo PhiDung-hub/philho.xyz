@@ -1,11 +1,14 @@
-import React from 'react';
+import { useEffect, useState, useRef } from 'react';
 
-export default function useScrollspy(ids: string[], options: IntersectionObserverInit) {
-  const [activeId, setActiveId] = React.useState<string>();
-  const observer = React.useRef(null);
+/**
+ * Return id of element with id among `spyIds` inside the viewport by using `IntersectionObserver.isIntersecting` interface.
+ **/
+export default function useScrollSpy(spyIds: string[], options: IntersectionObserverInit) {
+  const [activeId, setActiveId] = useState<string>();
+  const observer = useRef<IntersectionObserver | null>(null);
 
-  React.useEffect(() => {
-    const elements = ids.map((id) => document.getElementById(id));
+  useEffect(() => {
+    const elements = spyIds.map((id) => document.getElementById(id));
     observer.current?.disconnect();
     observer.current = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -20,7 +23,7 @@ export default function useScrollspy(ids: string[], options: IntersectionObserve
       }
     });
     return () => observer.current?.disconnect();
-  }, [ids, options]);
+  }, [spyIds, options]);
 
   return activeId;
 }

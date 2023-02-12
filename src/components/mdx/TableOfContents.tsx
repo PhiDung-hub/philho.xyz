@@ -1,12 +1,12 @@
 'use client';
 
-import { IconList } from '@tabler/icons';
+import { FaListUl } from 'react-icons/fa';
 import React from 'react';
 
-import clsxm from '~/utils/tailwind_clsx';
+import { clsxTailwindMerge } from '~/utils';
 import { useHeadings, useScrollSpy } from '~/hooks';
 
-import NextLink from "next/link"
+import NextLink from 'next/link';
 
 const TableOfContents = () => {
   const headings = useHeadings();
@@ -18,7 +18,7 @@ const TableOfContents = () => {
   return (
     <div className="hidden lg:block">
       <div className="mb-4 flex items-center gap-4">
-        <IconList />
+        <FaListUl size={16} />
         <div>Table of contents</div>
       </div>
       <div>
@@ -29,7 +29,7 @@ const TableOfContents = () => {
             <NextLink
               key={id}
               href={`#${id}`}
-              className={clsxm(
+              className={clsxTailwindMerge(
                 'block border-l-2 border-l-zinc-300 pt-[10px] pr-[10px] pb-[10px] text-sm leading-[1.2] text-accent-5 transition-all duration-300 hover:text-hong-fg dark:border-l-zinc-700',
                 {
                   ['border-l-red-500 text-hong-fg dark:border-l-red-600']: id === activeId,
