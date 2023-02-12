@@ -1,42 +1,11 @@
-// const withBundleAnalyzer = require('@next/bundle-analyzer')({
-//   enabled: process.env.ANALYZE === 'true',
-// });
-
 // const { i18n } = require('./next-i18next.config');
 
-// webpack(config) {
-//   config.module.rules.push({
-//     test: /\.svg?$/,
-//     oneOf: [
-//       {
-//         use: [
-//           {
-//             loader: '@svgr/webpack',
-//             options: {
-//               prettier: false,
-//               svgo: true,
-//               svgoConfig: {
-//                 plugins: [{ removeViewBox: false }],
-//               },
-//               titleProp: true,
-//             },
-//           },
-//         ],
-//         issuer: {
-//           and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
-//         },
-//       },
-//     ],
-//   });
-//
-//   return config;
-// },
-//
-
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
+  pageExtensions: ["ts", "tsx", "js", "jsx", "mdx"],
   experimental: {
     appDir: true,
+    mdxRs: true,
   },
   reactStrictMode: true,
   images: {
@@ -50,3 +19,6 @@ module.exports = {
   },
   swcMinify: true,
 };
+
+const withMDX = require('@next/mdx')()
+module.exports = withMDX(nextConfig)

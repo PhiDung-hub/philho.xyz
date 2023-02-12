@@ -12,3 +12,5 @@ export { default as useLocalStorage } from './useLocalStorage';
 export { default as useMediaQuery } from './useMediaQuery';
 export { default as useOnScreen } from './useOnScreen';
 export { default as useUpdateEffect } from './useUpdateEffect';
+export { default as useHeadings } from './useHeadings';
+export { default as useScrollSpy } from './useScrollSpy';
