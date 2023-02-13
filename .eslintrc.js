@@ -6,12 +6,28 @@ module.exports = {
     es6: true,
     node: true,
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'import'],
   parserOptions: {
     sourceType: 'module',
   },
   rules: {
     'no-console': 'warn',
+    'import/no-unresolved': [
+      2,
+      {
+        ignore: ['contentlayer/generated', 'next-contentlayer/hooks'],
+      },
+    ],
   },
   ignorePatterns: ['!.tina', 'node_modules', 'dist', 'next'],
+  settings: {
+    'import/parsers': {
+      '@typescrip-eslint/parser': ['.ts', '.tsx'],
+    },
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+      },
+    },
+  },
 };

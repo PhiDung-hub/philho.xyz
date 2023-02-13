@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
+
 const { withContentlayer } = require('next-contentlayer');
 
 /** @type {import('next').NextConfig} */
@@ -5,7 +7,6 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'mdx'],
   experimental: {
     appDir: true,
-    mdxRs: true,
   },
   reactStrictMode: true,
   images: {

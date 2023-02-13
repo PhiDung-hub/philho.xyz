@@ -1,25 +1,85 @@
 import { ImageResponse } from '@vercel/og';
+import dayjs from 'dayjs';
+import { NextRequest } from 'next/server';
 
 export const config = {
   runtime: 'experimental-edge',
 };
 
-export default function OpenGraph() {
+// Dynamic Open Graph image for each blog
+export default function OpenGraph(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
+  const title = searchParams.get('title');
+  const url = searchParams.get('url') ?? 'philho.xyz';
+  const image = searchParams.get('image') ?? 'OG_IMAGE here';
+  const author = searchParams.get('author') ?? 'Phil Ho';
+  const date = dayjs(searchParams.get('date')).format('DD MMMM YYYY');
+
   return new ImageResponse(
     (
       <div
         style={{
-          fontSize: 128,
-          background: 'white',
-          width: '100%',
-          height: '100%',
+          width: '100vw',
+          height: '100vh',
           display: 'flex',
-          textAlign: 'center',
-          alignItems: 'center',
-          justifyContent: 'center',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          color: '#fff',
+          padding: '64px 48px',
+          // backgroundImage: 'url(https://honghong.me/static/images/og/gradient_bg.png)',
         }}
       >
-        Hello OG friend!
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <img
+            width={85}
+            height={85}
+            src={image}
+            style={{
+              borderRadius: '50%',
+            }}
+            alt="logo"
+          />
+          <div
+            style={{
+              fontSize: '32px',
+              marginLeft: '16px',
+              fontWeight: '900',
+            }}
+          >
+            {author}
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '44px',
+              fontWeight: '900',
+              color: 'rgb(236, 237, 238)',
+            }}
+          >
+            {title}
+          </p>
+          <p
+            style={{
+              fontSize: '36px',
+              fontWeight: '700',
+              color: 'rgba(236, 237, 238, 0.7)',
+            }}
+          >
+            {url} · {date}
+          </p>
+        </div>
       </div>
     ),
     {

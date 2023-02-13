@@ -12,7 +12,7 @@ const TableOfContents = () => {
   const headings = useHeadings();
   const activeId = useScrollSpy(
     headings.map((heading) => heading.id),
-    { rootMargin: '0% 0% -55% 0%' },
+    { rootMargin: '0% 0% -80% 0%' },
   );
 
   return (
@@ -32,7 +32,7 @@ const TableOfContents = () => {
               className={clsxTailwindMerge(
                 'block border-l-2 border-l-zinc-300 pt-[10px] pr-[10px] pb-[10px] text-sm leading-[1.2] text-accent-5 transition-all duration-300 hover:text-hong-fg dark:border-l-zinc-700',
                 {
-                  ['border-l-red-500 text-hong-fg dark:border-l-red-600']: id === activeId,
+                  ['border-l-red-500 text-bold dark:border-l-red-600']: id === activeId,
                 },
               )}
               style={{

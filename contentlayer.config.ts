@@ -4,9 +4,8 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
-import { Options } from 'rehype-pretty-code';
 
-import { remarkImgToJSX } from '~/utils';
+import { rehypePrettyCodeOptions } from './src/utils';
 
 export const BlogPost = defineDocumentType(() => ({
   name: 'BlogPost',
@@ -40,38 +39,18 @@ export const BlogPost = defineDocumentType(() => ({
     },
   },
   computedFields: {
-    url: {
+    slug: {
       type: 'string',
       resolve: (doc) => doc._raw.sourceFileName.replace(/\.mdx$/, ''),
     },
   },
 }));
 
-const rehypePrettyCodeOptions = {
-  theme: {
-    light: 'github-light',
-    dark: 'github-dark',
-  },
-  onVisitLine(node: any) {
-    // Prevent lines from collapsing in `display: grid` mode, and
-    // allow empty lines to be copy/pasted
-    if (node.children.length === 0) {
-      node.children = [{ type: 'text', value: ' ' }];
-    }
-  },
-  onVisitHighlightedLine(node: any) {
-    node.properties.className.push('highlighted');
-  },
-  onVisitHighlightedWord(node: any) {
-    node.properties.className = ['word'];
-  },
-};
-
 export default makeSource({
-  contentDirPath: 'posts',
+  contentDirPath: 'mdx_contents',
   documentTypes: [BlogPost],
   mdx: {
-    remarkPlugins: [remarkGfm, remarkImgToJSX],
+    remarkPlugins: [remarkGfm],
     rehypePlugins: [
       rehypeSlug,
       [rehypePrettyCode, rehypePrettyCodeOptions],
@@ -79,7 +58,7 @@ export default makeSource({
         rehypeAutolinkHeadings,
         {
           properties: {
-            className: ['absolute left-0 top-0 bottom-0 w-full group'],
+            className: ['absolute left-0 w-full group'],
           },
           content: [
             // Default setting for svg elements

@@ -1,14 +1,13 @@
 import React from 'react';
-import NextImage from 'next/image';
-import { SectionContainer } from '~/components';
-import { Tooltip, Button } from '~/components/third_party/flowbite-react';
+import { Image, SectionContainer } from '~/components';
+import { Tooltip } from '~/components/third_party/flowbite-react';
 
-const Experience = () => {
+export default function Skills() {
   return (
     <SectionContainer className="flex flex-col justify-center">
       <div className="pb-4 xl:pb-8">
-        <Tooltip content="Tooltip for this element">
-          <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Technology</p>
+        <Tooltip content="These are the technologies I have worked with, roughly ranked by familiarity" className="max-w-[20rem]">
+          <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Skills</p>
         </Tooltip>
       </div>
 
@@ -21,7 +20,7 @@ const Experience = () => {
             className={`w-full shadow-md hover:scale-105 duration-500 py-4 rounded-lg ${style} bg-blue-100 dark:bg-blue-300 dark:text-violet-700`}
             key={`tech-skill-${index}`}
           >
-            <NextImage src={src} alt="alt-text" className="mx-auto py-2 md:py-8 h-[6rem] md:h-[10rem]" width={100} height={100} />
+            <Image src={src} alt="alt-text" className="mx-auto py-2 md:py-8 h-[6rem] md:h-[10rem]" width={100} height={100} />
             <p className="mt-4 font-bold mx-auto w-full">{title}</p>
           </a>
         ))}
@@ -29,8 +28,6 @@ const Experience = () => {
     </SectionContainer>
   );
 };
-
-export default Experience;
 
 const techs = [
   {
