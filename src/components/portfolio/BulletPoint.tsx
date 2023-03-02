@@ -10,7 +10,7 @@ export default function ResumeBulletPoint({ title, titleClassName, children }: B
   return (
     <p className="py-1">
       <span className={`font-semibold text-sky-600 dark:text-sky-200 ${titleClassName}`}>{title}</span>
-      <span className="dark:text-gray-200 dark:opacity-90">{children}</span>
+      <span className="dark:opacity-90">{children}</span>
     </p>
   );
 }

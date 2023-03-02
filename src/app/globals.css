@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
+:root {
   @apply text-gray-900;
   @apply bg-orange-50;
   @apply bg-gradient-to-b from-orange-50 to-white;
@@ -10,15 +10,15 @@ html {
   transition: all 0.5s linear;
   scrollbar-width: 10px;
   scrollbar-color: linear-gradient(to bottom, transparent, var(--scrollbar-color));
-  --bg-gradient: linear-gradient(to bottom, #FFF8F1, white);
+  --bg-gradient: linear-gradient(to bottom, #fff8f1, white);
   --scrollbar-color: rgba(11, 80, 155, 0.9);
 }
 
-html.dark {
-  @apply text-gray-200;
+.dark:root {
+  @apply text-gray-200 text-opacity-90;
   @apply bg-gray-900;
   @apply bg-gradient-to-b from-[#02060F] to-gray-900;
-  --bg-gradient: linear-gradient(to bottom, #02060F, #111827);
+  --bg-gradient: linear-gradient(to bottom, #02060f, #111827);
   --scrollbar-color: rgba(200, 250, 255, 0.9);
 }
 
@@ -37,6 +37,33 @@ body::-webkit-scrollbar-button {
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(to bottom, transparent, var(--scrollbar-color));
   border-radius: 4px;
+}
+
+pre,
+code {
+  @apply font-code;
+}
+
+[data-rehype-pretty-code-fragment] {
+  @apply relative;
+}
+
+div[data-rehype-pretty-code-title][data-theme='light'],
+div[data-rehype-pretty-code-fragment] pre[data-theme='light'] {
+  @apply block dark:hidden;
+}
+
+div[data-rehype-pretty-code-title][data-theme='dark'],
+div[data-rehype-pretty-code-fragment] pre[data-theme='dark'] {
+  @apply hidden dark:block;
+}
+
+span[data-rehype-pretty-code-fragment] code[data-theme='light'] {
+  @apply inline dark:hidden;
+}
+
+span[data-rehype-pretty-code-fragment] code[data-theme='dark'] {
+  @apply hidden dark:inline;
 }
 
 @layer base {
