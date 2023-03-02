@@ -39,11 +39,6 @@ body::-webkit-scrollbar-button {
   border-radius: 4px;
 }
 
-pre,
-code {
-  @apply font-code;
-}
-
 [data-rehype-pretty-code-fragment] {
   @apply relative;
 }
