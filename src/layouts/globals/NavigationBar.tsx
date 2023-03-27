@@ -39,7 +39,7 @@ export default function NavigationBar() {
         ${sticky == true ? 'sticky drop-shadow-md bg-gray-50 dark:bg-gray-800' : 'absolute bg-transparent h-32 pt-4'}`}
     >
       <div className="custom-container flex justify-between items-center mx-auto py-4">
-        <NextLink id="nav-logo" href="/">
+        <NextLink id="nav-logo" href="/" passHref>
           <div
             className="text-[1.75rem] font-logo font-semibold text-blue-600 dark:text-blue-200
             hover:scale-105 duration-300 hover:animate-text-pulse"
