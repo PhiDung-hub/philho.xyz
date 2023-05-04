@@ -7,7 +7,7 @@ export default function Skills() {
     <SectionContainer className="flex flex-col justify-center">
       <div className="pb-4 xl:pb-8">
         <Tooltip content="These are the technologies I have worked with, roughly ranked by familiarity" className="max-w-[20rem]">
-          <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Skills</p>
+          <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Stack</p>
         </Tooltip>
       </div>
 
@@ -49,12 +49,6 @@ const techs = [
     style: 'shadow-yellow-500',
   },
   {
-    src: '/techs/diesel.png',
-    title: 'Diesel ORM',
-    href: 'https://github.com/diesel-rs/diesel',
-    style: 'shadow-red-500',
-  },
-  {
     src: '/techs/prisma.png',
     title: 'Prisma ORM',
     href: 'https://github.com/prisma/prisma',
@@ -72,34 +66,28 @@ const techs = [
     href: 'https://nextjs.org/',
     style: 'shadow-lime-500',
   },
-  {
-    src: '/techs/nginx.png',
-    title: 'NGINX (Open Source)',
-    href: 'https://nginx.org/en/docs/',
-    style: 'shadow-emerald-500',
-  },
+  // {
+  //   src: '/techs/nginx.png',
+  //   title: 'NGINX (Open Source)',
+  //   href: 'https://nginx.org/en/docs/',
+  //   style: 'shadow-emerald-500',
+  // },
   {
     src: '/techs/threejs.png',
     title: 'Three JS',
     href: 'https://nextjs.org/',
     style: 'shadow-gray-500',
   },
-  {
-    src: '/techs/pandas.png',
-    title: 'Pandas',
-    href: 'https://pandas.pydata.org',
-    style: 'shadow-blue-700',
-  },
+  // {
+  //   src: '/techs/pandas.png',
+  //   title: 'Pandas',
+  //   href: 'https://pandas.pydata.org',
+  //   style: 'shadow-blue-700',
+  // },
   {
     src: '/techs/tensorflow.png',
     title: 'Tensorflow (Core + TFP)',
     href: 'https://www.tensorflow.org/about',
     style: 'shadow-amber-500',
-  },
-  {
-    src: '/techs/unity.webp',
-    title: 'Unity',
-    href: 'https://unity.com/',
-    style: 'shadow-gray-500',
   },
 ];

@@ -27,16 +27,7 @@ function ViewBase() {
       <PortfolioBulletPointsWrapper>
         <PortfolioBulletPoint title="Fullstack Development - ">
           <span>
-            Develop a{' '}
-            <a
-              href="https://test.viewbase.com"
-              rel="noreferrer noopener"
-              target="_blank"
-              className="text-blue-700 dark:text-blue-200 hover:animate-text-pulse"
-            >
-              crypto discussion forum
-            </a>{' '}
-            with reddit-like features (currently at test stage).
+            Develop a discussion forum with reddit-like features.
           </span>
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Token Design - ">
@@ -47,16 +38,7 @@ function ViewBase() {
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Frontend development - ">
           <span>
-            Help develop a{' '}
-            <a
-              href="https://denizen.io"
-              rel="noreferrer noopener"
-              target="_blank"
-              className="text-blue-700 dark:text-blue-200 hover:animate-text-pulse"
-            >
-              landing page
-            </a>{' '}
-            featuring 3D interactive models utilizing BabylonJS.
+            Help develop a landing page featuring 3D interactive models utilizing BabylonJS.
           </span>
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Smart Contract Engineering - ">

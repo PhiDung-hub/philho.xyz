@@ -4,14 +4,14 @@ import { ThemeToggler } from '~/components';
 import NextLink from 'next/link';
 
 const links = [
-  {
-    desc: 'Projects',
-    href: '/projects',
-  },
-  {
-    desc: 'Blog',
-    href: '/blog',
-  },
+  // {
+  //   desc: 'Projects',
+  //   href: '/projects',
+  // },
+  // {
+  //   desc: 'Blog',
+  //   href: '/blog',
+  // },
 ];
 
 export default function NavigationBar() {
