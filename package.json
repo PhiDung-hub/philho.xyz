@@ -42,9 +42,7 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "shiki": "^0.14.1",
-    "tailwind-merge": "^1.9.1",
-    "unist": "^8.0.11",
-    "unist-util-visit": "^4.1.2"
+    "tailwind-merge": "^1.9.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.51.0",
