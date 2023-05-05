@@ -11,7 +11,7 @@ type PreProps = {
   children: React.ReactNode;
 };
 
-const Pre = (props: PreProps) => {
+const CopyCallout = (props: PreProps) => {
   const { children, 'data-theme': theme, 'data-language': language } = props;
   const textInput = React.useRef<HTMLPreElement>(null);
   const [isCopied, setCopied] = React.useState(false);
@@ -57,4 +57,4 @@ const Pre = (props: PreProps) => {
   );
 };
 
-export default Pre;
+export default CopyCallout;

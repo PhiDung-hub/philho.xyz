@@ -1,9 +1,9 @@
 import { Image } from '~/components';
-import Pre from './Pre';
+import CopyCallout from './CopyCallout';
 
 const MDXComponents = {
   Image,
-  // pre: Pre,
+  // pre: CopyCallout,
 };
 
 export default MDXComponents;

@@ -1,4 +1,3 @@
-import NextImage from 'next/image';
 import { Image } from '~/components';
 
 type CardType = {

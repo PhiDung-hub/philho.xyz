@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ThemeToggler } from '~/components';
 import NextLink from 'next/link';
 
-const links = [
+const links: {desc: string, href: string}[] = [
   // {
   //   desc: 'Projects',
   //   href: '/projects',
