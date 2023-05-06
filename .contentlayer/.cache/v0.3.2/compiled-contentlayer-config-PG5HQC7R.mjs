@@ -1,5 +1,7 @@
 // contentlayer.config.ts
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 var BlogPost = defineDocumentType(() => ({
   name: "BlogPost",
@@ -43,12 +45,12 @@ var contentlayer_config_default = makeSource({
   contentDirPath: "mdx_contents",
   documentTypes: [BlogPost],
   mdx: {
-    remarkPlugins: [remarkGfm]
-    // rehypePlugins: [[rehypePrettyCode, rehypePrettyCodeOptions]],
+    remarkPlugins: [remarkGfm, remarkMath],
+    rehypePlugins: [rehypeKatex]
   }
 });
 export {
   BlogPost,
   contentlayer_config_default as default
 };
-//# sourceMappingURL=compiled-contentlayer-config-6SZ4WGYJ.mjs.map
+//# sourceMappingURL=compiled-contentlayer-config-PG5HQC7R.mjs.map

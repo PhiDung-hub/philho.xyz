@@ -33,7 +33,7 @@ Clone the rustup repo [here](https://github.com/rust-lang/rustup). If you didn't
 
 # First glance
 
-We will scan through some of important concepts & features of Rust. A good place to references is [Rust standard library](https://doc.rust-lang.org/stable/std)
+We will scan through some important concepts of Rust. A good reference is [Rust standard library](https://doc.rust-lang.org/stable/std)
 
 ## String
 
@@ -53,7 +53,8 @@ At least multiple types of strings in Rust.
 
 ## Ownership
 
-Ownership is what makes Rust compiler run on steroids, making it one of the safest system programming languages out there.
+Rust use Ownership and RAII to manage memory, no garbage collector is used => bare metal speed
+
 There are 3 rules regarding ownership:
 
 1. Each value has an owner
@@ -73,22 +74,23 @@ int main() {
 
 ## Pointer, Box & Smart pointers
 
-All values in Rust are stack allocated by default (continous/linear, high-speed access, [more info](https://www.guru99.com/stack-vs-heap.html)).
-Nevertheless, since the stack is fixed size so compilation wouldn't work for recusive data structures such as Linkedlists, Array, etc.. where
+All values in Rust are stack allocated by default (continuous, high-speed access, [more info](https://www.guru99.com/stack-vs-heap.html)).
+Stack size is fixed so compilation wouldn't work for recusive data structures such as Linkedlists, Array, etc.. where
 data size is unknown at compilation time.
 
-- Values can be boxed and allocates on the heap with `std::Box<T>`, where dynamic memory
-  allocation can happen.
-- A box is a smart pointer to a heap value of type `T`. And a smart pointer is a pointer with additional features like automatic
-  memory management or bounds checking
-  - Conceptualize by C++, inspired from Simula67 `element` - a pointer without `null` ([history](https://en.wikipedia.org/wiki/Smart_pointer#history)).
-  - For example, in C++11, `std::unique_ptr<Type> Func()` makes explicit that caller should takes ownership of the result, and C++ runtime ensures that memory will be reclaimed automatically.
-  - <strong>For Rust, </strong> a smart pointer is defined mostly as a struct that
-    implements `Deref` - , `Drop` traits. The concept is well described in [official
-    book](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html). You may find this [explanation](https://youtu.be/KYJ95TxEC18) helpful.
+Thus smart pointers are needed. 
+For example, values can be boxed and allocates on the heap with `std::Box<T>`. A box is a pointer with automatic mememory management feature (hence *smart* pointer) to a heap value of type `T`.
+- Conceptualize by C++, inspired from Simula67 `element` - a pointer without `null` ([history](https://en.wikipedia.org/wiki/Smart_pointer#history)).
+- For example, in C++11, `std::unique_ptr<Type> Func()` makes explicit that caller should takes ownership of the result, and C++ runtime ensures that memory will be reclaimed automatically.
+- <strong>For Rust, </strong> a smart pointer is defined mostly as a struct that
+  implements `Deref` - , `Drop` traits. The concept is well described in [official
+  book](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html). You may find this [explanation](https://youtu.be/KYJ95TxEC18) helpful.
 
-<br></br>
 An example of `Box` from the book, noticing box always takes 8 bytes.
+
+$$
+\lim_{x \to 0} \frac{\sin x}{x^2} = 1
+$$
 
 ```rust
 use std::mem;

@@ -1,9 +1,8 @@
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
 
-// import rehypePrettyCode from 'rehype-pretty-code';
-// import { rehypePrettyCodeOptions } from './src/utils';
-//
 export const BlogPost = defineDocumentType(() => ({
   name: 'BlogPost',
   filePathPattern: `blog/**/*.mdx`,
@@ -47,7 +46,7 @@ export default makeSource({
   contentDirPath: 'mdx_contents',
   documentTypes: [BlogPost],
   mdx: {
-    remarkPlugins: [remarkGfm],
-    // rehypePlugins: [[rehypePrettyCode, rehypePrettyCodeOptions]],
+    remarkPlugins: [remarkGfm, remarkMath],
+    rehypePlugins: [rehypeKatex],
   },
 });

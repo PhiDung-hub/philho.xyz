@@ -7,7 +7,7 @@ import type { BlogPostCardType } from '~/components';
 export default function Blog() {
   const allBlogPostMeta: BlogPostCardType[] = allBlogPosts.map((post: BlogPost) => {
     return {
-      href: post.slug,
+      href: `/blog/${post.slug}`,
       openGraphHref: `/${post.image}`,
       title: post.title,
       summary: post.summary,
