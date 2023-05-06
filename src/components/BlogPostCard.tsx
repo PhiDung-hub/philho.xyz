@@ -13,7 +13,6 @@ export default function BlogPostCard({ href, openGraphHref, title, summary, clas
   return (
     <NextLink
       href={href}
-      passHref
       replace
       prefetch
       className={`group my-4 md:my-0 mx-auto w-[280px] md:w-[350px] bg-blue-200 dark:bg-gray-600 rounded-md 
