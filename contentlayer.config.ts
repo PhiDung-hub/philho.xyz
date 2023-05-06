@@ -1,5 +1,4 @@
 import remarkGfm from 'remark-gfm';
-import remarkMdx from 'remark-mdx';
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
 
 // import rehypePrettyCode from 'rehype-pretty-code';
@@ -48,7 +47,7 @@ export default makeSource({
   contentDirPath: 'mdx_contents',
   documentTypes: [BlogPost],
   mdx: {
-    remarkPlugins: [remarkGfm, remarkMdx],
+    remarkPlugins: [remarkGfm],
     // rehypePlugins: [[rehypePrettyCode, rehypePrettyCodeOptions]],
   },
 });
