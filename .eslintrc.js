@@ -12,6 +12,7 @@ module.exports = {
   },
   rules: {
     'no-console': 'warn',
+    '@typescript-eslint/no-empty-function': 'off',
     'import/no-unresolved': [
       2,
       {

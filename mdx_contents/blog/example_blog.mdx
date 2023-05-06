@@ -7,51 +7,35 @@ image: 'blogs/rust/cover.webp'
 type: BlogPost
 ---
 
-## Introduction to Rust
-
-Rust is a programming language that helps you write faster and more reliable software. Through sophisticated design, Rust gives you low-level control without the hassle associated with it. Read the nice intro [here](https://doc.rust-lang.org/book/ch00-00-introduction.html)
-
-## Get started
+# Get started
 
 The most useful resource to kickstart rust development is [Rust book](https://doc.rust-lang.org/book/v)
 
-### If you run on Linux, MacOS, or any WSL2 Linux Distro
-
-For such Unix based platforms, rust installation is 1 click (or Ctrl-Shift-V) away. Copy and run this command in your terminal.
+## Linux, MacOS, or WSL2 Linux Distro
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-**Through out this tutorial, all commands will be explained in details. Ignore them if you just want to get things run**
-
-_The above command use `curl`, a Command Line Interface (CLI) tool to get data from URL via various potocol.
-For the command above, by looking at the flag, we can determine it run on [HTTPS](https://www.cloudflare.com/learning/ssl/what-is-https/)
-(`--proto '=https'`), using [TLS V1.2](https://datatracker.ietf.org/doc/html/rfc5246) security protocol (`--tlsv1.2`), run with silent,
-fail silent mode on target [https://sh.rust.rs](https://sh.rust.rs). This will download a bash script (`.sh`) then finally execute it
-using the pipe operator `|`. In the next parts of the series, I assume readers are familiar with `curl`. You can reference
-[Basic usage](https://everything.curl.dev/cmdline) and [flags](https://gist.github.com/eneko/dc2d8edd9a4b25c5b0725dd123f98b10) at any time._
-
-Most of the time, you will have `curl` installed by default (else, get your by following [this instruction](https://help.ubidots.com/en/articles/2165289-learn-how-to-install-run-curl-on-windows-macosx-linux)) and above command will get you `rustup`. Along side, you should be equipped with `cargo` and `rustc` then you are good to go. More about all these tools will be discussed in future series. For now, we know:
+You should now be equipped with:
 
 - [`rustup`](https://rust-lang.github.io/rustup/) - Toolchain manager for rust programmign language, it enables you to switch between or update `rustc` & `cargo`.
 - [`cargo`](https://doc.rust-lang.org/cargo/) - The package manager for rust, similar to what `yarn` or `npm` do for `node.js`.
 - [`rustc`](https://doc.rust-lang.org/stable/rustc/) - The rust compiler, it producees binary code from your source code. This is similar `gcc/g++` for C++, most of the time you don't invoke it directly but rather run & build rust program through a build tool (like `cmake`). For rust, our friend is `cargo`.
 
-### If you prefer Windows but not WSL2
+## Windows
 
-https://beta.nextjs.org/docs/api-reference/components/image#props
-Won't be that hard, download the installer by following [this instruction](https://www.rust-lang.org/tools/install). You should be ready in no time.
+Download the installer by following [this instruction](https://www.rust-lang.org/tools/install). You should be ready in no time.
 
-### If you want to build from source
+## Build from source
 
 Clone the rustup repo [here](https://github.com/rust-lang/rustup). If you didn't have `cargo`, double check `rustup-init.sh` script, execute it, then `cargo run --release`, else just run the command. More info [here](https://rust-lang.github.io/rustup/installation/other.html#msvc). **Becareful! This will supersede any pre-existing tools chains**.
 
-## What's to expect?
+# First glance
 
 We will scan through some of important concepts & features of Rust. A good place to references is [Rust standard library](https://doc.rust-lang.org/stable/std)
 
-### String
+## String
 
 At least multiple types of strings in Rust.
 
@@ -67,7 +51,7 @@ At least multiple types of strings in Rust.
 | $\_value | Underscore        | ✅    |
 | $1value  | Start from number | ❌    |
 
-### Ownership
+## Ownership
 
 Ownership is what makes Rust compiler run on steroids, making it one of the safest system programming languages out there.
 There are 3 rules regarding ownership:
@@ -78,7 +62,7 @@ There are 3 rules regarding ownership:
 
 An example of ownership:
 
-```rs
+```rust
 int main() {
   let s1 = String::from("hello"); // Initialize and given ownership of this string
   let s2 = s1; // Value is moved here // ownership is transferred to s2.
@@ -87,7 +71,7 @@ int main() {
 }
 ```
 
-### Pointer, Box & Smart pointers
+## Pointer, Box & Smart pointers
 
 All values in Rust are stack allocated by default (continous/linear, high-speed access, [more info](https://www.guru99.com/stack-vs-heap.html)).
 Nevertheless, since the stack is fixed size so compilation wouldn't work for recusive data structures such as Linkedlists, Array, etc.. where
@@ -99,12 +83,14 @@ data size is unknown at compilation time.
   memory management or bounds checking
   - Conceptualize by C++, inspired from Simula67 `element` - a pointer without `null` ([history](https://en.wikipedia.org/wiki/Smart_pointer#history)).
   - For example, in C++11, `std::unique_ptr<Type> Func()` makes explicit that caller should takes ownership of the result, and C++ runtime ensures that memory will be reclaimed automatically.
-  - <strong>For Rust, </strong> a smart pointer is defined mostly as a struct that implements `Deref` - , `Drop` traits. The concept is well
-    described in [official book](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html). A [well explanation](https://youtu.be/KYJ95TxEC18)
+  - <strong>For Rust, </strong> a smart pointer is defined mostly as a struct that
+    implements `Deref` - , `Drop` traits. The concept is well described in [official
+    book](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html). You may find this [explanation](https://youtu.be/KYJ95TxEC18) helpful.
 
+<br></br>
 An example of `Box` from the book, noticing box always takes 8 bytes.
 
-```rs
+```rust
 use std::mem;
 
 #[allow(dead_code)]
@@ -168,7 +154,9 @@ fn main() {
     println!("Unboxed point occupies {} bytes on the stack",
              mem::size_of_val(&unboxed_point));
 }
+```
 
+```bash
 Output >>
 
 Point occupies 16 bytes on the stack
@@ -182,3 +170,4 @@ Unboxed point occupies 16 bytes on the stack
 ## References
 
 - [O'Reilly rust crash course](https://learning.oreilly.com/videos/ultimate-rust-crash/9781800563902/)
+

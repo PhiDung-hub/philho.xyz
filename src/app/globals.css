@@ -15,10 +15,10 @@
 }
 
 .dark:root {
-  @apply text-gray-200 text-opacity-90;
+  @apply text-gray-300 text-opacity-90;
   @apply bg-gray-900;
-  @apply bg-gradient-to-b from-[#02060F] to-gray-900;
-  --bg-gradient: linear-gradient(to bottom, #02060f, #111827);
+  @apply bg-gradient-to-b from-[#161922] to-[#111518];
+  --bg-gradient: linear-gradient(to bottom, #161922, #111518);
   --scrollbar-color: rgba(200, 250, 255, 0.9);
 }
 
@@ -37,28 +37,6 @@ body::-webkit-scrollbar-button {
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(to bottom, transparent, var(--scrollbar-color));
   border-radius: 4px;
-}
-
-[data-rehype-pretty-code-fragment] {
-  @apply relative;
-}
-
-div[data-rehype-pretty-code-title][data-theme='light'],
-div[data-rehype-pretty-code-fragment] pre[data-theme='light'] {
-  @apply block dark:hidden;
-}
-
-div[data-rehype-pretty-code-title][data-theme='dark'],
-div[data-rehype-pretty-code-fragment] pre[data-theme='dark'] {
-  @apply hidden dark:block;
-}
-
-span[data-rehype-pretty-code-fragment] code[data-theme='light'] {
-  @apply inline dark:hidden;
-}
-
-span[data-rehype-pretty-code-fragment] code[data-theme='dark'] {
-  @apply hidden dark:inline;
 }
 
 @layer base {

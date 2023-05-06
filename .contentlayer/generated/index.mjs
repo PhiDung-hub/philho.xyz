@@ -9,3 +9,5 @@ import allBlogPosts from './BlogPost/_index.json' assert { type: 'json' }
 export { allBlogPosts }
 
 export const allDocuments = [...allBlogPosts]
+
+

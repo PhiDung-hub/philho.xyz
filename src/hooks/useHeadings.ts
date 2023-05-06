@@ -10,7 +10,9 @@ export default function useHeadings() {
   const [headings, setHeadings] = useState<Headings>([]);
 
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLHeadingElement>('article h2, article h3, article h4, article h5, article h6'))
+    const elements = Array.from(
+      document.querySelectorAll<HTMLHeadingElement>('article h1, article h2, article h3, article h4, article h5, article h6'),
+    )
       .filter((element) => element.id)
       .map((element) => ({
         id: element.id,
@@ -22,4 +24,4 @@ export default function useHeadings() {
   }, []);
 
   return headings;
-};
+}

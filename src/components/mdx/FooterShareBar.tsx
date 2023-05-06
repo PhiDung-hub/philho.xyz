@@ -7,27 +7,19 @@ type ShareProps = {
 };
 
 export default function FooterShareBar({ slug, title }: ShareProps) {
+  const shareLinkClsx = 'flex items-center justify-center h-8 w-8 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500';
   return (
     <div className="my-8  flex w-full items-center justify-between border-t border-accent-2 py-4">
-      <div>BRO</div>
-      <div className="flex items-center justify-center gap-2">
-        <NextLink
-          href={redditShareURL(slug, title)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-300 hover:bg-accent-2"
-        >
-          <FaReddit size={18} />
+      <div className="text-xl italic font-semibold">Phil Ho</div>
+      <div className="flex gap-4">
+        <NextLink href={redditShareURL(slug, title)} className={shareLinkClsx}>
+          <FaReddit size={24} />
         </NextLink>
-        <NextLink
-          href={twitterShareURL(slug, title)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-300 hover:bg-accent-2"
-        >
-          <FaTwitter size={18} />
+        <NextLink href={twitterShareURL(slug, title)} className={shareLinkClsx}>
+          <FaTwitter size={24} />
         </NextLink>
-        <NextLink
-          href={facebookShareURL(slug)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-300 hover:bg-accent-2"
-        >
-          <FaFacebook size={18} />
+        <NextLink href={facebookShareURL(slug)} className={shareLinkClsx}>
+          <FaFacebook size={24} />
         </NextLink>
       </div>
     </div>

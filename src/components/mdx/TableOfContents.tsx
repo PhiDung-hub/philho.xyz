@@ -6,13 +6,11 @@ import React from 'react';
 import { clsxTailwindMerge } from '~/utils';
 import { useHeadings, useScrollSpy } from '~/hooks';
 
-import NextLink from 'next/link';
-
 const TableOfContents = () => {
   const headings = useHeadings();
   const activeId = useScrollSpy(
     headings.map((heading) => heading.id),
-    { rootMargin: '0% 0% -80% 0%' },
+    { rootMargin: '0% 0% -65% 0%' },
   );
 
   return (
@@ -26,21 +24,21 @@ const TableOfContents = () => {
           const { id, level, title } = heading;
 
           return (
-            <NextLink
+            <a
               key={id}
               href={`#${id}`}
               className={clsxTailwindMerge(
-                'block border-l-2 border-l-zinc-300 pt-[10px] pr-[10px] pb-[10px] text-sm leading-[1.2] text-accent-5 transition-all duration-300 hover:text-hong-fg dark:border-l-zinc-700',
+                'block border-l-2 border-l-zinc-300 dark:border-l-zinc-700 py-2 text-sm leading-[1.2] hover:text-blue-500 dark:hover:text-blue-200',
                 {
-                  ['border-l-red-500 text-bold dark:border-l-red-600']: id === activeId,
+                  ['border-l-red-700 text-bold dark:border-l-red-500']: id === activeId,
                 },
               )}
               style={{
-                paddingLeft: (level - 1) * 16,
+                paddingLeft: level * 16,
               }}
             >
               {title}
-            </NextLink>
+            </a>
           );
         })}
       </div>

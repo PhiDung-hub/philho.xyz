@@ -1,5 +1,5 @@
-"use client";
+'use client';
 
-import {Tooltip} from "flowbite-react";
+import { Tooltip } from 'flowbite-react';
 
 export default Tooltip;

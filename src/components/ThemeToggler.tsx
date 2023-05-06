@@ -1,7 +1,6 @@
 'use client';
-import { useDarkMode } from '~/hooks';
-import {RiSunFill, RiMoonFill} from "react-icons/ri";
-
+import { useDarkMode } from '~/providers/DarkModeProvider';
+import { RiSunFill, RiMoonFill } from 'react-icons/ri';
 
 export default function ThemeToggler({ className }: { className?: string }) {
   const { toggle, isDarkMode } = useDarkMode();

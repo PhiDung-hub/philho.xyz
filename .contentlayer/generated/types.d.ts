@@ -42,6 +42,11 @@ export type DocumentTypeNames = 'BlogPost'
 export type NestedTypes = never
 export type NestedTypeNames = never
 
+export type DataExports = {
+  allDocuments: DocumentTypes[]
+  allBlogPosts: BlogPost[]
+}
+
 
 export interface ContentlayerGenTypes {
   documentTypes: DocumentTypes
@@ -51,6 +56,7 @@ export interface ContentlayerGenTypes {
   nestedTypeMap: NestedTypeMap
   nestedTypeNames: NestedTypeNames
   allTypeNames: AllTypeNames
+  dataExports: DataExports
 }
 
 declare global {

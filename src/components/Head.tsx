@@ -20,7 +20,6 @@ export default function Head(props: HeadProps) {
       <meta name="description" content="Phil Ho portfolio" />
       <link rel="icon" href="/favicon_io/favicon.ico" />
       <NextSeo
-        useAppDir
         titleTemplate="%s | Phil Space"
         title={title}
         defaultTitle="Phil Space"

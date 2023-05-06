@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { NextRequest } from 'next/server';
 
 export const config = {
-  runtime: 'experimental-edge',
+  runtime: 'edge',
 };
 
 // Dynamic Open Graph image for each blog

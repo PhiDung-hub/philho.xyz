@@ -8,7 +8,7 @@ import { useMDXComponent } from 'next-contentlayer/hooks';
 
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 import { formateDate } from '~/utils';
-import { MDXComponents, FooterShareBar, TableOfContents } from '~/components/mdx';
+import { CustomMDXComponents, FooterShareBar, TableOfContents } from '~/components/mdx';
 import { SectionContainer } from '~/components';
 
 type BlogPostPageProps = {
@@ -26,7 +26,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
     notFound();
   }
 
-  const MDXComponent = useMDXComponent(post.body.code);
+  const MDXContent = useMDXComponent(post.body.code);
   const pathname = usePathname();
 
   const { title, summary, date, modifiedTime } = post;
@@ -57,7 +57,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
         <div className="mt-8 flex flex-col justify-between lg:flex-row">
           <article className="w-full pr-8">
             <div className="w-full max-w-none">
-              <MDXComponent components={MDXComponents} />
+              <MDXContent components={CustomMDXComponents} />
             </div>
           </article>
           <aside className="lg:w-[18rem]">
