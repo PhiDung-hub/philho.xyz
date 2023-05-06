@@ -55,19 +55,19 @@ function NTUCourseworkProject() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8 mx-auto">
         <ProjectCard
-          previewImageHref="https://onestop-e-cycle.vercel.app/"
+          href="https://onestop-e-cycle.vercel.app/"
           openGraphHref="/projects/e-cycle.jpg"
           header="E-CYCLE"
           desc="Web application to assist with E-waste recycling in Singapore. APIs are provided by SG goverment at data.gov.sg"
         />
         <ProjectCard
-          previewImageHref="https://github.com/PhiDung-hub/basic_CV_techniques"
+          href="https://github.com/PhiDung-hub/basic_CV_techniques"
           openGraphHref="/projects/computer_vision.png"
           header="Basic Computer Vision"
           desc="A compilation of old school computer vision techniques, with detailed implementation and walkthrough examples."
         />
         <ProjectCard
-          previewImageHref="https://github.com/PhiDung-hub/TF_Probabilty"
+          href="https://github.com/PhiDung-hub/TF_Probabilty"
           openGraphHref="/projects/probabilitic_ML.jpg"
           header="Tensorflow Probibility"
           desc="An exploration of Tensorflow Probability library by constructing various probabilistic models for computer vision tasks."

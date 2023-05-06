@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { NextSeo, NextSeoProps } from 'next-seo';
 
-type HeadProps = NextSeoProps;
+export type HeadProps = NextSeoProps;
 
 export default function Head(props: HeadProps) {
   const pathname = usePathname();
