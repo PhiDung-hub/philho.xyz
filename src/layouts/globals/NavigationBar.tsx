@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ThemeToggler } from '~/components';
 import NextLink from 'next/link';
 
-const links: {desc: string, href: string}[] = [
+const links: { desc: string; href: string }[] = [
   // {
   //   desc: 'Projects',
   //   href: '/projects',
@@ -23,6 +23,20 @@ export default function NavigationBar() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      :target {
+        scroll-margin-top: ${sticky ? '80px' : '0'};
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, [sticky]);
 
   const handleScroll = () => {
     const SCROLL_Y_THRESHOLD = 200;

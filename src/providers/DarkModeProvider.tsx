@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from '~/hooks';
+// import Cookies from 'js-cookie';
 
 interface UseDarkModeOutput {
   isDarkMode: boolean;
@@ -13,9 +14,9 @@ interface UseDarkModeOutput {
 // Create a new context for the dark mode state
 export const DarkModeContext = createContext<UseDarkModeOutput>({
   isDarkMode: true,
-  toggle: () => {},
-  enable: () => {},
-  disable: () => {},
+  toggle: () => { },
+  enable: () => { },
+  disable: () => { },
 });
 
 export const DarkModeProvider = ({ children }: { children: React.ReactNode }) => {
@@ -25,8 +26,10 @@ export const DarkModeProvider = ({ children }: { children: React.ReactNode }) =>
     const root = window.document.documentElement.classList;
     if (isDarkMode) {
       root.add('dark');
+      // Cookies.set('isDarkMode', JSON.stringify(true), { expires: 365 });
     } else {
       root.remove('dark');
+      // Cookies.set('isDarkMode', JSON.stringify(false), { expires: 365 });
     }
   }, [isDarkMode]);
 
@@ -41,11 +44,7 @@ export const DarkModeProvider = ({ children }: { children: React.ReactNode }) =>
     disable,
   };
 
-  return (
-    <DarkModeContext.Provider value={value}>
-      {children}
-    </DarkModeContext.Provider>
-  );
+  return <DarkModeContext.Provider value={value}>{children}</DarkModeContext.Provider>;
 };
 
 // Create a custom hook that will allow other components to access the dark mode state
