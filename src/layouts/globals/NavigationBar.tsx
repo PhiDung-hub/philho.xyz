@@ -8,10 +8,10 @@ const links: {desc: string, href: string}[] = [
   //   desc: 'Projects',
   //   href: '/projects',
   // },
-  // {
-  //   desc: 'Blog',
-  //   href: '/blog',
-  // },
+  {
+    desc: 'Blog',
+    href: '/blog',
+  },
 ];
 
 export default function NavigationBar() {

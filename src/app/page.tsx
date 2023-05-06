@@ -1,13 +1,13 @@
-import { Achievements, Skills, Education, Experience, Hero } from '~/layouts';
+import { HomePage } from '~/layouts';
 
 export default function Home() {
   return (
     <main>
-      <Hero />
-      <Education />
-      <Experience />
-      <Skills />
-      <Achievements />
+      <HomePage.Hero />
+      <HomePage.Education />
+      <HomePage.Experience />
+      <HomePage.Skills />
+      <HomePage.Achievements />
     </main>
   );
 }
