@@ -11,7 +11,7 @@ export default function NotFound() {
 
   return (
     <div className="h-[100vh] w-full flex flex-col justify-center items-center font-mono text-3xl md:text-4xl text-yellow-500 dark:text-slate-400">
-      <div className="italic text-center">404 - Ye have set sail into th' unknown waters, matey!</div>
+      <div className="italic text-center">404 - Ye have set sail into th&apos; unknown waters, matey!</div>
       <button
         id="go-back"
         onClick={goBack}
