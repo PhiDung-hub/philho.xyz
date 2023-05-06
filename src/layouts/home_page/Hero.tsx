@@ -24,7 +24,7 @@ export default function Hero() {
             {' technology related to '}
           </p>
         </div>
-        <div className="text-rose-400 font-bold">Blockchain & Distributed Systems | Numerical Simulation | Artifical Intelligence</div>
+        <div className="text-rose-400 font-bold">DeFi | Web Simulations | System Design</div>
       </div>
 
       <div className="w-full mx-auto text-center md:flex flex-row p-12 sm:px-0 justify-center">
@@ -48,13 +48,13 @@ export default function Hero() {
 const cards = [
   {
     title: 'Projects',
-    desc: 'Places where I test new technologies and play with my knowledge. Keep building!',
+    desc: 'Places where I play with new technology. Builder season!',
     href: '/projects',
     style: 'shadow-orange-500',
   },
   {
     title: 'Blog',
-    desc: 'Places where I jot down what I learn (opinionatedly). Thoughts are occasionally found.',
+    desc: 'Places where I keep track of my learning journey. Thoughts are occasionally found',
     href: '/blog',
     style: 'shadow-orange-500',
   },

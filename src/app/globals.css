@@ -11,7 +11,7 @@
   scrollbar-width: 10px;
   scrollbar-color: linear-gradient(to bottom, transparent, var(--scrollbar-color));
   --bg-gradient: linear-gradient(to bottom, #fff8f1, white);
-  --scrollbar-color: rgba(11, 80, 155, 0.9);
+  --scrollbar-color: rgba(251, 191, 36);
 }
 
 .dark:root {

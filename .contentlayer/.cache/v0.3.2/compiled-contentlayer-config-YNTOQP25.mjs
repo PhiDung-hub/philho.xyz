@@ -46,11 +46,11 @@ var contentlayer_config_default = makeSource({
   documentTypes: [BlogPost],
   mdx: {
     remarkPlugins: [remarkGfm, remarkMath],
-    rehypePlugins: [rehypeKatex]
+    rehypePlugins: [[rehypeKatex, { output: "mathml" }]]
   }
 });
 export {
   BlogPost,
   contentlayer_config_default as default
 };
-//# sourceMappingURL=compiled-contentlayer-config-PG5HQC7R.mjs.map
+//# sourceMappingURL=compiled-contentlayer-config-YNTOQP25.mjs.map

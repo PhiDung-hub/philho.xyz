@@ -14,10 +14,10 @@ const TableOfContents = () => {
   );
 
   return (
-    <div className="hidden lg:block">
+    <div className="hidden md:block">
       <div className="mb-4 flex items-center gap-4">
-        <FaListUl size={16} />
-        <div>Table of contents</div>
+        <FaListUl size={20} />
+        <div className="text-lg md:text-xl font-semibold text-yellow-500 dark:text-blue-200">Table of contents</div>
       </div>
       <div>
         {headings.map((heading) => {

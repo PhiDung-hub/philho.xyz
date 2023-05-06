@@ -7,7 +7,7 @@ import React from 'react';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
-import { formateDate } from '~/utils';
+import { formatDate } from '~/utils';
 import { CustomMDXComponents, FooterShareBar, TableOfContents } from '~/components/mdx';
 import { SectionContainer } from '~/components';
 
@@ -30,7 +30,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
   const pathname = usePathname();
 
   const { title, summary, date, modifiedTime } = post;
-  const formattedDate = formateDate(date);
+  const formattedDate = formatDate(date);
   const ISOModifiedTime = new Date(modifiedTime).toISOString();
 
   return (
@@ -52,10 +52,19 @@ export default function BlogPostPage(props: BlogPostPageProps) {
         images={[`https://philho.xyz/api/og?title=${title}&date=${date}`]}
       />
       <SectionContainer className="min-h-[90vh] pt-32 md:pt-40 xl:pt48 px-2 xl:px-0">
-        <div>{formattedDate}</div>
         <h1 className="mb-4 text-3xl font-bold">{title}</h1>
         <div className="mt-8 flex flex-col justify-between lg:flex-row">
           <article className="w-full pr-8">
+            <div id="date-meta" className="block md:flex md:justify-between">
+              <div id="written-date">
+                <span className="font-semibold">Uploaded: </span>
+                <span className="italic">{formattedDate}</span>
+              </div>
+              <div id="last-modified-date">
+                <span className="font-semibold">Last modified: </span>
+                <span className="italic">{formatDate(ISOModifiedTime)}</span>
+              </div>
+            </div>
             <div className="w-full max-w-none">
               <MDXContent components={CustomMDXComponents} />
             </div>

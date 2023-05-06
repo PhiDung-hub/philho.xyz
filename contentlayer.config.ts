@@ -47,6 +47,6 @@ export default makeSource({
   documentTypes: [BlogPost],
   mdx: {
     remarkPlugins: [remarkGfm, remarkMath],
-    rehypePlugins: [rehypeKatex],
+    rehypePlugins: [[rehypeKatex, { output: 'mathml' }]],
   },
 });
