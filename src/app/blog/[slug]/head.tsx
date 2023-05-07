@@ -1,4 +1,5 @@
 import { allBlogPosts } from 'contentlayer/generated';
+import { setupThemeManager } from '~/providers/ThemeProvider';
 
 import { Head } from '~/components';
 
@@ -21,29 +22,31 @@ const BlogPostHead = (props: BlogPostHeadProps) => {
   const ISOModifiedTime = new Date(modifiedTime).toISOString();
 
   return (
-    <Head
-      title={title}
-      description={summary}
-      openGraph={{
-        description: summary,
-        type: 'article',
-        title: `${title} | ${process.env.BASE_TITLE}`,
-        article: {
-          publishedTime: ISOPublishedTime,
-          modifiedTime: ISOModifiedTime,
-          authors: ['https://philho.xyz'],
-        },
-        images: [
-          {
-            url: `https://philho.xyz/api/og?title=${title}&date=${date}`,
-            alt: title,
-            width: 1200,
-            height: 630,
-            type: 'image/png',
+    <>
+      <Head
+        title={title}
+        description={summary}
+        openGraph={{
+          description: summary,
+          type: 'article',
+          title: `${title} | ${process.env.BASE_TITLE}`,
+          article: {
+            publishedTime: ISOPublishedTime,
+            modifiedTime: ISOModifiedTime,
+            authors: ['https://philho.xyz'],
           },
-        ],
-      }}
-    />
+          images: [
+            {
+              url: `https://philho.xyz/public/${post.image}`,
+              alt: title,
+              width: 1200,
+              height: 630,
+              type: 'image/png',
+            },
+          ],
+        }}
+      />
+    </>
   );
 };
 

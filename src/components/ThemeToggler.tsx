@@ -1,5 +1,6 @@
 'use client';
 import { RiSunFill, RiMoonFill } from 'react-icons/ri';
+import { setupThemeManager } from '~/providers/ThemeProvider';
 
 declare global {
   interface Window {
@@ -13,6 +14,9 @@ export default function ThemeToggler() {
     <>
       <button
         onClick={() => {
+          if (!window.__setPreferredTheme) {
+            setupThemeManager();
+          }
           window.__setPreferredTheme('light');
         }}
         className="hidden dark:flex"
@@ -21,6 +25,9 @@ export default function ThemeToggler() {
       </button>
       <button
         onClick={() => {
+          if (!window.__setPreferredTheme) {
+            setupThemeManager();
+          }
           window.__setPreferredTheme('dark');
         }}
         className="flex dark:hidden"

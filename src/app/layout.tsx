@@ -8,9 +8,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (${setupThemeManager.toString()})();
-            `,
+            __html: `(${setupThemeManager.toString()})();`,
           }}
         />
       </head>
