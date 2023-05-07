@@ -1,0 +1,36 @@
+---
+title: Dark mode in React and Tailwind.js
+date: '2022-05-07T00:00:00Z'
+modifiedTime: '2022-05-06T00:00:00Z'
+summary: How to properly create a theme manager in react-next.js, without flashing effect (FOUC).
+image: 'blogs/react_theme.webp'
+type: BlogPost
+---
+
+# Problem statement
+
+We will implement a theme manager that can toggle between dark and light theme. The tech stack is **_React_** and **_Tailwind.js_**.
+
+# First approach
+
+If we look at the following snippet from [tailwind docs](https://tailwindcss.com/docs/dark-mode#supporting-system-preference-and-manual-selection)
+
+```javascript
+// On page load or when changing themes, best to add inline in `head` to avoid FOUC.
+if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  document.documentElement.classList.add('dark');
+} else {
+  document.documentElement.classList.remove('dark');
+}
+
+// Whenever the user explicitly chooses light mode
+localStorage.theme = 'light';
+
+// Whenever the user explicitly chooses dark mode
+localStorage.theme = 'dark';
+
+// Whenever the user explicitly chooses to respect the OS preference
+localStorage.removeItem('theme');
+```
+
+then transform it into pure React using useEffect and useState hooks:

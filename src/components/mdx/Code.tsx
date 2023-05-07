@@ -32,6 +32,12 @@ const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTML
     };
   }, [isCopied]);
 
+  const customCodeStyle = {
+    background: 'transparent',
+    maxHeight: '80vh',
+    code: { background: 'transparent' },
+  };
+
   return (
     <pre className="bg-gray-200 dark:bg-gray-800 rounded-md shadow-sm my-2 overflow-auto">
       <div className="flex justify-between bg-gray-300 dark:bg-gray-900 rounded-t-md py-2 px-4">
@@ -51,24 +57,10 @@ const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTML
         </button>
       </div>
       <div className="rounded-b-md">
-        <SyntaxHighlighter
-          language={language}
-          style={oneDark}
-          customStyle={{ background: 'transparent' }}
-          showLineNumbers
-          wrapLongLines
-          className="hidden dark:block"
-        >
+        <SyntaxHighlighter language={language} style={oneDark} customStyle={customCodeStyle} showLineNumbers className="hidden dark:block">
           {codeString}
         </SyntaxHighlighter>
-        <SyntaxHighlighter
-          language={language}
-          style={oneLight}
-          customStyle={{ background: 'transparent' }}
-          showLineNumbers
-          wrapLongLines
-          className="block dark:hidden"
-        >
+        <SyntaxHighlighter language={language} style={oneLight} customStyle={customCodeStyle} showLineNumbers className="block dark:hidden">
           {codeString}
         </SyntaxHighlighter>
       </div>
