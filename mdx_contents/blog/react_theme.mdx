@@ -11,7 +11,9 @@ type: BlogPost
 
 We will implement a theme manager that can toggle between dark and light theme. The tech stack is **_React_** and **_Tailwind.js_**.
 
-# First approach
+# First approach: React hooks
+
+## Tailwind example code 
 
 If we look at the following snippet from [tailwind docs](https://tailwindcss.com/docs/dark-mode#supporting-system-preference-and-manual-selection)
 
@@ -33,10 +35,12 @@ localStorage.theme = 'dark';
 localStorage.removeItem('theme');
 ```
 
-then transform it into pure React using useEffect and useState hooks:
+## Step 1: React way
+
+Transform the above into pure React using `useEffect` and `useState` hooks:
 
 ```typescript
-// file: DarkModeProvider.ts
+// file: <root>/src/providers/DarkModeProvider.ts
 
 'use client'; // for Next.JS 13 with `appDir`
 
@@ -112,9 +116,13 @@ export const DarkModeProvider = ({ children }: { children: React.ReactNode }) =>
 export const useDarkMode = () => useContext(DarkModeContext);
 ```
 
+## Step 2: Usage 
+
 and finally using the defined provider in our main app:
 
 ```typescript
+// File: <root>/src/app/layout.tsx
+
 import { DarkModeProvider } from '~/providers/DarkModeProvider'; // from `DarkModeProvider.ts`
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
@@ -131,12 +139,160 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 export default RootLayout;
 ```
 
+a theme toggler implementation will also be straightforward:
+```typescript
+// File: <root>/src/components/ThemeToggler.tsx
+
+'use client';
+import { useDarkMode } from '~/providers/DarkModeProvider'; // defined in Step 1
+import { RiSunFill, RiMoonFill } from 'react-icons/ri';
+
+export default function ThemeToggler({ className }: { className?: string }) {
+  const { toggle, isDarkMode } = useDarkMode();
+
+  return (
+    <div onClick={toggle} className={className}>
+      {isDarkMode ? <RiMoonFill size="2rem" className="text-[#007BFF]" /> : <RiSunFill size="2rem" className="text-[#FF5900]" />}
+    </div>
+  );
+}
+```
+
 ## FOUC (flash of unstyled content)
 
 The snippet using `DarkModeProvider` above will suffered from FOUC because React `useEffect` hook does not work as intended on hydration, 
 i.e. the `useEffect` hook will execute twice (one on initial hyrdation and another after DOM fully drawn), causing the screen to be flashed as below.
 
-Therefore, we will need another solution, which use only bare metal Javascript. In fact, I adopt the idea from [react.dev](https://react.dev/). 
+# Second Approach: Pure JS
+
+We will need another solution, which use only bare metal Javascript. In fact, I adopt the idea from [react.dev](https://react.dev/). 
 The relevant portion of code can be seen on their github repository:
 - [`_document.tsx`](https://github.com/reactjs/react.dev/blob/main/src/pages/_document.tsx) 
 - [`TopNav.tsx`](https://github.com/reactjs/react.dev/blob/main/src/components/Layout/TopNav/TopNav.tsx)
+
+## Step 1: Define theme manager
+
+Define `ThemeProvider.js` which implements a `setupThemeManager()` function:
+```javascript
+// File: <root>/src/providers/ThemeProvider.js
+
+/* eslint-disable */
+export function setupThemeManager() {
+  function setTheme(newTheme) {
+    window.__theme = newTheme;
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (newTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    }
+  }
+
+  var preferredTheme;
+  try {
+    preferredTheme = localStorage.getItem('theme');
+  } catch (err) {}
+
+  window.__setPreferredTheme = function (newTheme) {
+    preferredTheme = newTheme;
+    setTheme(newTheme);
+    try {
+      localStorage.setItem('theme', newTheme);
+    } catch (err) {}
+  };
+
+  var initialTheme = preferredTheme;
+  var darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+  if (!initialTheme) {
+    initialTheme = darkQuery.matches ? 'dark' : 'light';
+  }
+  setTheme(initialTheme);
+
+  darkQuery.addEventListener('change', function (e) {
+    if (!preferredTheme) {
+      setTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+}
+```
+Now all theme related functions are accessed through globally defined `window.__theme` and `window.__setPreferredTheme`
+
+## Step 2: setup in root layout
+
+Instantiate function in root layout using `<script>` and `dangerousHTML`:
+```typescript
+// File: <root>/src/app/layout.tsx
+
+import { setupThemeManager } from '~/providers/ThemeProvider'; // import the scripts defined in step 1
+
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <html lang="en">
+      <head>
+        <script
+          {/* Instantiate the script defined in step 1 */}
+          dangerouslySetInnerHTML={{
+            __html: `(${setupThemeManager.toString()})();`,
+          }}
+        />
+      </head>
+      {/* Other layout components */}
+      {children}
+    </html>
+  );
+};
+
+export default RootLayout;
+```
+
+## Step 3: Implements theme toggler
+
+Define a theme togger:
+```typescript
+// File: <root>/src/components/ThemeToggler.tsx
+
+'use client';
+import { RiSunFill, RiMoonFill } from 'react-icons/ri';
+import { setupThemeManager } from '~/providers/ThemeProvider';
+
+declare global {
+  interface Window {
+    __theme: string;
+    __setPreferredTheme: (theme: string) => void;
+  }
+}
+
+export default function ThemeToggler() {
+  return (
+    <>
+      <button
+        onClick={() => {
+          {/* Recheck for dynamic routes, otherwise `__theme` and `__setPreferredTheme` are ill-defined */}
+          if (!window.__setPreferredTheme) {
+            setupThemeManager();
+          }
+          window.__setPreferredTheme('light');
+        }}
+        className="hidden dark:flex"
+      >
+        <RiMoonFill size="2rem" className="text-[#007BFF]" />
+      </button>
+      <button
+        onClick={() => {
+          if (!window.__setPreferredTheme) {
+            setupThemeManager();
+          }
+          window.__setPreferredTheme('dark');
+        }}
+        className="flex dark:hidden"
+      >
+        <RiSunFill size="2rem" className="text-[#FF5900]" />
+      </button>
+    </>
+  );
+}
+```
+
+# References
+1. [react.dev source code](https://github.com/reactjs/react.dev)
+2. [Tailwind.js: customize theme](https://tailwindcss.com/docs/animation#customizing-your-theme)
