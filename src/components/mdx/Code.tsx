@@ -5,16 +5,14 @@ import { BsBookmarkCheckFill } from 'react-icons/bs';
 import React, { DetailedHTMLProps, HTMLAttributes } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { useDarkMode } from '~/providers/DarkModeProvider';
 
 const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTMLPreElement>> = ({ children }) => {
   const [isCopied, setCopied] = React.useState(false);
 
   const $code = React.Children.toArray(children)[0] as React.ReactElement;
-  const language = $code.props.className.match(/language-(.*)/)[1] ?? 'bash';
   const codeString: string = $code.props.children.trim() ?? '';
-
-  const { isDarkMode } = useDarkMode();
+  let language = $code.props.className.match(/language-(.*)/)[1] ?? 'bash';
+  language = SyntaxHighlighter.supportedLanguages.includes(language) ? language : 'bash';
 
   const onCopy = async () => {
     setCopied(true);
@@ -54,11 +52,22 @@ const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTML
       </div>
       <div className="rounded-b-md">
         <SyntaxHighlighter
-          language={SyntaxHighlighter.supportedLanguages.includes(language) ? language : 'bash'}
-          style={isDarkMode ? oneDark : oneLight}
+          language={language}
+          style={oneDark}
           customStyle={{ background: 'transparent' }}
           showLineNumbers
           wrapLongLines
+          className="hidden dark:block"
+        >
+          {codeString}
+        </SyntaxHighlighter>
+        <SyntaxHighlighter
+          language={language}
+          style={oneLight}
+          customStyle={{ background: 'transparent' }}
+          showLineNumbers
+          wrapLongLines
+          className="block dark:hidden"
         >
           {codeString}
         </SyntaxHighlighter>

@@ -1,13 +1,32 @@
 'use client';
-import { useDarkMode } from '~/providers/DarkModeProvider';
 import { RiSunFill, RiMoonFill } from 'react-icons/ri';
 
-export default function ThemeToggler({ className }: { className?: string }) {
-  const { toggle, isDarkMode } = useDarkMode();
+declare global {
+  interface Window {
+    __theme: string;
+    __setPreferredTheme: (theme: string) => void;
+  }
+}
 
+export default function ThemeToggler() {
   return (
-    <div onClick={toggle} className={className}>
-      {isDarkMode ? <RiMoonFill size="2rem" className="text-[#007BFF]" /> : <RiSunFill size="2rem" className="text-[#FF5900]" />}
-    </div>
+    <>
+      <button
+        onClick={() => {
+          window.__setPreferredTheme('light');
+        }}
+        className="hidden dark:flex"
+      >
+        <RiMoonFill size="2rem" className="text-[#007BFF]" />
+      </button>
+      <button
+        onClick={() => {
+          window.__setPreferredTheme('dark');
+        }}
+        className="flex dark:hidden"
+      >
+        <RiSunFill size="2rem" className="text-[#FF5900]" />
+      </button>
+    </>
   );
 }
