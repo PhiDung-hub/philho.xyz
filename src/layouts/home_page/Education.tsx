@@ -53,7 +53,7 @@ function NTUCourseworkProject() {
     <div className="">
       <div className="w-full text-center font-semibold text-base sm:text-xl md:text-2xl">Coursework Project</div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8 mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8 mx-auto">
         <ProjectCard
           href="https://onestop-e-cycle.vercel.app/"
           openGraphHref="/projects/e-cycle.jpg"

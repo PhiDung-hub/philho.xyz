@@ -1,7 +1,7 @@
 ---
 title: Dark mode in React and Tailwind.js
-date: '2022-05-07T00:00:00Z'
-modifiedTime: '2022-05-06T00:00:00Z'
+date: '2023-05-07T00:00:00Z'
+modifiedTime: '2023-05-07T00:00:00Z'
 summary: How to properly create a theme manager in react-next.js, without flashing effect (FOUC).
 image: 'blogs/react_theme.webp'
 type: BlogPost
@@ -34,3 +34,109 @@ localStorage.removeItem('theme');
 ```
 
 then transform it into pure React using useEffect and useState hooks:
+
+```typescript
+// file: DarkModeProvider.ts
+
+'use client'; // for Next.JS 13 with `appDir`
+
+import React, { createContext, useContext, useEffect } from 'react';
+import { useLocalStorage } from '~/hooks';
+import { Dispatch, SetStateAction, useEffect, useState, useDebugValue } from 'react';
+
+type SetValue<T> = Dispatch<SetStateAction<T>>;
+
+function useLocalStorage<T>(key: string, initialValue?: T | (() => T)): [T, SetValue<T>] {
+  // Pass initial state function to useState so logic is only executed once
+  const [storedValue, setStoredValue] = useState<T>(initialValue as T);
+  useDebugValue(storedValue);
+
+  useEffect(() => {
+    if (initialValue != storedValue) {
+      localStorage.setItem(key, JSON.stringify(storedValue));
+    }
+  }, [key, initialValue, storedValue]);
+
+  useEffect(() => {
+    const currentValue = localStorage.getItem(key);
+    if (currentValue) setStoredValue(parse(currentValue));
+  }, [key]);
+
+  return [storedValue, setStoredValue];
+}
+// A wrapper for "JSON.parse()"" to support "undefined" value
+function parse(value: string) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+interface UseDarkModeOutput {
+  isDarkMode: boolean;
+  toggle: () => void;
+}
+
+// Create a new context for the dark mode state
+export const DarkModeContext = createContext<UseDarkModeOutput>({
+  isDarkMode: true,
+  toggle: () => {},
+  enable: () => {},
+  disable: () => {},
+});
+
+export const DarkModeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isDarkMode, setDarkMode] = useLocalStorage<boolean>('is-dark-mode');
+
+  useEffect(() => {
+    const root = window.document.documentElement.classList;
+    if (isDarkMode) {
+      root.add('dark');
+    } else {
+      root.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const toggle = () => setDarkMode((prev) => !prev);
+
+  const value: UseDarkModeOutput = {
+    isDarkMode,
+    toggle,
+  };
+
+  return <DarkModeContext.Provider value={value}>{children}</DarkModeContext.Provider>;
+};
+
+// Create a custom hook that will allow other components to access the dark mode state
+export const useDarkMode = () => useContext(DarkModeContext);
+```
+
+and finally using the defined provider in our main app:
+
+```typescript
+import { DarkModeProvider } from '~/providers/DarkModeProvider'; // from `DarkModeProvider.ts`
+
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <DarkModeProvider>
+      <html lang="en">
+        {/* Other layout components */}
+        {children}
+      </html>
+    </DarkModeProvider>
+  );
+};
+
+export default RootLayout;
+```
+
+## FOUC (flash of unstyled content)
+
+The snippet using `DarkModeProvider` above will suffered from FOUC because React `useEffect` hook does not work as intended on hydration, 
+i.e. the `useEffect` hook will execute twice (one on initial hyrdation and another after DOM fully drawn), causing the screen to be flashed as below.
+
+Therefore, we will need another solution, which use only bare metal Javascript. In fact, I adopt the idea from [react.dev](https://react.dev/). 
+The relevant portion of code can be seen on their github repository:
+- [`_document.tsx`](https://github.com/reactjs/react.dev/blob/main/src/pages/_document.tsx) 
+- [`TopNav.tsx`](https://github.com/reactjs/react.dev/blob/main/src/components/Layout/TopNav/TopNav.tsx)

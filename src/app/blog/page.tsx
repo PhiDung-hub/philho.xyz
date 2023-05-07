@@ -1,4 +1,3 @@
-import { SectionContainer } from '~/components';
 import { BlogPage } from '~/layouts';
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 import React from 'react';
@@ -15,9 +14,9 @@ export default function Blog() {
   });
 
   return (
-    <SectionContainer className="h-screen flex flex-col items-center justify-center">
+    <div className="min-h-screen py-24 flex flex-col items-center justify-center">
       <BlogPage.About />
       <BlogPage.BlogCards allBlogPostMeta={allBlogPostMeta} />
-    </SectionContainer>
+    </div>
   );
 }
