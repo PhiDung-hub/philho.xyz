@@ -2,17 +2,19 @@ import './globals.css';
 import { Footer, NavigationBar, SocialLinks } from '~/layouts/globals';
 import { setupThemeManager } from '~/providers/ThemeProvider';
 
+const description =
+  "Hi, I'm Phil from NTU Singapore. I love to experiment new technologies. My interest are DeFi, Web Simulations, and System Design";
 export const metadata = {
   title: {
     template: '%s | Phil Ho',
     absolute: 'Portfolio | Phil Ho',
   },
-  description: 'Phil Ho personal portfolio',
+  description,
   creator: 'Phil Ho',
   openGraph: {
     type: 'website',
     title: 'Portfolio | Phil Ho',
-    description: 'Phil Ho personal portfolio',
+    description,
     siteName: 'PhilHo.xyz',
     url: 'https://philho.xyz',
     images: [
