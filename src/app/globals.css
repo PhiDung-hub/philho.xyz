@@ -49,6 +49,7 @@ code {
   .custom-container {
     width: 100%;
   }
+
   @media (min-width: 640px) {
     .custom-container {
       max-width: 640px;
@@ -67,6 +68,12 @@ code {
   @media (min-width: 1280px) {
     .custom-container {
       max-width: 1280px;
+    }
+  }
+
+  @media (min-width: 1560px) {
+    .custom-container {
+      max-width: 1560px;
     }
   }
 }

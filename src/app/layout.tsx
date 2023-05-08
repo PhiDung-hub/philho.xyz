@@ -3,8 +3,12 @@ import { Footer, NavigationBar, SocialLinks } from '~/layouts/globals';
 import { setupThemeManager } from '~/providers/ThemeProvider';
 
 const description =
-  "Hi, I'm Phil from NTU Singapore. I love to experiment new technologies. My interest are DeFi, Web Simulations, and System Design";
+  "Hi, I'm Phil Ho from NTU Singapore. I love to experiment with new technologies. My interest are DeFi, Web Simulations, and System Design";
 export const metadata = {
+  metadataBase: new URL('https://philho.xyz'),
+  alternates: {
+    canonical: '/'
+  },
   title: {
     template: '%s | Phil Ho',
     absolute: 'Portfolio | Phil Ho',
