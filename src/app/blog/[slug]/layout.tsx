@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: ['Phil Ho'],
       images: [
         {
-          url: `/${image}`,
+          url: `https://philho.xyz/${image}`,
           alt: title,
           width: 1200,
           height: 630,

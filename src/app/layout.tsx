@@ -18,8 +18,10 @@ export const metadata = {
     images: [
       {
         url: 'https://philho.xyz/photo.png',
-        width: 691,
-        height: 691,
+        alt: 'Phil Ho portfolio',
+        width: 1200,
+        height: 1200,
+        type: 'image/png',
       },
     ],
   },
