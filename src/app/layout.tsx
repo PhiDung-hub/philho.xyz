@@ -2,6 +2,29 @@ import './globals.css';
 import { Footer, NavigationBar, SocialLinks } from '~/layouts/globals';
 import { setupThemeManager } from '~/providers/ThemeProvider';
 
+export const metadata = {
+  title: {
+    template: '%s | Phil Ho',
+    absolute: 'Portfolio | Phil Ho',
+  },
+  description: 'Phil Ho personal portfolio',
+  creator: 'Phil Ho',
+  openGraph: {
+    type: 'website',
+    title: 'Portfolio | Phil Ho',
+    description: 'Phil Ho personal portfolio',
+    siteName: 'PhilHo.xyz',
+    url: 'https://philho.xyz',
+    images: [
+      {
+        url: 'https://philho.xyz/photo.png',
+        width: 691,
+        height: 691,
+      },
+    ],
+  },
+};
+
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
@@ -11,6 +34,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             __html: `(${setupThemeManager.toString()})();`,
           }}
         />
+        <meta charSet="utf-8" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <link rel="icon" href="/favicon_io/favicon.ico" />
       </head>
       <body className="overflow-x-hidden">
         <NavigationBar />
