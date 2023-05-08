@@ -34,7 +34,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
     <SectionContainer className="min-h-[90vh] pt-32 md:pt-40 xl:pt48 px-2 xl:px-0">
       <h1 className="mb-4 text-3xl md:text-4xl font-bold">{title}</h1>
       <div className="mt-8 flex flex-col justify-between lg:flex-row">
-        <article className="w-full lg:w-[85%] pr-8">
+        <article className="w-full lg:w-[85%] lg:pr-8">
           <div id="date-meta" className="block md:flex md:justify-between">
             <div id="written-date">
               <span className="font-semibold">Uploaded: </span>
