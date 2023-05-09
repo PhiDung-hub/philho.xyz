@@ -11,14 +11,14 @@ import { SectionContainer } from '~/components';
 
 type BlogPostPageProps = {
   params: {
-    slug: string;
+    slug: string[];
   };
 };
 
 export default function BlogPostPage(props: BlogPostPageProps) {
   const { slug } = props.params;
 
-  const post = allBlogPosts.find((post: BlogPost) => post.slug === slug);
+  const post = allBlogPosts.find((post: BlogPost) => post.slug === slug.join('/'));
 
   if (!post) {
     notFound();
@@ -55,7 +55,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
           </div>
         </aside>
       </div>
-      <FooterShareBar slug={slug} title={title} />
+      <FooterShareBar slug={slug.join('/')} title={title} />
     </SectionContainer>
   );
 }

@@ -2,13 +2,13 @@ import { Metadata } from 'next';
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 
 type Props = {
-  params: { slug: string };
+  params: { slug: string[] };
   // searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // read route params
-  const post = allBlogPosts.find((post: BlogPost) => post.slug === params.slug);
+  const post = allBlogPosts.find((post: BlogPost) => post.slug === params.slug.join('/'));
 
   if (!post) {
     return {

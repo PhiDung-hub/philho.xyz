@@ -37,7 +37,7 @@ var BlogPost = defineDocumentType(() => ({
   computedFields: {
     slug: {
       type: "string",
-      resolve: (doc) => doc._raw.sourceFileName.replace(/\.mdx$/, "")
+      resolve: (doc) => doc._raw.flattenedPath.replace("blog/", "")
     }
   }
 }));
@@ -53,4 +53,4 @@ export {
   BlogPost,
   contentlayer_config_default as default
 };
-//# sourceMappingURL=compiled-contentlayer-config-YNTOQP25.mjs.map
+//# sourceMappingURL=compiled-contentlayer-config-HLUC226L.mjs.map

@@ -37,7 +37,7 @@ export const BlogPost = defineDocumentType(() => ({
   computedFields: {
     slug: {
       type: 'string',
-      resolve: (doc) => doc._raw.sourceFileName.replace(/\.mdx$/, ''),
+      resolve: (doc) => doc._raw.flattenedPath.replace('blog/', ''),
     },
   },
 }));
