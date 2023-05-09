@@ -6,6 +6,7 @@ import React from 'react';
 
 type ImageProps = {
   rounded?: string;
+  caption?: string;
 } & NextImageProps;
 
 const Image = (props: ImageProps) => {
@@ -14,7 +15,7 @@ const Image = (props: ImageProps) => {
 
   // Configuration for NextImage: https://beta.nextjs.org/docs/api-reference/components/image#props
   return (
-    <div className={clsxTailwindMerge('overflow-hidden', rounded)}>
+    <div className={clsxTailwindMerge('overflow-hidden py-2', rounded)}>
       <NextImage
         className={clsxTailwindMerge('duration-75 ease-in', isLoading ? 'blur-md grayscale' : 'blur-0 grayscale-0', rounded, className)}
         src={src}
@@ -23,6 +24,7 @@ const Image = (props: ImageProps) => {
         onLoadingComplete={() => setLoading(false)}
         {...rest}
       />
+      {props.caption && <div className='text-center italic font-semibold'>{props.caption}</div>}
     </div>
   );
 };

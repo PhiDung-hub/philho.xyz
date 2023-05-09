@@ -2,5 +2,6 @@
 
 import blog__react_themeMdx from './blog__react_theme.mdx.json' assert { type: 'json' }
 import blog__rust_01Mdx from './blog__rust_01.mdx.json' assert { type: 'json' }
+import blog__smart_contractReentrance_attackMdx from './blog__smart_contract-reentrance_attack.mdx.json' assert { type: 'json' }
 
-export const allBlogPosts = [blog__react_themeMdx, blog__rust_01Mdx]
+export const allBlogPosts = [blog__react_themeMdx, blog__rust_01Mdx, blog__smart_contractReentrance_attackMdx]
