@@ -9,7 +9,7 @@ import { formatDate } from '~/utils';
 import MDXComponents, { FooterShareBar, TableOfContents } from '~/components/mdx';
 import { SectionContainer } from '~/components';
 
-type BlogPostPageProps = {
+export type BlogPostPageProps = {
   params: {
     slug: string[];
   };
