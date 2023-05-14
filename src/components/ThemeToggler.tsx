@@ -1,7 +1,7 @@
-'use client';
+// 'use client';
 import { RiSunFill, RiMoonFill } from 'react-icons/ri';
-import { setupThemeManager } from '~/providers/ThemeProvider';
-import { useEffect } from 'react';
+// import { setupThemeManager } from '~/providers/ThemeProvider';
+// import { useEffect } from 'react';
 
 declare global {
   interface Window {
@@ -12,11 +12,11 @@ declare global {
 
 export default function ThemeToggler() {
   // Recheck for dynamic routes, otherwise `__theme` and `__setPreferredTheme` are ill-defined
-  useEffect(() => {
-    if (!window.__setPreferredTheme) {
-      setupThemeManager();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!window.__setPreferredTheme) {
+  //     setupThemeManager();
+  //   }
+  // }, []);
 
   return (
     <>

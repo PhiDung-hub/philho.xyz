@@ -46,6 +46,6 @@ export async function generateMetadata(props: BlogPostPageProps, parent: Resolvi
 }
 
 const PostLayout = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
+  return children;
 };
 export default PostLayout;
