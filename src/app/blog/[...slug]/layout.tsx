@@ -2,7 +2,7 @@ import { Metadata, ResolvingMetadata } from 'next';
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 import { type BlogPostPageProps } from './page';
 
-export async function generateMetadata(props: BlogPostPageProps, parent?: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata(props: BlogPostPageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = props.params;
   const post = allBlogPosts.find((post: BlogPost) => post.slug === slug.join('/'));
 
@@ -17,7 +17,7 @@ export async function generateMetadata(props: BlogPostPageProps, parent?: Resolv
   const ISOPublishedTime = new Date(date).toISOString();
   const ISOModifiedTime = new Date(modifiedTime).toISOString();
 
-  const previousImages = (await parent)?.openGraph?.images || [];
+  const previousImages = (await parent).openGraph?.images || [];
 
   return {
     title: title,
