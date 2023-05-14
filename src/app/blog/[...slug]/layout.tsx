@@ -3,7 +3,6 @@ import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 
 type Props = {
   params: { slug: string[] };
-  // searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

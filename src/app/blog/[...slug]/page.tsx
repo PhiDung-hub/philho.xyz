@@ -6,7 +6,7 @@ import { useMDXComponent } from 'next-contentlayer/hooks';
 
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 import { formatDate } from '~/utils';
-import { CustomMDXComponents, FooterShareBar, TableOfContents } from '~/components/mdx';
+import MDXComponents, { FooterShareBar, TableOfContents } from '~/components/mdx';
 import { SectionContainer } from '~/components';
 
 type BlogPostPageProps = {
@@ -46,7 +46,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
             </div>
           </div>
           <div className="w-full max-w-none">
-            <MDXContent components={CustomMDXComponents} />
+            <MDXContent components={MDXComponents} />
           </div>
         </article>
         <aside className="lg:w-[12rem] lg:flex-shrink-0">

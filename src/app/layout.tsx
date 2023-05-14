@@ -7,7 +7,7 @@ const description =
 export const metadata = {
   metadataBase: new URL('https://philho.xyz'),
   alternates: {
-    canonical: '/'
+    canonical: '/',
   },
   title: {
     template: '%s | Phil Ho',

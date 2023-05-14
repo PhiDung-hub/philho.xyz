@@ -2,7 +2,7 @@
 title: Re-entrancy attack - Concept, Simulation, and Solution
 date: '2023-05-09T00:00:00Z'
 modifiedTime: '2023-05-09T00:00:00Z'
-summary: Introduce re-entrancy vulnerability in smart contracts. Implement a mock up exploitation scenario and guard against it.
+summary: Introduce re-entrancy vulnerability. Implement an example exploitation scenario and discuss potential solutions.
 image: 'blogs/blockchain/reentrance/cover.webp'
 type: BlogPost
 ---
@@ -301,17 +301,20 @@ contract RobustBank {
 In conclusion, there are two common solutions to guard against re-entrancy attacks in smart contracts:
 
 ## 1. Re-entrancy guard
-This is a simple solution that involves adding a boolean variable to the contract's state to track whether a function is currently executing. 
-While effective, this method can be costly in terms of gas usage and may impact the contract's overall performance. 
+
+This is a simple solution that involves adding a boolean variable to the contract's state to track whether a function is currently executing.
+While effective, this method can be costly in terms of gas usage and may impact the contract's overall performance.
 It is considered a safer option for developers who are not experienced with more sophisticated security patterns.
 
-## 2. Check-Effects-Interactions pattern 
+## 2. Check-Effects-Interactions pattern
+
 This method involves separating the contract's functions into three parts:
+
 1. checking inputs
 2. updating the state
 3. interacting with other contracts
 
-and ensuring that these parts are executed in a correct order. While more efficient than the re-entrancy guard, 
+and ensuring that these parts are executed in a correct order. While more efficient than the re-entrancy guard,
 this solution requires a more sophisticated understanding of smart contract security and can be challenging to implement correctly.
 
 # References

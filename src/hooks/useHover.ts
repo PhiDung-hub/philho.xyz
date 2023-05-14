@@ -3,9 +3,7 @@ import { RefObject, useState } from 'react';
 import useEventListener from './useEventListener';
 
 // Convenient hook to register hover event
-function useHover<T extends HTMLElement = HTMLElement>(
-  elementRef: RefObject<T>
-): boolean {
+function useHover<T extends HTMLElement = HTMLElement>(elementRef: RefObject<T>): boolean {
   const [value, setValue] = useState<boolean>(false);
 
   const handleMouseEnter = () => setValue(true);

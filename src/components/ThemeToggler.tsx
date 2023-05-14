@@ -1,6 +1,7 @@
 'use client';
 import { RiSunFill, RiMoonFill } from 'react-icons/ri';
 import { setupThemeManager } from '~/providers/ThemeProvider';
+import { useEffect } from 'react';
 
 declare global {
   interface Window {
@@ -10,13 +11,17 @@ declare global {
 }
 
 export default function ThemeToggler() {
+  // Recheck for dynamic routes, otherwise `__theme` and `__setPreferredTheme` are ill-defined
+  useEffect(() => {
+    if (!window.__setPreferredTheme) {
+      setupThemeManager();
+    }
+  }, []);
+
   return (
     <>
       <button
         onClick={() => {
-          if (!window.__setPreferredTheme) {
-            setupThemeManager();
-          }
           window.__setPreferredTheme('light');
         }}
         className="hidden dark:flex"
@@ -25,9 +30,6 @@ export default function ThemeToggler() {
       </button>
       <button
         onClick={() => {
-          if (!window.__setPreferredTheme) {
-            setupThemeManager();
-          }
           window.__setPreferredTheme('dark');
         }}
         className="flex dark:hidden"

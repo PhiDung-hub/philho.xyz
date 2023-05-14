@@ -26,9 +26,7 @@ function ViewBase() {
 
       <PortfolioBulletPointsWrapper>
         <PortfolioBulletPoint title="Fullstack Development - ">
-          <span>
-            Develop a discussion forum with reddit-like features.
-          </span>
+          <span>Develop a discussion forum with reddit-like features.</span>
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Token Design - ">
           <span>
@@ -37,9 +35,7 @@ function ViewBase() {
           </span>
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Frontend development - ">
-          <span>
-            Help develop a landing page featuring 3D interactive models utilizing BabylonJS.
-          </span>
+          <span>Help develop a landing page featuring 3D interactive models utilizing BabylonJS.</span>
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Smart Contract Engineering - ">
           <span>

@@ -24,7 +24,7 @@ const Image = (props: ImageProps) => {
         onLoadingComplete={() => setLoading(false)}
         {...rest}
       />
-      {props.caption && <div className='text-center italic font-semibold'>{props.caption}</div>}
+      {props.caption && <div className="text-center italic font-semibold">{props.caption}</div>}
     </div>
   );
 };

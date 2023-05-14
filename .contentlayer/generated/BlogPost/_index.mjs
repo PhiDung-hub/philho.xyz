@@ -2,7 +2,8 @@
 
 import blog__front_end__react_themeMdx from './blog__front_end__react_theme.mdx.json' assert { type: 'json' }
 import blog__rust__01Mdx from './blog__rust__01.mdx.json' assert { type: 'json' }
+import blog__smart_contract__akutar_and_dDoSMdx from './blog__smart_contract__akutar_and_DDoS.mdx.json' assert { type: 'json' }
 import blog__smart_contract__private_storageMdx from './blog__smart_contract__private_storage.mdx.json' assert { type: 'json' }
 import blog__smart_contract__reentrance_attackMdx from './blog__smart_contract__reentrance_attack.mdx.json' assert { type: 'json' }
 
-export const allBlogPosts = [blog__front_end__react_themeMdx, blog__rust__01Mdx, blog__smart_contract__private_storageMdx, blog__smart_contract__reentrance_attackMdx]
+export const allBlogPosts = [blog__front_end__react_themeMdx, blog__rust__01Mdx, blog__smart_contract__akutar_and_dDoSMdx, blog__smart_contract__private_storageMdx, blog__smart_contract__reentrance_attackMdx]

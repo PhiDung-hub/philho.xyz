@@ -30,4 +30,3 @@ function parse(value: string) {
 }
 
 export default useLocalStorage;
-

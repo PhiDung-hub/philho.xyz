@@ -78,13 +78,14 @@ All values in Rust are stack allocated by default (continuous, high-speed access
 Stack size is fixed so compilation wouldn't work for recusive data structures such as Linkedlists, Array, etc.. where
 data size is unknown at compilation time.
 
-Thus smart pointers are needed. 
-For example, values can be boxed and allocates on the heap with `std::Box<T>`. A box is a pointer with automatic mememory management feature (hence *smart* pointer) to a heap value of type `T`.
+Thus smart pointers are needed.
+For example, values can be boxed and allocates on the heap with `std::Box<T>`. A box is a pointer with automatic mememory management feature (hence _smart_ pointer) to a heap value of type `T`.
+
 - Conceptualize by C++, inspired from Simula67 `element` - a pointer without `null` ([history](https://en.wikipedia.org/wiki/Smart_pointer#history)).
 - For example, in C++11, `std::unique_ptr<Type> Func()` makes explicit that caller should takes ownership of the result, and C++ runtime ensures that memory will be reclaimed automatically.
-- <strong>For Rust, </strong> a smart pointer is defined mostly as a struct that
-  implements `Deref` - , `Drop` traits. The concept is well described in [official
-  book](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html). You may find this [explanation](https://youtu.be/KYJ95TxEC18) helpful.
+- <strong>For Rust, </strong> a smart pointer is defined mostly as a struct that implements `Deref` - , `Drop` traits. The concept is well described
+  in [official book](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html). You may find this [explanation](https://youtu.be/KYJ95TxEC18)
+  helpful.
 
 An example of `Box` from the book, noticing box always takes 8 bytes.
 
@@ -168,4 +169,3 @@ Unboxed point occupies 16 bytes on the stack
 # References
 
 1. [O'Reilly rust crash course](https://learning.oreilly.com/videos/ultimate-rust-crash/9781800563902/)
-
