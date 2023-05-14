@@ -19,15 +19,15 @@ export const metadata = {
     type: 'website',
     title: 'Portfolio | Phil Ho',
     description,
-    siteName: 'PhilHo.xyz',
+    siteName: 'philho.xyz',
     url: 'https://philho.xyz',
     images: [
       {
-        url: 'https://philho.xyz/index.jpg',
+        url: 'https://philho.xyz/og/index.webp',
         alt: 'Phil Ho portfolio',
         width: 728,
         height: 676,
-        type: 'image/png',
+        type: 'image/webp',
       },
     ],
   },

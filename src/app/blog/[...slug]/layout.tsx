@@ -6,7 +6,6 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // read route params
   const { slug } = params;
   const post = allBlogPosts.find((post: BlogPost) => post.slug === slug.join('/'));
 
@@ -26,7 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: summary,
     openGraph: {
       type: 'article',
+      title: title,
       url: `https://philho.xyz/blog/${post.slug}`,
+      siteName: 'philho.xyz',
       description: summary,
       publishedTime: ISOPublishedTime,
       modifiedTime: ISOModifiedTime,

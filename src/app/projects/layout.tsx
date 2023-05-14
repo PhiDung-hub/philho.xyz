@@ -6,7 +6,7 @@ export const metadata = {
     type: 'website',
     title: 'Projects | Phil Ho',
     description,
-    siteName: 'PhilHo.xyz',
+    siteName: 'philho.xyz',
     url: 'https://philho.xyz',
     images: [
       {
@@ -14,7 +14,7 @@ export const metadata = {
         alt: 'Phil Ho project gallery',
         width: 1200,
         height: 1200,
-        type: 'image/png',
+        type: 'image/webp',
       },
     ],
   },
