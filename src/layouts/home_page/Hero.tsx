@@ -5,7 +5,7 @@ import { SectionContainer } from '~/components';
 export default function Hero() {
   return (
     <SectionContainer className="pt-24">
-      <NextImage priority width={300} height={300} src="/photo.png" alt="Personal Photo" className="mx-auto rounded-full py-4" />
+      <NextImage priority width={300} height={300} src="/personal_photo.jpg" alt="Personal Photo" className="mx-auto rounded-full py-4" />
 
       <div className={`font-mono text-xl md:text-2xl animate-text-bounce p-5 w-full h-full text-center`}>
         <div>
