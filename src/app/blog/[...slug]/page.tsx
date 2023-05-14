@@ -17,7 +17,6 @@ type BlogPostPageProps = {
 
 export default function BlogPostPage(props: BlogPostPageProps) {
   const { slug } = props.params;
-
   const post = allBlogPosts.find((post: BlogPost) => post.slug === slug.join('/'));
 
   if (!post) {

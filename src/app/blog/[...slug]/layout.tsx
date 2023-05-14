@@ -7,7 +7,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // read route params
-  const post = allBlogPosts.find((post: BlogPost) => post.slug === params.slug.join('/'));
+  const { slug } = params;
+  const post = allBlogPosts.find((post: BlogPost) => post.slug === slug.join('/'));
 
   if (!post) {
     return {
@@ -29,14 +30,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: summary,
       publishedTime: ISOPublishedTime,
       modifiedTime: ISOModifiedTime,
-      authors: ['Phil Ho'],
+      authors: 'Phil Ho',
       images: [
         {
           url: `https://philho.xyz/${image}`,
           alt: title,
           width: 1200,
           height: 630,
-          type: 'image/png',
+          type: 'image/webp',
         },
       ],
     },
