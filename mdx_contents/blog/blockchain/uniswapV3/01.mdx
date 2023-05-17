@@ -125,8 +125,6 @@ And the [official values](https://github.com/Uniswap/v3-core/blob/main/contracts
 With this range, tick values can be packed into 21-bits signed integers.
 Thus the [official implementation](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/TickMath.sol) uses **int24** for ticks (size should fit in bytes).
 
----
-
 With the tick system, our next step is to provide a mechanism to manage liquidity provision between 2 ticks values.
 For example, a user who wish to provide liquidity between tick $[-1000, 1000]$ suppose to trade their tokens and earn fee while $P \in [0.904842, 1.105165]$,
 and do nothing otherwise.
