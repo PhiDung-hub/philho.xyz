@@ -44,8 +44,6 @@ $$
 \Large{\Delta X = L \times \Delta \frac{1}{\sqrt{P}}}
 $$
 
----
-
 ### Proof (2-3)
 
 For $\Delta Y\ (2)$:
@@ -80,8 +78,6 @@ L \times \Delta \sqrt {\frac{1}{P}}
 }
 $$
 
----
-
 ### Discussion: about Square root of price
 
 All the above formulas involves $\sqrt{P}$ and $L$, a natural approach is utilizing these 2 variables to manage liquidity and price for the AMM model.
@@ -93,7 +89,7 @@ as evidence in [PriceMath.sol](https://github.com/Uniswap/v3-core/blob/c09c892f5
 [`SqrtPriceMath`](https://docs.uniswap.org/contracts/v3/reference/core/libraries/SqrtPriceMath) was first introduced on [commit 4724f148f5eb626d07d68e485a0a7a45103ee448](https://github.com/Uniswap/v3-core/commit/4724f148f5eb626d07d68e485a0a7a45103ee448) and regularly updated to use **UQ64.96** as of present.
 Using the new approach provides better granularity and higher precision compared to a linear approximation (using Babylonian sqrt) pricing model.
 
-## Ticks system
+## 2. Tick system
 
 As the AMM operates on percentage, e.g. fee is 0.01% | 0.05% | 0.3%, and we traders love using ticks. Uniswap V3 implements a tick system that is:
 
