@@ -1,0 +1,134 @@
+---
+title: UniswapV3 - Part 01
+date: '2023-05-09T00:00:00Z'
+modifiedTime: '2023-05-09T00:00:00Z'
+summary: Uniswap V3 Introduction - Discover the innovative liquidity model, essential concepts, and mathematical formulas.
+image: 'blogs/blockchain/uniswap/01/cover.webp'
+type: BlogPost
+---
+
+# Introduction and resources
+
+This is the first part of my series titled "Uniswap V3". First and foremost, here are some good references to get started:
+
+1. [Uniswap V2 whitepaper](https://uniswap.org/whitepaper.pdf) and [docs](https://docs.uniswap.org/contracts/v2/overview)
+2. [Comprehensive tutorial](https://uniswapv3book.com/docs/introduction/uniswap-v3/) from [Ivan Kuznetsov](https://github.com/Jeiwan)
+3. [Official whitepaper](https://uniswap.org/whitepaper-v3.pdf), [official docs](https://docs.uniswap.org/contracts/v3/overview) and [source code](https://github.com/Uniswap/v3-core)
+
+# Liquidity model
+
+Comparing to Uniswap V2, V3 uses the same constant product $X \times Y = K$ curve.
+However, Uniswap V3 augment the liquidity model, i.e. introducing new concepts to support concentrated liquidity provision.
+
+## 1. Liquidity Amount
+
+In V3, the amount of liquidity $L$, represented by an **uint128** is defined as:
+
+$$
+\tag{1}
+
+\LARGE{L = \sqrt{X \times Y}}
+$$
+
+With same price defined as in V2 ($P = \dfrac{Y}{X}$), the following can be derived:
+
+$$
+\tag{2}
+
+\Large{\Delta Y = L \times \Delta \sqrt{P}}
+$$
+
+$$
+\tag{3}
+
+\Large{\Delta X = L \times \Delta \frac{1}{\sqrt{P}}}
+$$
+
+---
+
+### Proof (2-3)
+
+For $\Delta Y\ (2)$:
+
+$$
+\begin{aligned}
+L \times \Delta \sqrt{P}
+
+&= \sqrt{XY} \times ( \sqrt{\frac{Y_1}{X_1}} - \sqrt{\frac{Y_2}{X_2}} ) \\
+
+&= \sqrt{\frac {Y_1^2 \cdot X_1} {X_1}} - \sqrt{\frac {Y_2^2 \cdot X_2} {X_2}} \quad [since \ X_1 Y_1 = X_2 Y_2 = XY] \\
+
+&= Y_1 - Y_2 = \Delta Y \quad (Q.E.D)
+\end{aligned}
+$$
+
+Similarly, for $\Delta X \ (3)$:
+
+$$
+\begin{aligned}
+
+L \times \Delta \sqrt {\frac{1}{P}}
+
+&= \sqrt{XY} \times ( \sqrt{\frac{X_1}{Y_1}} - \sqrt{\frac{X_2}{Y_2}} ) \\
+
+&= \sqrt{\frac {X_1^2 \cdot Y_1} {Y_1}} - \sqrt{\frac {X_2^2 \cdot Y_2} {Y_2}} \\
+
+&= X_1 - X_2 = \Delta X \quad (Q.E.D)
+
+\end{aligned}
+$$
+
+---
+
+### Discussion: about Square root of price
+
+All the above formulas involves $\sqrt{P}$ and $L$, a natural approach is utilizing these 2 variables to manage liquidity and price for the AMM model.
+
+However, this wasn't always the case. During first days, V3 was using [`Babylonian.sqrt`](https://github.com/Uniswap/solidity-lib/blob/master/contracts/libraries/Babylonian.sol) algotihm to approximate reserve values.
+**uint256**, **uint128**, and **UQ128.128** ([Unsigned Q number](<https://en.wikipedia.org/wiki/Q_(number_format)>) was being used for liqiduity and price calculation,
+as evidence in [PriceMath.sol](https://github.com/Uniswap/v3-core/blob/c09c892f59e08783e2415d1957c67979a4c7dccc/contracts/libraries/PriceMath.sol).
+
+[`SqrtPriceMath`](https://docs.uniswap.org/contracts/v3/reference/core/libraries/SqrtPriceMath) was first introduced on [commit 4724f148f5eb626d07d68e485a0a7a45103ee448](https://github.com/Uniswap/v3-core/commit/4724f148f5eb626d07d68e485a0a7a45103ee448) and regularly updated to use **UQ64.96** as of present.
+Using the new approach provides better granularity and higher precision compared to a linear approximation (using Babylonian sqrt) pricing model.
+
+## Ticks system
+
+As the AMM operates on percentage, e.g. fee is 0.01% | 0.05% | 0.3%, and we traders love using ticks. Uniswap V3 implements a tick system that is:
+
+$$
+\tag{4}
+
+p(i) = 1.0001^i \quad [1 \ tick = 0.01\%]
+$$
+
+### Tick range
+
+As $\sqrt{P}$ is [$Q64.96$](<https://en.wikipedia.org/wiki/Q_(number_format)>) formatted, the tick range is
+
+$$
+\begin{aligned}
+[\log_{1.0001}P_{min}, \ log_{1.0001}P_{max}]
+
+&= [\log_{1.0001}{2^{-96*2}}, \ \log_{1.0001}{2^{64*2}}] \\
+
+&\overset{\Delta} {\approx} [\log_{1.0001}{2^{-128}}, \ \log_{1.0001}{2^{128}}] \quad (for \ symmetry) \\
+
+&= [-887272, 887272] \quad
+\end{aligned}
+$$
+
+Same reasoning can be found in [this discussion](https://ethereum.stackexchange.com/questions/144793/why-does-uniswap-v3-use-ticks-887220-887220-to-represent-the-price-range-0-%E2%88%9E) (though the value was 887220).
+And the [official values](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/TickMath.sol#L9) can be verified as derived.
+
+### Tick representation
+
+With this range, tick values can be packed into 21-bits signed integers.
+Thus the [official implementation](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/TickMath.sol) uses **int24** for ticks (size should fit in bytes).
+
+---
+
+With the tick system, our next step is to provide a mechanism to manage liquidity provision between 2 ticks values.
+For example, a user who wish to provide liquidity between tick $[-1000, 1000]$ suppose to trade their tokens and earn fee while $P \in [0.904842, 1.105165]$,
+and do nothing otherwise.
+
+Detailed models will be discussed in next part of this series "Uniswap V3 - Part 02". Cheers!

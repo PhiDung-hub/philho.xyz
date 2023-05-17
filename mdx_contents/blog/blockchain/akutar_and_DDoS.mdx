@@ -2,7 +2,7 @@
 title: DDoS attack
 date: '2023-05-10T00:00:00Z'
 modifiedTime: '2023-05-10T00:00:00Z'
-summary: Akutar NFT incidand an example of DDoS attack from Ethernaut.
+summary: Akutar NFT incident an example of DDoS attack from Ethernaut.
 image: 'blogs/blockchain/dos/cover.webp'
 type: BlogPost
 ---
@@ -620,8 +620,8 @@ In order to stop owner from withdrawing funds, one of the following must happen:
 2. fund is exhausted before owner receive their share (line 20) => impractical since withdraw 1% balance each time.
 
 For the 1st case, withdrawal partner receive their share by a low-level `call` statement on **_line 19_**.
-Therefore making this call failed, i.e. a simple `revert()` or `assert(false)` statement, won't do the trick.
-Instead, the partner contract need to:
+Making this call failed, i.e. a simple `revert()` or `assert(false)` statement won't do the trick.
+Therefore, the partner (smart contract) need to:
 
 - execute `while(true) { <some_statement>; }` to consume all gas => OutOfGas reversal error.
 - OR perform re-entrancy on `withdraw()` => exhaust the call stack by consuming all gas => same OutOfGas error.
