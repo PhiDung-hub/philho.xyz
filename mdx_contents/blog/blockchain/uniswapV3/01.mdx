@@ -3,7 +3,7 @@ title: UniswapV3 - Part 01
 date: '2023-05-09T00:00:00Z'
 modifiedTime: '2023-05-09T00:00:00Z'
 summary: Uniswap V3 Introduction - Discover the innovative liquidity model, essential concepts, and mathematical formulas.
-image: 'blogs/blockchain/uniswap/01/cover.webp'
+image: 'blogs/blockchain/uniswapV3/01/cover.webp'
 type: BlogPost
 ---
 
@@ -51,31 +51,33 @@ $$
 For $\Delta Y\ (2)$:
 
 $$
-\begin{aligned}
-L \times \Delta \sqrt{P}
+\large{
+\begin{align*}
 
-&= \sqrt{XY} \times ( \sqrt{\frac{Y_1}{X_1}} - \sqrt{\frac{Y_2}{X_2}} ) \\
-
-&= \sqrt{\frac {Y_1^2 \cdot X_1} {X_1}} - \sqrt{\frac {Y_2^2 \cdot X_2} {X_2}} \quad [since \ X_1 Y_1 = X_2 Y_2 = XY] \\
-
+L \times \Delta \sqrt{P} &= \sqrt{XY} \times ( \sqrt{\frac{Y_1}{X_1}} - \sqrt{\frac{Y_2}{X_2}} ) \\
+&= \sqrt{\frac {Y_1^2 \cdot X_1} {X_1}} - \sqrt{\frac {Y_2^2 \cdot X_2} {X_2}} \quad [X_1 Y_1 = X_2 Y_2 = XY] \\
 &= Y_1 - Y_2 = \Delta Y \quad (Q.E.D)
-\end{aligned}
+
+\end{align*}
+}
 $$
 
 Similarly, for $\Delta X \ (3)$:
 
 $$
+\large{
 \begin{aligned}
 
 L \times \Delta \sqrt {\frac{1}{P}}
 
 &= \sqrt{XY} \times ( \sqrt{\frac{X_1}{Y_1}} - \sqrt{\frac{X_2}{Y_2}} ) \\
 
-&= \sqrt{\frac {X_1^2 \cdot Y_1} {Y_1}} - \sqrt{\frac {X_2^2 \cdot Y_2} {Y_2}} \\
+&= \sqrt{\frac {X_1^2 \cdot Y_1} {Y_1}} - \sqrt{\frac {X_2^2 \cdot Y_2} {Y_2}} \quad [X_1 Y_1 = X_2 Y_2 = XY] \\
 
 &= X_1 - X_2 = \Delta X \quad (Q.E.D)
 
 \end{aligned}
+}
 $$
 
 ---
@@ -98,7 +100,7 @@ As the AMM operates on percentage, e.g. fee is 0.01% | 0.05% | 0.3%, and we trad
 $$
 \tag{4}
 
-p(i) = 1.0001^i \quad [1 \ tick = 0.01\%]
+\LARGE{p(i) = 1.0001^i \quad [1 \ tick = 0.01\%]}
 $$
 
 ### Tick range
@@ -106,6 +108,7 @@ $$
 As $\sqrt{P}$ is [$Q64.96$](<https://en.wikipedia.org/wiki/Q_(number_format)>) formatted, the tick range is
 
 $$
+\large{
 \begin{aligned}
 [\log_{1.0001}P_{min}, \ log_{1.0001}P_{max}]
 
@@ -115,6 +118,7 @@ $$
 
 &= [-887272, 887272] \quad
 \end{aligned}
+}
 $$
 
 Same reasoning can be found in [this discussion](https://ethereum.stackexchange.com/questions/144793/why-does-uniswap-v3-use-ticks-887220-887220-to-represent-the-price-range-0-%E2%88%9E) (though the value was 887220).

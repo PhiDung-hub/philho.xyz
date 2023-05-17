@@ -26,6 +26,10 @@ code {
   background-color: transparent !important;
 }
 
+mtd {
+  text-align: left;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

@@ -4,7 +4,7 @@ export { default as Code } from './Code';
 
 import { Image } from '~/components';
 import type { MDXComponents } from 'mdx/types';
-import { FC, ReactNode, Children, isValidElement } from 'react';
+import { ReactNode, Children, isValidElement } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import CodeBlock from './Code';
 import Annotation from './Annotation';
