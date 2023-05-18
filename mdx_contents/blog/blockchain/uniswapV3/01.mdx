@@ -202,14 +202,24 @@ only needs to maintain enough reserves to support trading within
 its range, and therefore can act like a constant product pool with
 larger reserves (we call these the virtual reserves) within that range."
 
-<Image src="/blogs/blockchain/uniswapV3/01/virtual_reserve.webp" width="600" height="600" alt="virutal reserve" caption="Virtual reserve" />
-<Image
-  src="/blogs/blockchain/uniswapV3/01/real_reserve.webp"
-  width="600"
-  height="600"
-  alt="real vs virtual reserve"
-  caption="Real vs Virtual reserve"
-/>
+<div className="block md:flex py-2">
+  <Image
+    src="/blogs/blockchain/uniswapV3/01/virtual_reserve.webp"
+    className="md:w-[40%] md:pr-2 mx-auto"
+    width="600"
+    height="600"
+    alt="virutal reserve"
+    caption="Virtual reserve"
+  />
+  <Image
+    src="/blogs/blockchain/uniswapV3/01/real_reserve.webp"
+    className="md:w-[40%] md:pl-2 mx-auto"
+    width="600"
+    height="600"
+    alt="real vs virtual reserve"
+    caption="Real vs Virtual reserve"
+  />
+</div>
 
 So the new strategy is to split each tick into a virtual reserve then combine them to form the complete liquidity curve.
 Doing so will result in more efficient captical allocation $\rightarrow$ more fee earned and less slippage.
@@ -218,6 +228,7 @@ In summary, the curve can be visualised as follow:
 
 <Image
   src="/blogs/blockchain/uniswapV3/liquidity_curve.webp"
+  className="py-2"
   width="1500"
   height="600"
   alt="liquidty curve"
