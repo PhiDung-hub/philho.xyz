@@ -3,7 +3,7 @@ title: UniswapV3 - Part 01
 date: '2023-05-09T00:00:00Z'
 modifiedTime: '2023-05-09T00:00:00Z'
 summary: Uniswap V3 Introduction - Discover the innovative liquidity model, essential concepts, and mathematical formulas.
-image: 'blogs/blockchain/uniswapV3/01/cover.webp'
+image: 'blogs/blockchain/uniswapV3/cover.webp'
 type: BlogPost
 ---
 
@@ -22,12 +22,14 @@ However, Uniswap V3 augment the liquidity model, i.e. introducing new concepts t
 
 ## 1. Liquidity Amount
 
-In V3, the amount of liquidity $L$, represented by an **uint128** is defined as:
+Let X, Y be the price of two tokens in a liquidity pool, respectively. In V3, the amount of liquidity $L$, represented by an **uint128** is defined as:
 
 $$
 \tag{1}
 
-\LARGE{L = \sqrt{X \times Y}}
+\Large{
+  L \overset{\Delta} = \sqrt{X \times Y}
+}
 $$
 
 With same price defined as in V2 ($P = \dfrac{Y}{X}$), the following can be derived:
@@ -35,13 +37,17 @@ With same price defined as in V2 ($P = \dfrac{Y}{X}$), the following can be deri
 $$
 \tag{2}
 
-\Large{\Delta Y = L \times \Delta \sqrt{P}}
+\Large{
+  \Delta Y = L \times \Delta \sqrt{P}
+}
 $$
 
 $$
 \tag{3}
 
-\Large{\Delta X = L \times \Delta \frac{1}{\sqrt{P}}}
+\Large{
+  \Delta X = L \times \Delta \frac{1}{\sqrt{P}}
+}
 $$
 
 ### Proof (2-3)
@@ -50,13 +56,13 @@ For $\Delta Y\ (2)$:
 
 $$
 \large{
-\begin{align*}
+  \begin{aligned}
 
-L \times \Delta \sqrt{P} &= \sqrt{XY} \times ( \sqrt{\frac{Y_1}{X_1}} - \sqrt{\frac{Y_2}{X_2}} ) \\
-&= \sqrt{\frac {Y_1^2 \cdot X_1} {X_1}} - \sqrt{\frac {Y_2^2 \cdot X_2} {X_2}} \quad [X_1 Y_1 = X_2 Y_2 = XY] \\
-&= Y_1 - Y_2 = \Delta Y \quad (Q.E.D)
+  L \times \Delta \sqrt{P} &= \sqrt{XY} \times ( \sqrt{\frac{Y_1}{X_1}} - \sqrt{\frac{Y_2}{X_2}} ) \\
+  &= \sqrt{\frac {Y_1^2 \cdot X_1} {X_1}} - \sqrt{\frac {Y_2^2 \cdot X_2} {X_2}} \quad [X_1 Y_1 = X_2 Y_2 = XY] \\
+  &= Y_1 - Y_2 = \Delta Y \quad (Q.E.D)
 
-\end{align*}
+  \end{aligned}
 }
 $$
 
@@ -64,17 +70,17 @@ Similarly, for $\Delta X \ (3)$:
 
 $$
 \large{
-\begin{aligned}
+  \begin{aligned}
 
-L \times \Delta \sqrt {\frac{1}{P}}
+  L \times \Delta \sqrt {\frac{1}{P}}
 
-&= \sqrt{XY} \times ( \sqrt{\frac{X_1}{Y_1}} - \sqrt{\frac{X_2}{Y_2}} ) \\
+  &= \sqrt{XY} \times ( \sqrt{\frac{X_1}{Y_1}} - \sqrt{\frac{X_2}{Y_2}} ) \\
 
-&= \sqrt{\frac {X_1^2 \cdot Y_1} {Y_1}} - \sqrt{\frac {X_2^2 \cdot Y_2} {Y_2}} \quad [X_1 Y_1 = X_2 Y_2 = XY] \\
+  &= \sqrt{\frac {X_1^2 \cdot Y_1} {Y_1}} - \sqrt{\frac {X_2^2 \cdot Y_2} {Y_2}} \quad [X_1 Y_1 = X_2 Y_2 = XY] \\
 
-&= X_1 - X_2 = \Delta X \quad (Q.E.D)
+  &= X_1 - X_2 = \Delta X \quad (Q.E.D)
 
-\end{aligned}
+  \end{aligned}
 }
 $$
 
@@ -96,7 +102,9 @@ As the AMM operates on percentage, e.g. fee is 0.01% | 0.05% | 0.3%, and we trad
 $$
 \tag{4}
 
-\LARGE{p(i) = 1.0001^i \quad [1 \ tick = 0.01\%]}
+\Large{
+  Tick_{i} \overset{\Delta} = 1.0001^i \quad \text{[1 tick = 0.01\%]}
+}
 $$
 
 ### Tick range
@@ -105,15 +113,15 @@ As $\sqrt{P}$ is [$Q64.96$](<https://en.wikipedia.org/wiki/Q_(number_format)>) f
 
 $$
 \large{
-\begin{aligned}
-[\log_{1.0001}P_{min}, \ log_{1.0001}P_{max}]
+  \begin{aligned}
+  [\log_{1.0001}P_{min}, \ log_{1.0001}P_{max}]
 
-&= [\log_{1.0001}{2^{-96*2}}, \ \log_{1.0001}{2^{64*2}}] \\
+  &= [\log_{1.0001}{2^{-96 \times 2}}, \ \log_{1.0001}{2^{64 \times 2}}] \\
 
-&\overset{\Delta} {\approx} [\log_{1.0001}{2^{-128}}, \ \log_{1.0001}{2^{128}}] \quad (for \ symmetry) \\
+  &\overset{\Delta} {\approx} [\log_{1.0001}{2^{-128}}, \ \log_{1.0001}{2^{128}}] \quad \text{(for symmetry)} \\
 
-&= [-887272, 887272] \quad
-\end{aligned}
+  &= [-887272, 887272]
+  \end{aligned}
 }
 $$
 
@@ -129,4 +137,96 @@ With the tick system, our next step is to provide a mechanism to manage liquidit
 For example, a user who wish to provide liquidity between tick $[-1000, 1000]$ suppose to trade their tokens and earn fee while $P \in [0.904842, 1.105165]$,
 and do nothing otherwise.
 
-Detailed models will be discussed in next part of this series "Uniswap V3 - Part 02". Cheers!
+## 3. Liquidity curve
+
+With the tick system and liquidity amount defined in previous section. Let's _token0_ and _token1_ be 2 tokens in our liquidity pool.
+The liquidity density, i.e. the amount of liquidity within a price/tick range is:
+
+$$
+\tag{5}
+
+\Large{
+  \lambda \overset{\Delta}= \frac {\delta L}{\delta \sqrt{P}} \\
+}
+$$
+
+$$
+\begin{aligned}
+
+\text{where }
+&\delta \sqrt{P} \text{ - quantum (sqrt) price range, i.e. a tick for V3} \\
+&\delta L \text{ - liquidity within the range, i.e. amount of token0 tradable in }[P, P + \delta P]
+
+\end{aligned}
+$$
+
+Then liquidity curve is $\lambda - P$.
+
+### Uniswap V2
+
+For V2, every liquidity provider is exposed to the whole $0 \rightarrow \infty$ range. Meaning liquidity is evenly distributed and $\lambda - P$ will be a straight line.
+
+For example, let take a liquidity pool with initial reserve of **100 token A** (token0) and **100 token B** (token1). The liquidity locked in first tick is
+
+$$
+\begin{aligned}
+
+\bullet \ \delta L &= \Delta_{0 \rightarrow 1} Y \\
+&= L \times \Delta_{0  \rightarrow 1} \sqrt{P} \\
+&= 100 \times (\sqrt{1.0001} - 1) \\
+&\approx 0.05  \\
+
+&\bullet \ \delta \sqrt{P} = \Delta_{0 \rightarrow 1} \sqrt{P} \\
+
+\end{aligned} \\
+
+
+\Rightarrow
+\lambda_{0 \rightarrow 1} = \frac {\Delta_{0 \rightarrow 1} Y} {\Delta_{0 \rightarrow 1} \sqrt{P}} = 100
+
+
+$$
+
+In fact, $\lambda_{i \rightarrow i+1} = L \ \forall i$, which mean liquidity is uniformly distributed
+
+### Uniswap V3
+
+In V2, there was an issue with stable coin pools. Users expected to be able to swap stable coins with minimal slippage.
+However, in V2, the slippage for such swaps was quite high, around 0.8% for 1% of the total value locked (TVL) in the pool.
+This means that if someone wanted to swap $1M USDC for DAI in a pool that had a total value of $100M in both DAI and USDC,
+they would have to pay a staggering $80,000 in fees.
+
+This issue is solved by concentrated liquidity in V3. A concentrated liquidity is, quoted, from V3-whitepaper:
+"We call liquidity concentrated to a finite range a position. A position
+only needs to maintain enough reserves to support trading within
+its range, and therefore can act like a constant product pool with
+larger reserves (we call these the virtual reserves) within that range."
+
+<Image src="/blogs/blockchain/uniswapV3/01/virtual_reserve.webp" width="600" height="600" alt="virutal reserve" caption="Virtual reserve" />
+<Image
+  src="/blogs/blockchain/uniswapV3/01/real_reserve.webp"
+  width="600"
+  height="600"
+  alt="real vs virtual reserve"
+  caption="Real vs Virtual reserve"
+/>
+
+So the new strategy is to split each tick into a virtual reserve then combine them to form the complete liquidity curve.
+Doing so will result in more efficient captical allocation $\rightarrow$ more fee earned and less slippage.
+
+In summary, the curve can be visualised as follow:
+
+<Image
+  src="/blogs/blockchain/uniswapV3/liquidity_curve.webp"
+  width="1500"
+  height="600"
+  alt="liquidty curve"
+  caption="Liquidity curve [visualization from V3-whitepaper]"
+/>
+
+# What's next?
+
+Thank you for completing Part 1 of my Uniswap V3 series!
+In the next installment, we'll dive into the practical implementation of this decentralized exchange.
+Get ready for a deep exploration of its technical intricacies, cutting-edge technologies, and innovative mechanisms.
+Stay tuned for Part 2, where theory meets reality. Cheers!

@@ -47,7 +47,7 @@ const CustomMDXComponents: MDXComponents = {
       if (isValidElement(item) && item.type === 'li') {
         return (
           <li key={`${uuidv4()}-${index}`}>
-            <span className="font-mono font-semibold">- </span>
+            <span className="font-mono font-semibold">&bull; </span>
             {item.props.children}
           </li>
         );
