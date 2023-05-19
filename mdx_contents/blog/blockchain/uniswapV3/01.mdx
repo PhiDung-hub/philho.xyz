@@ -171,15 +171,18 @@ For example, let take a liquidity pool with initial reserve of **100 token A** (
 $$
 \begin{aligned}
 
-\bullet \ \delta L &= \Delta_{0 \rightarrow 1} Y \\
+\bullet \ \delta L
+&= \Delta_{0 \rightarrow 1} Y \\
 &= L \times \Delta_{0  \rightarrow 1} \sqrt{P} \\
 &= 100 \times (\sqrt{1.0001} - 1) \\
 &\approx 0.05  \\
 
-&\bullet \ \delta \sqrt{P} = \Delta_{0 \rightarrow 1} \sqrt{P} \\
+\bullet \ \delta \sqrt{P} &= \Delta_{0 \rightarrow 1} \sqrt{P} \\
 
-\end{aligned} \\
+\end{aligned}
+$$
 
+$$
 
 \Rightarrow
 \lambda_{0 \rightarrow 1} = \frac {\Delta_{0 \rightarrow 1} Y} {\Delta_{0 \rightarrow 1} \sqrt{P}} = 100
@@ -221,7 +224,10 @@ larger reserves (we call these the virtual reserves) within that range."
   />
 </div>
 
-So the new strategy is to split each tick into a virtual reserve then combine them to form the complete liquidity curve.
+If considering a curve bounded by 2 points $[a, b]$ as above figures.
+Virtual reserve is the reserve in the pool if we extended it to infinity, whereas real reserve is the actual token reserves available within specified range, i.e. $[a, b]$
+
+Then "concentrated liquidity" essential mean splitting each tick into a virtual reserve and combine them to form the complete liquidity curve.
 Doing so will result in more efficient captical allocation $\rightarrow$ more fee earned and less slippage.
 
 In summary, the curve can be visualised as follow:
@@ -238,6 +244,5 @@ In summary, the curve can be visualised as follow:
 # What's next?
 
 Thank you for completing Part 1 of my Uniswap V3 series!
-In the next installment, we'll dive into the practical implementation of this decentralized exchange.
-Get ready for a deep exploration of its technical intricacies, cutting-edge technologies, and innovative mechanisms.
-Stay tuned for Part 2, where theory meets reality. Cheers!
+In the next installment, we'll dive into the implementation details.
+Stay tuned for Part 2 and cheers!
