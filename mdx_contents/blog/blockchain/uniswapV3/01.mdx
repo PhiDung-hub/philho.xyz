@@ -182,15 +182,16 @@ $$
 \end{aligned}
 $$
 
-$$
-
-\Rightarrow
-\lambda_{0 \rightarrow 1} = \frac {\Delta_{0 \rightarrow 1} Y} {\Delta_{0 \rightarrow 1} \sqrt{P}} = 100
-
+<div className="py-1"></div>
 
 $$
+\large {
+  \Rightarrow
+  \lambda_{0 \rightarrow 1} = \frac {\Delta_{0 \rightarrow 1} Y} {\Delta_{0 \rightarrow 1} \sqrt{P}} = 100
+}
+$$
 
-In fact, $\lambda_{i \rightarrow i+1} = L \ \forall i$, which mean liquidity is uniformly distributed
+In fact, $\lambda_{i \rightarrow i+1} = L \ \forall i$ as derived above. This mean liquidity is uniformly distributed for V2.
 
 ### Uniswap V3
 
@@ -199,26 +200,40 @@ However, in V2, the slippage for such swaps was quite high, around 0.8% for 1% o
 This means that if someone wanted to swap $1M USDC for DAI in a pool that had a total value of $100M in both DAI and USDC,
 they would have to pay a staggering $80,000 in fees.
 
-This issue is solved by concentrated liquidity in V3. A concentrated liquidity is, quoted, from V3-whitepaper:
-"We call liquidity concentrated to a finite range a position. A position
-only needs to maintain enough reserves to support trading within
-its range, and therefore can act like a constant product pool with
-larger reserves (we call these the virtual reserves) within that range."
+This issue is solved by concentrated liquidity in V3.
 
-<div className="block md:flex py-2">
+<Quote author="Uniswap V3 white-paper" className="my-2">
+
+"...We call liquidity concentrated to a finite range a position. A position only needs to maintain enough reserves to support trading within
+its range, and therefore can act like a constant product pool with larger reserves (we call these the virtual reserves) within that
+range.
+
+Specifically, a position only needs to hold enough of asset X to cover price movement to its upper bound,
+because upwards price movement corresponds to depletion of the X reserves.
+Similarly, it only needs to hold enough of asset Y to cover price movement to its lower bound.
+
+When the price exits a position’s range, the position’s liquidity is no longer active, and no longer earns fees.
+At that point, its liquidity is composed entirely of a single asset, because the reserves of the other asset must have been entirely depleted.
+If the price ever reenters the range, the liquidity becomes active again..."
+
+</Quote>
+
+<div className="block md:flex justify-center align-center py-2">
   <Image
     src="/blogs/blockchain/uniswapV3/01/virtual_reserve.webp"
-    className="md:w-[40%] md:pr-2 mx-auto"
-    width="600"
-    height="600"
+    className="mx-auto"
+    wrapperClassName="pr-2"
+    width="576"
+    height="576"
     alt="virutal reserve"
     caption="Virtual reserve"
   />
   <Image
     src="/blogs/blockchain/uniswapV3/01/real_reserve.webp"
-    className="md:w-[40%] md:pl-2 mx-auto"
-    width="600"
-    height="600"
+    className="mx-auto"
+    wrapperClassName="pl-2"
+    width="551"
+    height="551"
     alt="real vs virtual reserve"
     caption="Real vs Virtual reserve"
   />

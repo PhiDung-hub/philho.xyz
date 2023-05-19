@@ -132,4 +132,20 @@ From the above implementations, there are a few notes:
   and derive the total amount once every update, as seen in [pool contract](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L379).
   `feeGrowthInside...` is padded with 128 "0" bits to make `mulDiv` works ([`mulDiv(a, b, denominator)`](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol#L14) calculate `a x b / denominator` with full precision).
 
+Since the position is non-fungible in nature, it will be reasonable to represent them as an NFT.
+
+In addition:
+
+<Quote author="Uniswap V3 white-paper">
+  "Fees earned in earlier versions were continuously deposited in the pool as liquidity. This meant that liquidity in the pool would grow
+  over time, even without explicit deposits, and that fee earnings compounded. In Uniswap v3, due to the non-fungible nature of positions,
+  this is no longer possible. Instead, fee earnings are stored separately and held as the tokens in which the fees are paid.
+
+... in v3, the pool contract does not implement the ERC-20 standard. Anyone can create an ERC-20 token contract in the periphery that
+makes a liquidity position more fungible, but it will have to have additional logic to handle distribution of,
+or reinvestment of, collected fees. Alternatively, anyone could create a periphery contract that wraps an individual liquidity position
+(including collected fees) in an ERC-721 non-fungible token."
+
+</Quote>
+
 # Tick

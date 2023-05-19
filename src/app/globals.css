@@ -26,10 +26,21 @@ code {
   background-color: transparent !important;
 }
 
+/* MATH related (Katex) rendering */
 mtd {
   text-align: left;
 }
 
+math {
+  @apply text-yellow-700;
+}
+
+.dark math {
+  @apply text-blue-300;
+}
+/**********************************/
+
+/******* Scollbar styling *********/
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -48,6 +59,7 @@ mtd {
   background: var(--scrollbar-color);
   border-radius: 2px;
 }
+/**********************************/
 
 @layer base {
   .custom-container {
@@ -110,71 +122,6 @@ mtd {
     }
     50% {
       opacity: 1;
-    }
-  }
-
-  .animate-text-change::before {
-    content: '';
-    animation: change infinite 6s;
-  }
-
-  @keyframes change {
-    0% {
-      content: 'l';
-    }
-    2% {
-      content: 'le';
-    }
-    4% {
-      content: 'lea';
-    }
-    6% {
-      content: 'lear';
-    }
-    8% {
-      content: 'learn';
-    }
-
-    30% {
-      content: '';
-    }
-
-    33.3% {
-      content: 'b';
-    }
-    35.3% {
-      content: 'bu';
-    }
-    37.3% {
-      content: 'bui';
-    }
-    39.3% {
-      content: 'buil';
-    }
-    41.3% {
-      content: 'build';
-    }
-
-    63% {
-      content: '';
-    }
-
-    66.6% {
-      content: 't';
-    }
-    68.6% {
-      content: 'te';
-    }
-    70.6% {
-      content: 'tes';
-    }
-    72.6% {
-      content: 'test';
-    }
-
-    100% {
-      transform: translateX(-50%);
-      content: '';
     }
   }
 }

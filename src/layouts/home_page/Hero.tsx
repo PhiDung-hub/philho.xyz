@@ -1,6 +1,7 @@
 import NextImage from 'next/image';
 import NextLink from 'next/link';
 import { SectionContainer } from '~/components';
+import './Hero.css';
 
 export default function Hero() {
   return (

@@ -1,6 +1,7 @@
 export { default as TableOfContents } from './TableOfContents';
 export { default as FooterShareBar } from './FooterShareBar';
 export { default as Code } from './Code';
+export { default as Quote } from './Quote';
 
 import { Image } from '~/components';
 import type { MDXComponents } from 'mdx/types';
@@ -8,6 +9,7 @@ import { ReactNode, Children, isValidElement } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import CodeBlock from './Code';
 import Annotation from './Annotation';
+import Quote from './Quote';
 
 const textToId = (children: ReactNode): string => {
   return (children as string).replace(' ', '-');
@@ -16,6 +18,7 @@ const textToId = (children: ReactNode): string => {
 const CustomMDXComponents: MDXComponents = {
   Image,
   Annotation,
+  Quote,
   h1: ({ children }) => (
     <h1 className="font-bold text-2xl py-4 text-blue-500 dark:text-blue-200" id={textToId(children)}>
       <a href={`#${textToId(children)}`}>{children}</a>

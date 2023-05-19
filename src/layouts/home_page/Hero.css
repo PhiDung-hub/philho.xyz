@@ -1,0 +1,51 @@
+@tailwind utilities;
+
+@layer utilities {
+  @keyframes change {
+    2% {
+      content: 'l';
+    }
+    4% {
+      content: 'le';
+    }
+    6% {
+      content: 'lea';
+    }
+    8% {
+      content: 'lear';
+    }
+    10% {
+      content: 'learn';
+    }
+
+    50% {
+      content: '';
+    }
+
+    52% {
+      content: 'b';
+    }
+    54% {
+      content: 'bu';
+    }
+    56% {
+      content: 'bui';
+    }
+    58% {
+      content: 'buil';
+    }
+    60% {
+      content: 'build';
+    }
+
+    100% {
+      transform: translateX(-50%);
+      content: '';
+    }
+  }
+
+  .animate-text-change::before {
+    content: '';
+    animation: change infinite 4s;
+  }
+}
