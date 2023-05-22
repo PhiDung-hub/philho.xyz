@@ -61,7 +61,7 @@ const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTML
           style={oneDark}
           customStyle={customCodeStyle}
           showLineNumbers
-          className="hidden dark:block max-h-[90vh] md:max-h-[70vh]"
+          className="hidden dark:block max-h-[70vh] md:max-h-[75vh]"
         >
           {codeString}
         </SyntaxHighlighter>
@@ -70,7 +70,7 @@ const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTML
           style={oneLight}
           customStyle={customCodeStyle}
           showLineNumbers
-          className="block dark:hidden max-h-[90vh] md:max-h-[75vh]"
+          className="block dark:hidden max-h-[70vh] md:max-h-[75vh]"
         >
           {codeString}
         </SyntaxHighlighter>

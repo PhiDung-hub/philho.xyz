@@ -25,22 +25,22 @@ const CustomMDXComponents: MDXComponents = {
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="font-semibold text-xl py-3" id={textToId(children)}>
+    <h2 className="font-semibold text-xl py-3 text-blue-500 dark:text-blue-200" id={textToId(children)}>
       <a href={`#${textToId(children)}`}>{children}</a>
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="font-semibold text-lg py-2" id={textToId(children)}>
+    <h3 className="font-semibold text-lg py-2 text-blue-500 dark:text-blue-200" id={textToId(children)}>
       <a href={`#${textToId(children)}`}>{children}</a>
     </h3>
   ),
   h4: ({ children }) => (
-    <h4 className="font-medium text-md py-1" id={textToId(children)}>
+    <h4 className="font-medium text-md py-1 text-blue-500 dark:text-blue-200" id={textToId(children)}>
       <a href={`#${textToId(children)}`}>{children}</a>
     </h4>
   ),
   a: ({ href, children }) => (
-    <a href={href} target="_blank" className="text-sky-600 dark:text-sky-200 hover:underline">
+    <a href={href} target="_blank" className="text-sky-600 dark:text-rose-300 hover:underline">
       {children}
     </a>
   ),
@@ -76,6 +76,9 @@ const CustomMDXComponents: MDXComponents = {
     return <ol className="pl-4 py-1">{listItems}</ol>;
   },
   pre: CodeBlock,
+  code: ({ children }) => {
+    return <code className="opacity-80 dark:opacity-100 dark:text-stone-400">{children}</code>;
+  },
 };
 
 export default CustomMDXComponents;

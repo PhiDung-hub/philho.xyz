@@ -1,8 +1,8 @@
 ---
-title: UniswapV3 - Part 02
-date: '2023-05-09T00:00:00Z'
-modifiedTime: '2023-05-09T00:00:00Z'
-summary: Uniswap V3 - Concentrated liquidity - Explore tick and position mechanisms. Ticks represent discrete price points within a Uniswap V3 pool, while positions define the liquidity provided by liquidity providers (LPs) at specific price ranges determined by two ticks.
+title: UniswapV3 02 - Tick and Position
+date: '2023-05-15T00:00:00Z'
+modifiedTime: '2023-05-23T00:00:00Z'
+summary: Uniswap V3 - Explore tick and position structure in concentrated liquidity.
 image: 'blogs/blockchain/uniswapV3/cover.webp'
 type: BlogPost
 ---
@@ -49,9 +49,9 @@ Tick bitmaps are responsible for packing ticks' initialized state (whether activ
 - **16 bits key** - `wordPosition = int16(tick >> 8)`
 - **8 bits value** - position of the tick within that word, `bitPos = uint8(tick % 256)`
 
-**\*Note:** a tick is represented as an **int24** since they are bounded by [-887272, 887272] (discussed in [part 1](https://philho.xyz/blog/blockchain/uniswapV3/01#2.-Tick%20system) of this series).\*
+_**Note:** a tick is represented as an **int24** since they are bounded by [-887272, 887272] (discussed in [part 1](https://philho.xyz/blog/blockchain/uniswapV3/01#2.-Tick%20system) of this series)._
 
-### But why the bit map and 16 | 8 division?
+### Why 16 | 8 bit map?
 
 Firstly, we need an efficient data structure to store ticks' state for access.
 Obviously, it's no good using all 887272 booleans storage variable for each position initialized as this will incur astronomical gas on Ethereum (as of current time).
@@ -63,7 +63,7 @@ Therefore the strategy is using a simple (lazy) storage that:
 
 ### How about the math?
 
-The source code for [`TickBitmap.sol`](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/TickBitmap.sol)
+The source code for [TickBitmap.sol](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/TickBitmap.sol)
 
 ```solidity
 // SPDX-License-Identifier: BUSL-1.1
@@ -180,14 +180,16 @@ tick that a swap crosses imposes a gas cost on the swapper)."
 
 Tick math is wielded by black magic [here](https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/TickMath.sol), which containing:
 
-- Tick and corresponding $\sqrt P$ boundary ($P =$ price).
+- Tick and corresponding $\sqrt P$ boundary ($P$ is price).
 - Effective conversion of $\sqrt P \leftrightarrow tick$ (Using pre-calculated values so conversion can be done in $O(log_2{n})$ times).
 
 ## Tick structure and mechanism
 
-Tick implementations details is referenced from the source code - [`Tick.sol`](https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Tick.sol)
+Tick implementations details is referenced from the source code - [Tick.sol](https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Tick.sol)
 
 ### Tick layout
+
+From the source code:
 
 ```solidity
 struct Info {
@@ -225,7 +227,7 @@ A tick containing info about
 
 ### Tick functions
 
-As mentioned in the tick source code in the beginning of this section:
+From the source code:
 
 ```solidity
 /// @notice Derives max liquidity per tick from given tick spacing
@@ -483,7 +485,7 @@ From the above implementation:
 - A position is indexed by `owner, tickLower, tickUpper` using [`keccak256`](https://keccak.team/keccak_specs_summary.html) (precede SHA-3) hash.
 - As $\Delta X$ and $\Delta Y$ both involves common factor $L$ [from (2) and (3)], it's more efficient to use fee per unit of liquidity
   and derive the total amount once every update, as seen in [pool contract](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L379).
-  `feeGrowthInside...` is padded with 128 "0" bits to make `mulDiv` works ([`mulDiv(a, b, denominator)`](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol#L14) calculate `a x b / denominator` with full precision).
+  `feeGrowthInside...` is padded with 128 "0" bits to make `mulDiv` works ([mulDiv(a, b, denominator)](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol#L14) calculate `a x b / denominator` with full precision).
 
 Since the position is non-fungible in nature, it will be reasonable to represent them as an NFT. As quoted:
 
