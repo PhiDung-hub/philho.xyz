@@ -34,7 +34,6 @@ const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTML
 
   const customCodeStyle = {
     background: 'transparent',
-    maxHeight: '80vh',
     code: { background: 'transparent' },
   };
 
@@ -57,10 +56,22 @@ const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTML
         </button>
       </div>
       <div className="rounded-b-md">
-        <SyntaxHighlighter language={language} style={oneDark} customStyle={customCodeStyle} showLineNumbers className="hidden dark:block">
+        <SyntaxHighlighter
+          language={language}
+          style={oneDark}
+          customStyle={customCodeStyle}
+          showLineNumbers
+          className="hidden dark:block max-h-[90vh] md:max-h-[70vh]"
+        >
           {codeString}
         </SyntaxHighlighter>
-        <SyntaxHighlighter language={language} style={oneLight} customStyle={customCodeStyle} showLineNumbers className="block dark:hidden">
+        <SyntaxHighlighter
+          language={language}
+          style={oneLight}
+          customStyle={customCodeStyle}
+          showLineNumbers
+          className="block dark:hidden max-h-[90vh] md:max-h-[75vh]"
+        >
           {codeString}
         </SyntaxHighlighter>
       </div>

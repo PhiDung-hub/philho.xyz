@@ -2,7 +2,7 @@
 title: UniswapV3 - Part 02
 date: '2023-05-09T00:00:00Z'
 modifiedTime: '2023-05-09T00:00:00Z'
-summary: Uniswap V3 - Concentrated liquidity - mechanism and implementations
+summary: Uniswap V3 - Concentrated liquidity - Explore tick and position mechanisms. Ticks represent discrete price points within a Uniswap V3 pool, while positions define the liquidity provided by liquidity providers (LPs) at specific price ranges determined by two ticks.
 image: 'blogs/blockchain/uniswapV3/cover.webp'
 type: BlogPost
 ---
@@ -36,116 +36,7 @@ For our current discussion, we will be focusing on the following aspects:
 - [Tick](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/Tick.sol) - Manage tick liquidity and fee acculmulation (within _this_ tick)
 - [SwapMath](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/SwapMath.sol) - Compute result of a swap (or trade)
 
-# Position
-
-The source code for [`Position.sol`](https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Position.sol)
-
-```solidity
-// SPDX-License-Identifier: BUSL-1.1
-pragma solidity >=0.5.0 <0.8.0;
-
-// ADDED_NOTE: Visit https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Position.sol
-import './FullMath.sol';
-import './FixedPoint128.sol';
-import './LiquidityMath.sol';
-
-/// @title Position
-/// @notice Positions represent an owner address' liquidity between a lower and upper tick boundary
-/// @dev Positions store additional state for tracking fees owed to the position
-library Position {
-  // info stored for each user's position
-  struct Info {
-    // the amount of liquidity owned by this position
-    uint128 liquidity;
-    // fee growth per unit of liquidity as of the last update to liquidity or fees owed
-    uint256 feeGrowthInside0LastX128;
-    uint256 feeGrowthInside1LastX128;
-    // the fees owed to the position owner in token0/token1
-    uint128 tokensOwed0;
-    uint128 tokensOwed1;
-  }
-
-  /// @notice Returns the Info struct of a position, given an owner and position boundaries
-  /// @param self The mapping containing all user positions
-  /// @param owner The address of the position owner
-  /// @param tickLower The lower tick boundary of the position
-  /// @param tickUpper The upper tick boundary of the position
-  /// @return position The position info struct of the given owners' position
-  function get(
-    mapping(bytes32 => Info) storage self,
-    address owner,
-    int24 tickLower,
-    int24 tickUpper
-  ) internal view returns (Position.Info storage position) {
-    position = self[keccak256(abi.encodePacked(owner, tickLower, tickUpper))];
-  }
-
-  /// @notice Credits accumulated fees to a user's position
-  /// @param self The individual position to update
-  /// @param liquidityDelta The change in pool liquidity as a result of the position update
-  /// @param feeGrowthInside0X128 The all-time fee growth in token0, per unit of liquidity, inside the position's tick boundaries
-  /// @param feeGrowthInside1X128 The all-time fee growth in token1, per unit of liquidity, inside the position's tick boundaries
-  function update(
-    Info storage self,
-    int128 liquidityDelta,
-    uint256 feeGrowthInside0X128,
-    uint256 feeGrowthInside1X128
-  ) internal {
-    Info memory _self = self;
-
-    uint128 liquidityNext;
-    if (liquidityDelta == 0) {
-      require(_self.liquidity > 0, 'NP'); // disallow pokes for 0 liquidity positions
-      liquidityNext = _self.liquidity;
-    } else {
-      liquidityNext = LiquidityMath.addDelta(_self.liquidity, liquidityDelta);
-    }
-
-    // calculate accumulated fees
-    // ADDED NOTE: Q128 = 2^128
-    uint128 tokensOwed0 = uint128(
-      FullMath.mulDiv(feeGrowthInside0X128 - _self.feeGrowthInside0LastX128, _self.liquidity, FixedPoint128.Q128)
-    );
-    uint128 tokensOwed1 = uint128(
-      FullMath.mulDiv(feeGrowthInside1X128 - _self.feeGrowthInside1LastX128, _self.liquidity, FixedPoint128.Q128)
-    );
-
-    // update the position
-    if (liquidityDelta != 0) self.liquidity = liquidityNext;
-    self.feeGrowthInside0LastX128 = feeGrowthInside0X128;
-    self.feeGrowthInside1LastX128 = feeGrowthInside1X128;
-    if (tokensOwed0 > 0 || tokensOwed1 > 0) {
-      // overflow is acceptable, have to withdraw before you hit type(uint128).max fees
-      self.tokensOwed0 += tokensOwed0;
-      self.tokensOwed1 += tokensOwed1;
-    }
-  }
-}
-```
-
-From the above implementations, there are a few notes:
-
-- A position stores `L` and total fee accumulated for both tokens.
-- A position is indexed by `owner, tickLower, tickUpper` using keccak256 hash.
-- As $\Delta X$ and $\Delta Y$ both involves common factor $L$ [from (2) and (3)], it's more efficient to use fee per unit of liquidity
-  and derive the total amount once every update, as seen in [pool contract](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L379).
-  `feeGrowthInside...` is padded with 128 "0" bits to make `mulDiv` works ([`mulDiv(a, b, denominator)`](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol#L14) calculate `a x b / denominator` with full precision).
-
-Since the position is non-fungible in nature, it will be reasonable to represent them as an NFT.
-
-In addition:
-
-<Quote author="Uniswap V3 white-paper">
-  "Fees earned in earlier versions were continuously deposited in the pool as liquidity. This meant that liquidity in the pool would grow
-  over time, even without explicit deposits, and that fee earnings compounded. In Uniswap v3, due to the non-fungible nature of positions,
-  this is no longer possible. Instead, fee earnings are stored separately and held as the tokens in which the fees are paid.
-
-... in v3, the pool contract does not implement the ERC-20 standard. Anyone can create an ERC-20 token contract in the periphery that
-makes a liquidity position more fungible, but it will have to have additional logic to handle distribution of,
-or reinvestment of, collected fees. Alternatively, anyone could create a periphery contract that wraps an individual liquidity position
-(including collected fees) in an ERC-721 non-fungible token."
-
-</Quote>
+For a high level overview, refer to the [SECTION 6 - Implementing Concentrated Liquidity](https://uniswap.org/whitepaper-v3.pdf) in the official white-paper.
 
 # Tick
 
@@ -285,193 +176,333 @@ tick that a swap crosses imposes a gas cost on the swapper)."
 
 </Quote>
 
-## Tick math and mechanism
+## Tick math
 
-The source code for [`Tick.sol`](https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Tick.sol)
+Tick math is wielded by black magic [here](https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/TickMath.sol), which containing:
+
+- Tick and corresponding $\sqrt P$ boundary ($P =$ price).
+- Effective conversion of $\sqrt P \leftrightarrow tick$ (Using pre-calculated values so conversion can be done in $O(log_2{n})$ times).
+
+## Tick structure and mechanism
+
+Tick implementations details is referenced from the source code - [`Tick.sol`](https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Tick.sol)
+
+### Tick layout
+
+```solidity
+struct Info {
+  // the total position liquidity that references this tick
+  uint128 liquidityGross;
+  // amount of net liquidity added (subtracted) when tick is crossed from left to right (right to left),
+  int128 liquidityNet;
+  // fee growth per unit of liquidity on the _other_ side of this tick (relative to the current tick)
+  // only has relative meaning, not absolute — the value depends on when the tick is initialized
+  uint256 feeGrowthOutside0X128;
+  uint256 feeGrowthOutside1X128;
+  // the cumulative tick value on the other side of the tick
+  int56 tickCumulativeOutside;
+  // the seconds per unit of liquidity on the _other_ side of this tick (relative to the current tick)
+  // only has relative meaning, not absolute — the value depends on when the tick is initialized
+  uint160 secondsPerLiquidityOutsideX128;
+  // the seconds spent on the other side of the tick (relative to the current tick)
+  // only has relative meaning, not absolute — the value depends on when the tick is initialized
+  uint32 secondsOutside;
+  // true iff the tick is initialized, i.e. the value is exactly equivalent to the expression liquidityGross != 0
+  // these 8 bits are set to prevent fresh sstores when crossing newly initialized ticks
+  bool initialized;
+}
+```
+
+A tick containing info about
+
+- liquidity grossed within this tick - `liquidityGross`, and net liquidity movement when tick is crossed from either side - `liquidityNet`.
+- initialized state indicating whether this tick is active - `initialized`.
+- `tickCumulativeOutside`, `secondsOutside`, `secondsPerLiquidityOutsideX128` keep track of accumulated within a selective range for each tick.
+  These values are not used within the contract, but are tracked for the benefit of external contracts that need
+  more finegrained information about the pool’s behavior, e.g. for purposes like liquidity mining.
+  For example, this is useful for Time Weighted Average (TWAP) Oracle implementations.
+  Their update schemes will be discussed in next part.
+
+### Tick functions
+
+As mentioned in the tick source code in the beginning of this section:
+
+```solidity
+/// @notice Derives max liquidity per tick from given tick spacing
+/// @dev Executed within the pool constructor
+/// @param tickSpacing The amount of required tick separation, realized in multiples of `tickSpacing`
+///     e.g., a tickSpacing of 3 requires ticks to be initialized every 3rd tick i.e., ..., -6, -3, 0, 3, 6, ...
+/// @return The max liquidity per tick
+function tickSpacingToMaxLiquidityPerTick(int24 tickSpacing) internal pure returns (uint128) {
+    int24 minTick = (TickMath.MIN_TICK / tickSpacing) * tickSpacing;
+    int24 maxTick = (TickMath.MAX_TICK / tickSpacing) * tickSpacing;
+    uint24 numTicks = uint24((maxTick - minTick) / tickSpacing) + 1;
+    return type(uint128).max / numTicks;
+}
+
+/// @notice Retrieves fee growth data
+/// @param self The mapping containing all tick information for initialized ticks
+/// @param tickLower The lower tick boundary of the position
+/// @param tickUpper The upper tick boundary of the position
+/// @param tickCurrent The current tick
+/// @param feeGrowthGlobal0X128 The all-time global fee growth, per unit of liquidity, in token0
+/// @param feeGrowthGlobal1X128 The all-time global fee growth, per unit of liquidity, in token1
+/// @return feeGrowthInside0X128 The all-time fee growth in token0, per unit of liquidity, inside the position's tick boundaries
+/// @return feeGrowthInside1X128 The all-time fee growth in token1, per unit of liquidity, inside the position's tick boundaries
+function getFeeGrowthInside(
+    mapping(int24 => Tick.Info) storage self,
+    int24 tickLower,
+    int24 tickUpper,
+    int24 tickCurrent,
+    uint256 feeGrowthGlobal0X128,
+    uint256 feeGrowthGlobal1X128
+) internal view returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128) {
+    Info storage lower = self[tickLower];
+    Info storage upper = self[tickUpper];
+
+    // calculate fee growth below
+    uint256 feeGrowthBelow0X128;
+    uint256 feeGrowthBelow1X128;
+    if (tickCurrent >= tickLower) {
+        feeGrowthBelow0X128 = lower.feeGrowthOutside0X128;
+        feeGrowthBelow1X128 = lower.feeGrowthOutside1X128;
+    } else {
+        feeGrowthBelow0X128 = feeGrowthGlobal0X128 - lower.feeGrowthOutside0X128;
+        feeGrowthBelow1X128 = feeGrowthGlobal1X128 - lower.feeGrowthOutside1X128;
+    }
+
+    // calculate fee growth above
+    uint256 feeGrowthAbove0X128;
+    uint256 feeGrowthAbove1X128;
+    if (tickCurrent < tickUpper) {
+        feeGrowthAbove0X128 = upper.feeGrowthOutside0X128;
+        feeGrowthAbove1X128 = upper.feeGrowthOutside1X128;
+    } else {
+        feeGrowthAbove0X128 = feeGrowthGlobal0X128 - upper.feeGrowthOutside0X128;
+        feeGrowthAbove1X128 = feeGrowthGlobal1X128 - upper.feeGrowthOutside1X128;
+    }
+
+    feeGrowthInside0X128 = feeGrowthGlobal0X128 - feeGrowthBelow0X128 - feeGrowthAbove0X128;
+    feeGrowthInside1X128 = feeGrowthGlobal1X128 - feeGrowthBelow1X128 - feeGrowthAbove1X128;
+}
+
+/// @notice Updates a tick and returns true if the tick was flipped from initialized to uninitialized, or vice versa
+/// @param self The mapping containing all tick information for initialized ticks
+/// @param tick The tick that will be updated
+/// @param tickCurrent The current tick
+/// @param liquidityDelta A new amount of liquidity to be added (subtracted) when tick is crossed from left to right (right to left)
+/// @param feeGrowthGlobal0X128 The all-time global fee growth, per unit of liquidity, in token0
+/// @param feeGrowthGlobal1X128 The all-time global fee growth, per unit of liquidity, in token1
+/// @param secondsPerLiquidityCumulativeX128 The all-time seconds per max(1, liquidity) of the pool
+/// @param tickCumulative The tick * time elapsed since the pool was first initialized
+/// @param time The current block timestamp cast to a uint32
+/// @param upper true for updating a position's upper tick, or false for updating a position's lower tick
+/// @param maxLiquidity The maximum liquidity allocation for a single tick
+/// @return flipped Whether the tick was flipped from initialized to uninitialized, or vice versa
+function update(
+    mapping(int24 => Tick.Info) storage self,
+    int24 tick,
+    int24 tickCurrent,
+    int128 liquidityDelta,
+    uint256 feeGrowthGlobal0X128,
+    uint256 feeGrowthGlobal1X128,
+    uint160 secondsPerLiquidityCumulativeX128,
+    int56 tickCumulative,
+    uint32 time,
+    bool upper,
+    uint128 maxLiquidity
+) internal returns (bool flipped) {
+    Tick.Info storage info = self[tick];
+
+    uint128 liquidityGrossBefore = info.liquidityGross;
+    uint128 liquidityGrossAfter = LiquidityMath.addDelta(liquidityGrossBefore, liquidityDelta);
+
+    require(liquidityGrossAfter <= maxLiquidity, 'LO');
+
+    flipped = (liquidityGrossAfter == 0) != (liquidityGrossBefore == 0);
+
+    if (liquidityGrossBefore == 0) {
+        // by convention, we assume that all growth before a tick was initialized happened _below_ the tick
+        if (tick <= tickCurrent) {
+            info.feeGrowthOutside0X128 = feeGrowthGlobal0X128;
+            info.feeGrowthOutside1X128 = feeGrowthGlobal1X128;
+            info.secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128;
+            info.tickCumulativeOutside = tickCumulative;
+            info.secondsOutside = time;
+        }
+        info.initialized = true;
+    }
+
+    info.liquidityGross = liquidityGrossAfter;
+
+    // when the lower (upper) tick is crossed left to right (right to left), liquidity must be added (removed)
+    info.liquidityNet = upper
+        ? int256(info.liquidityNet).sub(liquidityDelta).toInt128()
+        : int256(info.liquidityNet).add(liquidityDelta).toInt128();
+}
+
+/// @notice Transitions to next tick as needed by price movement
+/// @param self The mapping containing all tick information for initialized ticks
+/// @param tick The destination tick of the transition
+/// @param feeGrowthGlobal0X128 The all-time global fee growth, per unit of liquidity, in token0
+/// @param feeGrowthGlobal1X128 The all-time global fee growth, per unit of liquidity, in token1
+/// @param secondsPerLiquidityCumulativeX128 The current seconds per liquidity
+/// @param tickCumulative The tick * time elapsed since the pool was first initialized
+/// @param time The current block.timestamp
+/// @return liquidityNet The amount of liquidity added (subtracted) when tick is crossed from left to right (right to left)
+function cross(
+    mapping(int24 => Tick.Info) storage self,
+    int24 tick,
+    uint256 feeGrowthGlobal0X128,
+    uint256 feeGrowthGlobal1X128,
+    uint160 secondsPerLiquidityCumulativeX128,
+    int56 tickCumulative,
+    uint32 time
+) internal returns (int128 liquidityNet) {
+    Tick.Info storage info = self[tick];
+    info.feeGrowthOutside0X128 = feeGrowthGlobal0X128 - info.feeGrowthOutside0X128;
+    info.feeGrowthOutside1X128 = feeGrowthGlobal1X128 - info.feeGrowthOutside1X128;
+    info.secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128 - info.secondsPerLiquidityOutsideX128;
+    info.tickCumulativeOutside = tickCumulative - info.tickCumulativeOutside;
+    info.secondsOutside = time - info.secondsOutside;
+    liquidityNet = info.liquidityNet;
+}
+```
+
+For detailed reasoning, see [white-paper Section 6.3](https://uniswap.org/whitepaper-v3.pdf) for reasoning. A summary from above:
+
+1. Liquidity cap for each tick is: $\text{Max Liquidity} = 2^{128} / \text{number of ticks}$
+2. `getFeeGrowthInside(...)` - calculate the fee accrued within current position boundary (specified by `tickLower` and `tickUpper`)
+3. `update` - update a tick states, can be any tick (different from current tick). "Outside" variables,
+   i.e. `...Outside`, is initialized as:
+   $$
+   F^{Outside} =
+   \begin{cases}
+   F^{Global}, & tick \leq tick_{current} \\
+   0, & tick > tick_{current}
+   \end{cases}
+   $$
+4. `cross` - update a tick to next tick as price moves. Notice that `feeGrowthOutside...` and `tickCumulativeOutside` are updated in the same manner:
+   $$
+   F^{Outside}_{new} \overset{\Delta}= F^{Global} - F^{Outside}_{old}
+   $$
+
+`update` and `cross` rules effectively infer definition for `...Outside` variables, i.e. $F^{Outside}$.
+In summary, they keep track of accumulated values either on to the left or right of a specific tick.
+
+# Position
+
+With the tick system defined, we are ready to define a concentrated position of V3. The source code for [`Position.sol`](https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Position.sol)
 
 ```solidity
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity >=0.5.0;
+pragma solidity >=0.5.0 <0.8.0;
 
-// ADDED_NOTE: Visit https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Tick.sol
-import './LowGasSafeMath.sol';
-import './SafeCast.sol';
-
-import './TickMath.sol';
+// ADDED_NOTE: Visit https://github.com/Uniswap/v3-core/blob/v1.0.0/contracts/libraries/Position.sol
+import './FullMath.sol';
+import './FixedPoint128.sol';
 import './LiquidityMath.sol';
 
-/// @title Tick
-/// @notice Contains functions for managing tick processes and relevant calculations
-library Tick {
-    using LowGasSafeMath for int256;
-    using SafeCast for int256;
+/// @title Position
+/// @notice Positions represent an owner address' liquidity between a lower and upper tick boundary
+/// @dev Positions store additional state for tracking fees owed to the position
+library Position {
+  // info stored for each user's position
+  struct Info {
+    // the amount of liquidity owned by this position
+    uint128 liquidity;
+    // fee growth per unit of liquidity as of the last update to liquidity or fees owed
+    uint256 feeGrowthInside0LastX128;
+    uint256 feeGrowthInside1LastX128;
+    // the fees owed to the position owner in token0/token1
+    uint128 tokensOwed0;
+    uint128 tokensOwed1;
+  }
 
-    // info stored for each initialized individual tick
-    struct Info {
-        // the total position liquidity that references this tick
-        uint128 liquidityGross;
-        // amount of net liquidity added (subtracted) when tick is crossed from left to right (right to left),
-        int128 liquidityNet;
-        // fee growth per unit of liquidity on the _other_ side of this tick (relative to the current tick)
-        // only has relative meaning, not absolute — the value depends on when the tick is initialized
-        uint256 feeGrowthOutside0X128;
-        uint256 feeGrowthOutside1X128;
-        // the cumulative tick value on the other side of the tick
-        int56 tickCumulativeOutside;
-        // the seconds per unit of liquidity on the _other_ side of this tick (relative to the current tick)
-        // only has relative meaning, not absolute — the value depends on when the tick is initialized
-        uint160 secondsPerLiquidityOutsideX128;
-        // the seconds spent on the other side of the tick (relative to the current tick)
-        // only has relative meaning, not absolute — the value depends on when the tick is initialized
-        uint32 secondsOutside;
-        // true iff the tick is initialized, i.e. the value is exactly equivalent to the expression liquidityGross != 0
-        // these 8 bits are set to prevent fresh sstores when crossing newly initialized ticks
-        bool initialized;
+  /// @notice Returns the Info struct of a position, given an owner and position boundaries
+  /// @param self The mapping containing all user positions
+  /// @param owner The address of the position owner
+  /// @param tickLower The lower tick boundary of the position
+  /// @param tickUpper The upper tick boundary of the position
+  /// @return position The position info struct of the given owners' position
+  function get(
+    mapping(bytes32 => Info) storage self,
+    address owner,
+    int24 tickLower,
+    int24 tickUpper
+  ) internal view returns (Position.Info storage position) {
+    position = self[keccak256(abi.encodePacked(owner, tickLower, tickUpper))];
+  }
+
+  /// @notice Credits accumulated fees to a user's position
+  /// @param self The individual position to update
+  /// @param liquidityDelta The change in pool liquidity as a result of the position update
+  /// @param feeGrowthInside0X128 The all-time fee growth in token0, per unit of liquidity, inside the position's tick boundaries
+  /// @param feeGrowthInside1X128 The all-time fee growth in token1, per unit of liquidity, inside the position's tick boundaries
+  function update(
+    Info storage self,
+    int128 liquidityDelta,
+    uint256 feeGrowthInside0X128,
+    uint256 feeGrowthInside1X128
+  ) internal {
+    Info memory _self = self;
+
+    uint128 liquidityNext;
+    if (liquidityDelta == 0) {
+      require(_self.liquidity > 0, 'NP'); // disallow pokes for 0 liquidity positions
+      liquidityNext = _self.liquidity;
+    } else {
+      liquidityNext = LiquidityMath.addDelta(_self.liquidity, liquidityDelta);
     }
 
-    /// @notice Derives max liquidity per tick from given tick spacing
-    /// @dev Executed within the pool constructor
-    /// @param tickSpacing The amount of required tick separation, realized in multiples of `tickSpacing`
-    ///     e.g., a tickSpacing of 3 requires ticks to be initialized every 3rd tick i.e., ..., -6, -3, 0, 3, 6, ...
-    /// @return The max liquidity per tick
-    function tickSpacingToMaxLiquidityPerTick(int24 tickSpacing) internal pure returns (uint128) {
-        int24 minTick = (TickMath.MIN_TICK / tickSpacing) * tickSpacing;
-        int24 maxTick = (TickMath.MAX_TICK / tickSpacing) * tickSpacing;
-        uint24 numTicks = uint24((maxTick - minTick) / tickSpacing) + 1;
-        return type(uint128).max / numTicks;
+    // calculate accumulated fees
+    // ADDED NOTE: Q128 = 2^128
+    uint128 tokensOwed0 = uint128(
+      FullMath.mulDiv(feeGrowthInside0X128 - _self.feeGrowthInside0LastX128, _self.liquidity, FixedPoint128.Q128)
+    );
+    uint128 tokensOwed1 = uint128(
+      FullMath.mulDiv(feeGrowthInside1X128 - _self.feeGrowthInside1LastX128, _self.liquidity, FixedPoint128.Q128)
+    );
+
+    // update the position
+    if (liquidityDelta != 0) self.liquidity = liquidityNext;
+    self.feeGrowthInside0LastX128 = feeGrowthInside0X128;
+    self.feeGrowthInside1LastX128 = feeGrowthInside1X128;
+    if (tokensOwed0 > 0 || tokensOwed1 > 0) {
+      // overflow is acceptable, have to withdraw before you hit type(uint128).max fees
+      self.tokensOwed0 += tokensOwed0;
+      self.tokensOwed1 += tokensOwed1;
     }
-
-    /// @notice Retrieves fee growth data
-    /// @param self The mapping containing all tick information for initialized ticks
-    /// @param tickLower The lower tick boundary of the position
-    /// @param tickUpper The upper tick boundary of the position
-    /// @param tickCurrent The current tick
-    /// @param feeGrowthGlobal0X128 The all-time global fee growth, per unit of liquidity, in token0
-    /// @param feeGrowthGlobal1X128 The all-time global fee growth, per unit of liquidity, in token1
-    /// @return feeGrowthInside0X128 The all-time fee growth in token0, per unit of liquidity, inside the position's tick boundaries
-    /// @return feeGrowthInside1X128 The all-time fee growth in token1, per unit of liquidity, inside the position's tick boundaries
-    function getFeeGrowthInside(
-        mapping(int24 => Tick.Info) storage self,
-        int24 tickLower,
-        int24 tickUpper,
-        int24 tickCurrent,
-        uint256 feeGrowthGlobal0X128,
-        uint256 feeGrowthGlobal1X128
-    ) internal view returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128) {
-        Info storage lower = self[tickLower];
-        Info storage upper = self[tickUpper];
-
-        // calculate fee growth below
-        uint256 feeGrowthBelow0X128;
-        uint256 feeGrowthBelow1X128;
-        if (tickCurrent >= tickLower) {
-            feeGrowthBelow0X128 = lower.feeGrowthOutside0X128;
-            feeGrowthBelow1X128 = lower.feeGrowthOutside1X128;
-        } else {
-            feeGrowthBelow0X128 = feeGrowthGlobal0X128 - lower.feeGrowthOutside0X128;
-            feeGrowthBelow1X128 = feeGrowthGlobal1X128 - lower.feeGrowthOutside1X128;
-        }
-
-        // calculate fee growth above
-        uint256 feeGrowthAbove0X128;
-        uint256 feeGrowthAbove1X128;
-        if (tickCurrent < tickUpper) {
-            feeGrowthAbove0X128 = upper.feeGrowthOutside0X128;
-            feeGrowthAbove1X128 = upper.feeGrowthOutside1X128;
-        } else {
-            feeGrowthAbove0X128 = feeGrowthGlobal0X128 - upper.feeGrowthOutside0X128;
-            feeGrowthAbove1X128 = feeGrowthGlobal1X128 - upper.feeGrowthOutside1X128;
-        }
-
-        feeGrowthInside0X128 = feeGrowthGlobal0X128 - feeGrowthBelow0X128 - feeGrowthAbove0X128;
-        feeGrowthInside1X128 = feeGrowthGlobal1X128 - feeGrowthBelow1X128 - feeGrowthAbove1X128;
-    }
-
-    /// @notice Updates a tick and returns true if the tick was flipped from initialized to uninitialized, or vice versa
-    /// @param self The mapping containing all tick information for initialized ticks
-    /// @param tick The tick that will be updated
-    /// @param tickCurrent The current tick
-    /// @param liquidityDelta A new amount of liquidity to be added (subtracted) when tick is crossed from left to right (right to left)
-    /// @param feeGrowthGlobal0X128 The all-time global fee growth, per unit of liquidity, in token0
-    /// @param feeGrowthGlobal1X128 The all-time global fee growth, per unit of liquidity, in token1
-    /// @param secondsPerLiquidityCumulativeX128 The all-time seconds per max(1, liquidity) of the pool
-    /// @param time The current block timestamp cast to a uint32
-    /// @param upper true for updating a position's upper tick, or false for updating a position's lower tick
-    /// @param maxLiquidity The maximum liquidity allocation for a single tick
-    /// @return flipped Whether the tick was flipped from initialized to uninitialized, or vice versa
-    function update(
-        mapping(int24 => Tick.Info) storage self,
-        int24 tick,
-        int24 tickCurrent,
-        int128 liquidityDelta,
-        uint256 feeGrowthGlobal0X128,
-        uint256 feeGrowthGlobal1X128,
-        uint160 secondsPerLiquidityCumulativeX128,
-        int56 tickCumulative,
-        uint32 time,
-        bool upper,
-        uint128 maxLiquidity
-    ) internal returns (bool flipped) {
-        Tick.Info storage info = self[tick];
-
-        uint128 liquidityGrossBefore = info.liquidityGross;
-        uint128 liquidityGrossAfter = LiquidityMath.addDelta(liquidityGrossBefore, liquidityDelta);
-
-        require(liquidityGrossAfter <= maxLiquidity, 'LO');
-
-        flipped = (liquidityGrossAfter == 0) != (liquidityGrossBefore == 0);
-
-        if (liquidityGrossBefore == 0) {
-            // by convention, we assume that all growth before a tick was initialized happened _below_ the tick
-            if (tick <= tickCurrent) {
-                info.feeGrowthOutside0X128 = feeGrowthGlobal0X128;
-                info.feeGrowthOutside1X128 = feeGrowthGlobal1X128;
-                info.secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128;
-                info.tickCumulativeOutside = tickCumulative;
-                info.secondsOutside = time;
-            }
-            info.initialized = true;
-        }
-
-        info.liquidityGross = liquidityGrossAfter;
-
-        // when the lower (upper) tick is crossed left to right (right to left), liquidity must be added (removed)
-        info.liquidityNet = upper
-            ? int256(info.liquidityNet).sub(liquidityDelta).toInt128()
-            : int256(info.liquidityNet).add(liquidityDelta).toInt128();
-    }
-
-    /// @notice Clears tick data
-    /// @param self The mapping containing all initialized tick information for initialized ticks
-    /// @param tick The tick that will be cleared
-    function clear(mapping(int24 => Tick.Info) storage self, int24 tick) internal {
-        delete self[tick];
-    }
-
-    /// @notice Transitions to next tick as needed by price movement
-    /// @param self The mapping containing all tick information for initialized ticks
-    /// @param tick The destination tick of the transition
-    /// @param feeGrowthGlobal0X128 The all-time global fee growth, per unit of liquidity, in token0
-    /// @param feeGrowthGlobal1X128 The all-time global fee growth, per unit of liquidity, in token1
-    /// @param secondsPerLiquidityCumulativeX128 The current seconds per liquidity
-    /// @param time The current block.timestamp
-    /// @return liquidityNet The amount of liquidity added (subtracted) when tick is crossed from left to right (right to left)
-    function cross(
-        mapping(int24 => Tick.Info) storage self,
-        int24 tick,
-        uint256 feeGrowthGlobal0X128,
-        uint256 feeGrowthGlobal1X128,
-        uint160 secondsPerLiquidityCumulativeX128,
-        int56 tickCumulative,
-        uint32 time
-    ) internal returns (int128 liquidityNet) {
-        Tick.Info storage info = self[tick];
-        info.feeGrowthOutside0X128 = feeGrowthGlobal0X128 - info.feeGrowthOutside0X128;
-        info.feeGrowthOutside1X128 = feeGrowthGlobal1X128 - info.feeGrowthOutside1X128;
-        info.secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128 - info.secondsPerLiquidityOutsideX128;
-        info.tickCumulativeOutside = tickCumulative - info.tickCumulativeOutside;
-        info.secondsOutside = time - info.secondsOutside;
-        liquidityNet = info.liquidityNet;
-    }
+  }
 }
 ```
+
+From the above implementation:
+
+- A position stores total liquidity `L` and total fee accumulated within the concentrated range `[tickLower, tickUpper)`.
+- A position is indexed by `owner, tickLower, tickUpper` using [`keccak256`](https://keccak.team/keccak_specs_summary.html) (precede SHA-3) hash.
+- As $\Delta X$ and $\Delta Y$ both involves common factor $L$ [from (2) and (3)], it's more efficient to use fee per unit of liquidity
+  and derive the total amount once every update, as seen in [pool contract](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L379).
+  `feeGrowthInside...` is padded with 128 "0" bits to make `mulDiv` works ([`mulDiv(a, b, denominator)`](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol#L14) calculate `a x b / denominator` with full precision).
+
+Since the position is non-fungible in nature, it will be reasonable to represent them as an NFT. As quoted:
+
+<Quote author="Uniswap V3 white-paper">
+  "Fees earned in earlier versions were continuously deposited in the pool as liquidity. This meant that liquidity in the pool would grow
+  over time, even without explicit deposits, and that fee earnings compounded. In Uniswap v3, due to the non-fungible nature of positions,
+  this is no longer possible. Instead, fee earnings are stored separately and held as the tokens in which the fees are paid.
+
+... in v3, the pool contract does not implement the ERC-20 standard. Anyone can create an ERC-20 token contract in the periphery that
+makes a liquidity position more fungible, but it will have to have additional logic to handle distribution of,
+or reinvestment of, collected fees. Alternatively, anyone could create a periphery contract that wraps an individual liquidity position
+(including collected fees) in an ERC-721 non-fungible token."
+
+</Quote>
+
+# Outro
+
+Uniswap V3's tick and position mechanism introduces a new paradigm in liquidity provision, offering liquidity providers unprecedented control and customization.
+With the ability to concentrate liquidity within specific price ranges, LPs can optimize their fee earnings.
+As we continue our exploration into Uniswap V3 in the upcoming sections, we will unravel the intricacies of the Pool contract,
+empowering ourselves with the knowledge to navigate the protocol's inner workings such as **position minting** and **token swaps**.
+Stay tuned for part 03 of our journey into the heart of Uniswap V3 - "Minting and Swapping".
