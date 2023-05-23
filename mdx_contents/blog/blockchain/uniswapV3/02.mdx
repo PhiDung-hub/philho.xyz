@@ -378,15 +378,21 @@ For detailed reasoning, see [white-paper Section 6.3](https://uniswap.org/whitep
 3. `update` - update a tick states, can be any tick (different from current tick). "Outside" variables,
    i.e. `...Outside`, is initialized as:
    $$
-   F^{Outside} =
-   \begin{cases}
-   F^{Global}, & tick \leq tick_{current} \\
-   0, & tick > tick_{current}
-   \end{cases}
+   \tag{1}
+   \large {
+    F^{Outside} =
+    \begin{cases}
+    F^{Global}, & tick \leq tick_{current} \\
+    0, & tick > tick_{current}
+    \end{cases}
+   }
    $$
 4. `cross` - update a tick to next tick as price moves. Notice that `feeGrowthOutside...` and `tickCumulativeOutside` are updated in the same manner:
    $$
-   F^{Outside}_{new} \overset{\Delta}= F^{Global} - F^{Outside}_{old}
+   \tag{2}
+   \large {
+    F^{Outside}_{new} \overset{\Delta}= F^{Global} - F^{Outside}_{old}
+   }
    $$
 
 `update` and `cross` rules effectively infer definition for `...Outside` variables, i.e. $F^{Outside}$.
