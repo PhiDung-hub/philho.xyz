@@ -58,10 +58,10 @@ const techs = [
     style: 'shadow-yellow-500',
   },
   {
-    src: '/techs/prisma.png',
-    title: 'Prisma ORM',
-    href: 'https://github.com/prisma/prisma',
-    style: 'shadow-sky-500',
+    src: '/techs/polars.svg',
+    title: 'Pola-rs',
+    href: 'https://www.pola.rs/',
+    style: 'shadow-blue-700',
   },
   {
     src: '/techs/nestjs.svg',
@@ -71,28 +71,16 @@ const techs = [
   },
   {
     src: '/techs/nextjs.png',
-    title: 'Next JS',
+    title: 'Next JS (React)',
     href: 'https://nextjs.org/',
     style: 'shadow-lime-500',
   },
-  // {
-  //   src: '/techs/nginx.png',
-  //   title: 'NGINX (Open Source)',
-  //   href: 'https://nginx.org/en/docs/',
-  //   style: 'shadow-emerald-500',
-  // },
   {
     src: '/techs/threejs.png',
     title: 'Three JS',
     href: 'https://nextjs.org/',
     style: 'shadow-gray-500',
   },
-  // {
-  //   src: '/techs/pandas.png',
-  //   title: 'Pandas',
-  //   href: 'https://pandas.pydata.org',
-  //   style: 'shadow-blue-700',
-  // },
   {
     src: '/techs/tensorflow.png',
     title: 'Tensorflow (Core + TFP)',

@@ -1,12 +1,12 @@
 import React from 'react';
-import { PortfolioSectionHeader, PortfolioBulletPoint, PortfolioBulletPointsWrapper } from '~/components/portfolio';
+import { PortfolioSectionHeader, PortfolioBulletPoint, PortfolioBulletPointWrapper } from '~/components/portfolio';
 import { SectionContainer } from '~/components';
 
 export default function Achievements() {
   return (
     <SectionContainer className="flex flex-col justify-center px-2 lg:px-0 !pt-0">
       <PortfolioSectionHeader sectionTitle="Achievements" />
-      <PortfolioBulletPointsWrapper>
+      <PortfolioBulletPointWrapper>
         <PortfolioBulletPoint title="ASEAN Undergraduate Scholarships - ">
           Awarded by Singapore&apos; Ministry of Education.
         </PortfolioBulletPoint>
@@ -48,7 +48,7 @@ export default function Achievements() {
             the press release
           </a>
         </PortfolioBulletPoint>
-      </PortfolioBulletPointsWrapper>
+      </PortfolioBulletPointWrapper>
     </SectionContainer>
   );
 }

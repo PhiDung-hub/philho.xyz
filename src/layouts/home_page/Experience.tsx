@@ -3,7 +3,7 @@ import {
   PortfolioSectionHeader,
   PortfolioEntryHeader,
   PortfolioBulletPoint,
-  PortfolioBulletPointsWrapper,
+  PortfolioBulletPointWrapper,
 } from '~/components/portfolio';
 import { SectionContainer } from '~/components';
 
@@ -11,10 +11,46 @@ export default function Experience() {
   return (
     <SectionContainer className="flex flex-col justify-center px-2 lg:px-0">
       <PortfolioSectionHeader sectionTitle="Experience" />
-      <ViewBase />
+      <ChainUp />
       <NewWorldPharma />
       <BlockchainAtNTU />
+      <ViewBase />
     </SectionContainer>
+  );
+}
+
+function ChainUp() {
+  return (
+    <>
+      <PortfolioEntryHeader
+        entity="ChainUp"
+        entityHref="https://www.chainup.com/"
+        location="Singapore"
+        positionType="Blockchain Engineer Shadowing"
+        positionPeriod="February 2023 - March 2023"
+      />
+
+      <PortfolioBulletPointWrapper>
+        <PortfolioBulletPoint title="Blockchain Research - ">
+          <span>
+            Conducted thorough inspections of vulnerable smart contracts, successfully identifying and categorizing
+            various types of attacks including re-entrancy, private storage, and FlashLoan exploits.
+          </span>
+        </PortfolioBulletPoint>
+        <PortfolioBulletPoint title="Blockkchain Development - ">
+          <span>
+            Demonstrated expertise in recreating the exploitation flow of identified vulnerabilities using forge-foundry.
+          </span>
+        </PortfolioBulletPoint>
+
+        <PortfolioBulletPoint title="Smart Contract Implementation - ">
+          <span>
+            Explored the implementation and utilization of ZK-tech applications in Blockchain as a Service (BaaS)
+            models, expanding knowledge in this emerging field.
+          </span>
+        </PortfolioBulletPoint>
+      </PortfolioBulletPointWrapper>
+    </>
   );
 }
 
@@ -29,7 +65,7 @@ function ViewBase() {
         positionPeriod="November 2021 - December 2022"
       />
 
-      <PortfolioBulletPointsWrapper>
+      <PortfolioBulletPointWrapper>
         <PortfolioBulletPoint title="Fullstack Development - ">
           <span>Develop a discussion forum with reddit-like features.</span>
         </PortfolioBulletPoint>
@@ -48,7 +84,7 @@ function ViewBase() {
             compromising functionalities.
           </span>
         </PortfolioBulletPoint>
-      </PortfolioBulletPointsWrapper>
+      </PortfolioBulletPointWrapper>
     </>
   );
 }
@@ -64,7 +100,7 @@ function NewWorldPharma() {
         positionPeriod="October 2022 - February 2023"
       />
 
-      <PortfolioBulletPointsWrapper>
+      <PortfolioBulletPointWrapper>
         <PortfolioBulletPoint title="Web Development - ">
           <span>
             Created a fully functional website for New World Pharma JSC, a pharmaceutical company based in Vietnam.{' '}
@@ -76,7 +112,7 @@ function NewWorldPharma() {
             and content.
           </span>
         </PortfolioBulletPoint>
-      </PortfolioBulletPointsWrapper>
+      </PortfolioBulletPointWrapper>
     </>
   );
 }
@@ -87,12 +123,12 @@ function BlockchainAtNTU() {
       <PortfolioEntryHeader
         entity="Blockchain@NTU"
         entityHref="https://linkedin.com"
-        location="Vietnam"
+        location="Singapore"
         positionType="Development Director"
-        positionPeriod="August 2022 - Now"
+        positionPeriod="August 2022 - May 2023"
       />
 
-      <PortfolioBulletPointsWrapper>
+      <PortfolioBulletPointWrapper>
         <PortfolioBulletPoint title="Experience Sharing - ">
           <span>
             Facilitated events and development workshops to onboard enthusiastic blockchain developers on their journey.
@@ -104,7 +140,7 @@ function BlockchainAtNTU() {
             decentralized applications.
           </span>
         </PortfolioBulletPoint>
-      </PortfolioBulletPointsWrapper>
+      </PortfolioBulletPointWrapper>
     </>
   );
 }

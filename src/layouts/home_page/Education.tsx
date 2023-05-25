@@ -4,7 +4,7 @@ import {
   PortfolioSectionHeader,
   PortfolioBulletPoint,
   PortfolioEntryHeader,
-  PortfolioBulletPointsWrapper,
+  PortfolioBulletPointWrapper,
 } from '~/components/portfolio';
 
 export default function Education() {
@@ -33,7 +33,7 @@ function NTU() {
 
 function NTUEducationDetails() {
   return (
-    <PortfolioBulletPointsWrapper>
+    <PortfolioBulletPointWrapper>
       <PortfolioBulletPoint title="Expected Honour - ">
         <span>
           Highest Distinction{' '}
@@ -50,7 +50,7 @@ function NTUEducationDetails() {
       <PortfolioBulletPoint title="Specialization - ">
         <span>Distributed Computing Network | Decentralized Finance | Computer Vision</span>
       </PortfolioBulletPoint>
-    </PortfolioBulletPointsWrapper>
+    </PortfolioBulletPointWrapper>
   );
 }
 
