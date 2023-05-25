@@ -13,7 +13,13 @@ const SocialLinks = () => {
             className="flex justify-between items-center w-[9rem] h-14 px-4 ml-[-5rem] hover:ml-[-0.5rem] duration-300 hover:rounded-md font-semibold 
             bg-gray-200 text-gray-700 hover:text-blue-600 dark:text-gray-100  dark:bg-gray-600 dark:hover:text-blue-300"
           >
-            <a href={href} className="flex justify-between items-center w-full" download={false} target="_blank" rel="noreferrer">
+            <a
+              href={href}
+              className="flex justify-between items-center w-full"
+              download={false}
+              target="_blank"
+              rel="noreferrer"
+            >
               {desc} {icon}
             </a>
           </li>

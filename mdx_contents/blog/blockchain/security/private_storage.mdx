@@ -4,6 +4,8 @@ date: '2023-05-09T00:00:00Z'
 modifiedTime: '2023-05-09T00:00:00Z'
 summary: Introduce private storage vulnerability. An example of un-authenticated private information retrieval and discuss solution.
 image: 'blogs/blockchain/private_storage/cover.webp'
+seriesName: 'Block Security'
+seriesIndex: 2
 type: BlogPost
 ---
 
@@ -49,7 +51,12 @@ contract Locker {
 
 If we analyze [storage allocation](https://ethereum.org/en/developers/docs/smart-contracts/anatomy/#data) of the contract above, the result is:
 
-<Image src="/blogs/blockchain/private_storage/storage.webp" width="1200" height="500" caption="Storage layout of Locker contract" />
+<Image
+  src="/blogs/blockchain/private_storage/storage.webp"
+  width="1200"
+  height="500"
+  caption="Storage layout of Locker contract"
+/>
 
 Having that information in hand, an example unlocker would perform the following step:
 

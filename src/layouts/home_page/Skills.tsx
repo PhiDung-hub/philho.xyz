@@ -6,7 +6,10 @@ export default function Skills() {
   return (
     <SectionContainer className="flex flex-col justify-center">
       <div className="pb-4 xl:pb-8">
-        <Tooltip content="These are the technologies I have worked with, roughly ranked by familiarity" className="max-w-[20rem]">
+        <Tooltip
+          content="These are the technologies I have worked with, roughly ranked by familiarity"
+          className="max-w-[20rem]"
+        >
           <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Stack</p>
         </Tooltip>
       </div>
@@ -20,7 +23,13 @@ export default function Skills() {
             className={`w-full shadow-md hover:scale-105 duration-500 py-4 rounded-lg ${style} bg-blue-100 dark:bg-blue-300 dark:text-violet-700`}
             key={`tech-skill-${index}`}
           >
-            <Image src={src} alt="alt-text" className="mx-auto py-2 md:py-8 h-[6rem] md:h-[10rem]" width={100} height={100} />
+            <Image
+              src={src}
+              alt="alt-text"
+              className="mx-auto py-2 md:py-8 h-[6rem] md:h-[10rem]"
+              width={100}
+              height={100}
+            />
             <p className="mt-4 font-bold mx-auto w-full">{title}</p>
           </a>
         ))}

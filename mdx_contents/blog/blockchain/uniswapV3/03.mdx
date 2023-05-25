@@ -4,5 +4,127 @@ date: '2023-05-23T00:00:00Z'
 modifiedTime: '2023-05-25T00:00:00Z'
 summary: Uniswap V3 - Implement liquidity provision (minting) and DEX (token swapping).
 image: 'blogs/blockchain/uniswapV3/cover.webp'
+seriesName: 'Uniswap V3'
+seriesIndex: 3
 type: BlogPost
 ---
+
+# Recap
+
+We have discussed **Tick** and **Position** from the [previous section](https://philho.xyz/blog/blockchain/uniswapV3/02). Take notes of the following:
+
+1. Each tick:
+
+- is represented by `int24`.
+- is managed by a `16 | 8` bit map.
+- holds an `initialize` state, indicating whether the tick is active in the current position
+- contains information about liquidity, fee, and time spent.
+
+2. A position:
+
+- is **non-fungible**.
+- contains information about fee accrued for both token (within the pool).
+
+# About Uniswap V3 core
+
+Uniswap V3 core contracts implements critical operations such as liquidity provision, token swaps, and fee calculations.
+Key contracts in the repository include:
+
+1. [UniswapV3Pool.sol](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol): represents a specific Uniswap V3 liquidity pool and
+   handles functions related to liquidity management, swapping tokens, and calculating fees.
+2. [UniswapV3Factory.sol](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Factory.sol): manage the overall pool creation process.
+   It keeps track of all created pools and provides functions to create new pools with specific token pairs and fee tiers.
+3. [UniswapV3PoolDeployer.sol](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3PoolDeployer.sol): an utility contract used internally by the `UniswapV3Factory` contract.
+   It contains the necessary logic and functions to deploy new instances of a liquidity pool.
+
+The `UniswapV3Factory` and `UniswapV3PoolDeployer` contracts are relatively simple and do not provide details about the protocol specification. Hence, we will not discuss them in this series.
+Our main focus will be on the `UniswapV3Pool` contract, and this article will explain the processes of position minting and token swapping.
+
+# Providing liquidity (position minting)
+
+This is the portion of minting code from the **UniswapV3Pool** contract.
+Where `_modifyPosition` update the position and return new position state with amount of tokens owed to _this_ pool.
+
+```solidity
+interface IUniswapV3MintCallback {
+  /// @notice Called to `msg.sender` after minting liquidity to a position from IUniswapV3Pool#mint.
+  /// @dev In the implementation you must pay the pool tokens owed for the minted liquidity.
+  /// The caller of this method must be checked to be a UniswapV3Pool deployed by the canonical UniswapV3Factory.
+  /// @param amount0Owed The amount of token0 due to the pool for the minted liquidity
+  /// @param amount1Owed The amount of token1 due to the pool for the minted liquidity
+  /// @param data Any data passed through by the caller via the IUniswapV3PoolActions#mint call
+  function uniswapV3MintCallback(
+    uint256 amount0Owed,
+    uint256 amount1Owed,
+    bytes calldata data
+  ) external;
+}
+
+/// @inheritdoc IUniswapV3PoolActions
+/// @dev noDelegateCall is applied indirectly via _modifyPosition
+function mint(
+  address recipient,
+  int24 tickLower,
+  int24 tickUpper,
+  uint128 amount,
+  bytes calldata data
+) external override lock returns (uint256 amount0, uint256 amount1) {
+  require(amount > 0);
+  (, int256 amount0Int, int256 amount1Int) = _modifyPosition(
+    ModifyPositionParams({owner: recipient, tickLower: tickLower, tickUpper: tickUpper, liquidityDelta: int256(amount).toInt128()})
+  );
+
+  amount0 = uint256(amount0Int);
+  amount1 = uint256(amount1Int);
+
+  uint256 balance0Before;
+  uint256 balance1Before;
+  if (amount0 > 0) balance0Before = balance0();
+  if (amount1 > 0) balance1Before = balance1();
+  IUniswapV3MintCallback(msg.sender).uniswapV3MintCallback(amount0, amount1, data);
+  if (amount0 > 0) require(balance0Before.add(amount0) <= balance0(), 'M0');
+  if (amount1 > 0) require(balance1Before.add(amount1) <= balance1(), 'M1');
+
+  emit Mint(msg.sender, recipient, tickLower, tickUpper, amount, amount0, amount1);
+}
+
+/// @dev Get the pool's balance of token0
+/// @dev This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize
+/// check
+function balance0() private view returns (uint256) {
+  (bool success, bytes memory data) = token0.staticcall(abi.encodeWithSelector(IERC20Minimal.balanceOf.selector, address(this)));
+  require(success && data.length >= 32);
+  return abi.decode(data, (uint256));
+}
+
+/// @dev Get the pool's balance of token1
+/// @dev This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize
+/// check
+function balance1() private view returns (uint256) {
+  (bool success, bytes memory data) = token1.staticcall(abi.encodeWithSelector(IERC20Minimal.balanceOf.selector, address(this)));
+  require(success && data.length >= 32);
+  return abi.decode(data, (uint256));
+}
+```
+
+## Main flow
+
+Essentially, minting contains 4 steps:
+
+1. Register the position paramters, which are owner, price range, and liquidityDelta for the minted position.
+2. Call internal `_modifyPosition` to get expected token amount given to the pool (can be negative).
+3. Call a `uniswapV3MintCallback`, the client (contract or EOA) must realize implementations, execute this callback and payback the owed amount.
+   The official protocol implements this callback in **V3-Periphery** contracts at [LiquidityManagement.sol](https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/LiquidityManagement.sol)
+   (V3-Periphery complement the core Uniswap V3 protocol, providing features such as position management, liquidity provision, and advanced trading strategies)
+4. Validate final state and emit a `Mint` event to the blockchain, indicating a liquidity povision order is placed.
+
+## Liquidity Delta calculation
+
+# Token Swapping
+
+## Main flow
+
+# Minimal reconstruction
+
+For the first time in this series, we will get our hands dirty and dive into the practical implementation of Uniswap V3.
+Together, we will reconstruct a minimal example of Uniswap V3, exploring its core functionalities and gaining valuable hands-on experience with the protocol.

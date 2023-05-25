@@ -83,9 +83,9 @@ For example, values can be boxed and allocates on the heap with `std::Box<T>`. A
 
 - Conceptualize by C++, inspired from Simula67 `element` - a pointer without `null` ([history](https://en.wikipedia.org/wiki/Smart_pointer#history)).
 - For example, in C++11, `std::unique_ptr<Type> Func()` makes explicit that caller should takes ownership of the result, and C++ runtime ensures that memory will be reclaimed automatically.
-- <strong>For Rust, </strong> a smart pointer is defined mostly as a struct that implements `Deref` - , `Drop` traits. The concept is well described
-  in [official book](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html). You may find this [explanation](https://youtu.be/KYJ95TxEC18)
-  helpful.
+- <strong>For Rust, </strong> a smart pointer is defined mostly as a struct that implements `Deref` - , `Drop` traits. The
+  concept is well described in [official book](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html). You may find
+  this [explanation](https://youtu.be/KYJ95TxEC18) helpful.
 
 An example of `Box` from the book, noticing box always takes 8 bytes.
 

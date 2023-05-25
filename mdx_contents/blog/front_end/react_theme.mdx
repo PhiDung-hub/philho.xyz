@@ -19,7 +19,10 @@ If we look at the following snippet from [tailwind docs](https://tailwindcss.com
 
 ```javascript
 // On page load or when changing themes, best to add inline in `head` to avoid FOUC.
-if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+if (
+  localStorage.theme === 'dark' ||
+  (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+) {
   document.documentElement.classList.add('dark');
 } else {
   document.documentElement.classList.remove('dark');
@@ -118,7 +121,7 @@ export const useDarkMode = () => useContext(DarkModeContext);
 
 ## Step 2: Usage
 
-and finally using the defined provider in our main app:
+Finally, use the defined provider in our main app:
 
 ```typescript
 // File: <root>/src/app/layout.tsx
@@ -139,7 +142,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 export default RootLayout;
 ```
 
-a theme toggler implementation will also be straightforward:
+The theme toggler implementation will also be straightforward:
 
 ```typescript
 // File: <root>/src/components/ThemeToggler.tsx
@@ -153,7 +156,11 @@ export default function ThemeToggler({ className }: { className?: string }) {
 
   return (
     <div onClick={toggle} className={className}>
-      {isDarkMode ? <RiMoonFill size="2rem" className="text-[#007BFF]" /> : <RiSunFill size="2rem" className="text-[#FF5900]" />}
+      {isDarkMode ? (
+        <RiMoonFill size="2rem" className="text-[#007BFF]" />
+      ) : (
+        <RiSunFill size="2rem" className="text-[#FF5900]" />
+      )}
     </div>
   );
 }

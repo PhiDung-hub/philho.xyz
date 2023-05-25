@@ -24,8 +24,8 @@ export default function Achievements() {
         </PortfolioBulletPoint>
 
         <PortfolioBulletPoint title="12th IOAA Silver Medalist - ">
-          12th International Olympiads on Astronomy and Astrophysics was hosted in Beijing, China (website currently unavailable). More info
-          at{' '}
+          12th International Olympiads on Astronomy and Astrophysics was hosted in Beijing, China (website currently
+          unavailable). More info at{' '}
           <a
             href="https://www.ioaastrophysics.org"
             rel="noreferrer noopener"
@@ -37,7 +37,8 @@ export default function Achievements() {
         </PortfolioBulletPoint>
 
         <PortfolioBulletPoint title="4th IOM Silver Medalist in Physics - ">
-          4th International Olympiad of Metropolises was hosted in Moscow, Russia (website currently sanctioned). More info in{' '}
+          4th International Olympiad of Metropolises was hosted in Moscow, Russia (website currently sanctioned). More
+          info in{' '}
           <a
             href="https://en.vietnamplus.vn/vietnam-wins-big-at-4th-international-olympiad-of-metropolises/160090.vnp"
             rel="noreferrer noopener"

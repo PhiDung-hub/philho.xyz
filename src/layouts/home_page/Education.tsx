@@ -1,6 +1,11 @@
 import React from 'react';
 import { ProjectCard, SectionContainer } from '~/components';
-import { PortfolioSectionHeader, PortfolioBulletPoint, PortfolioEntryHeader, PortfolioBulletPointsWrapper } from '~/components/portfolio';
+import {
+  PortfolioSectionHeader,
+  PortfolioBulletPoint,
+  PortfolioEntryHeader,
+  PortfolioBulletPointsWrapper,
+} from '~/components/portfolio';
 
 export default function Education() {
   return (
@@ -31,7 +36,8 @@ function NTUEducationDetails() {
     <PortfolioBulletPointsWrapper>
       <PortfolioBulletPoint title="Expected Honour - ">
         <span>
-          Highest Distinction <strong className="font-normal italic text-gray-900 dark:text-gray-50">{'(CGPA > 4.5/5.0)'}</strong>
+          Highest Distinction{' '}
+          <strong className="font-normal italic text-gray-900 dark:text-gray-50">{'(CGPA > 4.5/5.0)'}</strong>
         </span>
       </PortfolioBulletPoint>
 

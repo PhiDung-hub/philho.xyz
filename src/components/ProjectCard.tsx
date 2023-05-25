@@ -19,7 +19,9 @@ export default function ProjectCard({ href, openGraphHref, header, desc, classNa
     >
       <Image src={openGraphHref} alt="Open Graph Image" width={350} height={200} className="rounded-t-md" />
       <div className="py-2 px-4">
-        <p className="text-lg text-center font-semibold text-blue-700 dark:text-blue-200 group-hover:animate-text-pulse">{header}</p>
+        <p className="text-lg text-center font-semibold text-blue-700 dark:text-blue-200 group-hover:animate-text-pulse">
+          {header}
+        </p>
         <p className="text-center w-full">{desc}</p>
       </div>
     </a>

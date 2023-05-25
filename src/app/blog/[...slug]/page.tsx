@@ -6,7 +6,8 @@ import { useMDXComponent } from 'next-contentlayer/hooks';
 
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 import { formatDate } from '~/utils';
-import MDXComponents, { FooterShareBar, TableOfContents } from '~/components/mdx';
+import MDXComponents from '~/components/mdx';
+import { FooterShareBar, TableOfContents, BlogNavigator } from '~/layouts/blog_page';
 import { SectionContainer } from '~/components';
 
 export type BlogPostPageProps = {
@@ -16,8 +17,8 @@ export type BlogPostPageProps = {
 };
 
 export default function BlogPostPage(props: BlogPostPageProps) {
-  const { slug } = props.params;
-  const post = allBlogPosts.find((post: BlogPost) => post.slug === slug.join('/'));
+  const slug = props.params.slug.join('/');
+  const post = allBlogPosts.find((post: BlogPost) => post.slug === slug);
 
   if (!post) {
     notFound();
@@ -31,6 +32,7 @@ export default function BlogPostPage(props: BlogPostPageProps) {
 
   return (
     <SectionContainer className="min-h-[90vh] pt-32 md:pt-40 xl:pt48 px-2 xl:px-0">
+      <BlogNavigator activeSlug={slug} wrapperClassname="mb-8" />
       <h1 className="mb-4 text-3xl md:text-4xl font-bold">{title}</h1>
       <div className="mt-8 flex flex-col justify-between lg:flex-row">
         <article className="w-full lg:w-[85%] lg:pr-8">
@@ -54,7 +56,8 @@ export default function BlogPostPage(props: BlogPostPageProps) {
           </div>
         </aside>
       </div>
-      <FooterShareBar slug={slug.join('/')} title={title} />
+      <FooterShareBar slug={slug} title={title} />
+      <BlogNavigator activeSlug={slug} inverseDisplay />
     </SectionContainer>
   );
 }

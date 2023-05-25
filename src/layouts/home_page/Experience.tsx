@@ -1,5 +1,10 @@
 import React from 'react';
-import { PortfolioSectionHeader, PortfolioEntryHeader, PortfolioBulletPoint, PortfolioBulletPointsWrapper } from '~/components/portfolio';
+import {
+  PortfolioSectionHeader,
+  PortfolioEntryHeader,
+  PortfolioBulletPoint,
+  PortfolioBulletPointsWrapper,
+} from '~/components/portfolio';
 import { SectionContainer } from '~/components';
 
 export default function Experience() {
@@ -30,8 +35,8 @@ function ViewBase() {
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Token Design - ">
           <span>
-            Designed a time-based rebasing token system for platform subscriptions, enabling efficient microtransactions and transferable
-            subscriptions.
+            Designed a time-based rebasing token system for platform subscriptions, enabling efficient microtransactions
+            and transferable subscriptions.
           </span>
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Frontend development - ">
@@ -39,8 +44,8 @@ function ViewBase() {
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Smart Contract Engineering - ">
           <span>
-            Optimized ERC721 contracts by modifying IERC721Enumerable, resulting in a 70% reduction in gas usage without compromising
-            functionalities.
+            Optimized ERC721 contracts by modifying IERC721Enumerable, resulting in a 70% reduction in gas usage without
+            compromising functionalities.
           </span>
         </PortfolioBulletPoint>
       </PortfolioBulletPointsWrapper>
@@ -61,11 +66,14 @@ function NewWorldPharma() {
 
       <PortfolioBulletPointsWrapper>
         <PortfolioBulletPoint title="Web Development - ">
-          <span>Created a fully functional website for New World Pharma JSC, a pharmaceutical company based in Vietnam. </span>
+          <span>
+            Created a fully functional website for New World Pharma JSC, a pharmaceutical company based in Vietnam.{' '}
+          </span>
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Web Content Management System - ">
           <span>
-            Successfully integrated Tina CMS, a content management system that facilitates efficient management of media and content.
+            Successfully integrated Tina CMS, a content management system that facilitates efficient management of media
+            and content.
           </span>
         </PortfolioBulletPoint>
       </PortfolioBulletPointsWrapper>
@@ -86,11 +94,14 @@ function BlockchainAtNTU() {
 
       <PortfolioBulletPointsWrapper>
         <PortfolioBulletPoint title="Experience Sharing - ">
-          <span>Facilitated events and development workshops to onboard enthusiastic blockchain developers on their journey.</span>
+          <span>
+            Facilitated events and development workshops to onboard enthusiastic blockchain developers on their journey.
+          </span>
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Blockchain Development - ">
           <span>
-            Create a smart contract CLI tool that effectively demonstrated the principles of EVM blockchains and decentralized applications.
+            Create a smart contract CLI tool that effectively demonstrated the principles of EVM blockchains and
+            decentralized applications.
           </span>
         </PortfolioBulletPoint>
       </PortfolioBulletPointsWrapper>

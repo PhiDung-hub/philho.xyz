@@ -23,15 +23,24 @@ export default function Footer() {
 
 const links = [
   {
-    icon: <FaLinkedin size={32} className="text-gray-700 dark:text-gray-50 hover:text-blue-500 dark:hover:text-blue-300" />,
+    icon: (
+      <FaLinkedin size={32} className="text-gray-700 dark:text-gray-50 hover:text-blue-500 dark:hover:text-blue-300" />
+    ),
     href: 'https://linkedin.com/in/phi-dung-ho',
   },
   {
-    icon: <FaGithub size={32} className="text-gray-700 dark:text-gray-50 hover:text-blue-500 dark:hover:text-blue-300" />,
+    icon: (
+      <FaGithub size={32} className="text-gray-700 dark:text-gray-50 hover:text-blue-500 dark:hover:text-blue-300" />
+    ),
     href: 'https://github.com/phidung-hub',
   },
   {
-    icon: <HiOutlineMail size={32} className="text-gray-700 dark:text-gray-50 hover:text-blue-500 dark:hover:text-blue-300" />,
+    icon: (
+      <HiOutlineMail
+        size={32}
+        className="text-gray-700 dark:text-gray-50 hover:text-blue-500 dark:hover:text-blue-300"
+      />
+    ),
     href: 'mailto:philho.dev@outlook.com',
   },
 ];

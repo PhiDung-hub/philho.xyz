@@ -13,6 +13,14 @@ export const BlogPost = defineDocumentType(() => ({
       description: 'Blog title',
       required: true,
     },
+    seriesName: {
+      type: 'string',
+      description: 'series that a blog post belongs to',
+    },
+    seriesIndex: {
+      type: 'number',
+      description: 'Index of this article in the current series',
+    },
     date: {
       type: 'string',
       description: 'Date of creation',

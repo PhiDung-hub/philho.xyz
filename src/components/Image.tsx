@@ -17,7 +17,11 @@ const Image = (props: ImageProps) => {
   return (
     <div className={clsxTailwindMerge('overflow-hidden', wrapperClassName)}>
       <NextImage
-        className={clsxTailwindMerge('duration-75 ease-in', isLoading ? 'blur-md grayscale' : 'blur-0 grayscale-0', className)}
+        className={clsxTailwindMerge(
+          'duration-75 ease-in',
+          isLoading ? 'blur-md grayscale' : 'blur-0 grayscale-0',
+          className,
+        )}
         src={src}
         alt={alt}
         loading="lazy"
