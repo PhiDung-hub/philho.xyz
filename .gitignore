@@ -45,3 +45,6 @@ next-env.d.ts
 
 # WSL
 public/**/*.Identifier
+
+# experiment with meili search
+search.mjs

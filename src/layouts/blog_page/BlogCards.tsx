@@ -8,8 +8,8 @@ interface BlogCardsProps {
 export default function BlogCards(props: BlogCardsProps) {
   return (
     <div id="all-blogs">
-      <div className="w-full text-center font-semibold text-xl sm:text-2xl md:text-3xl">Blog Posts</div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8 mx-auto">
+      <div className="w-full mb-8 text-center font-semibold text-2xl md:text-3xl">Blog Posts</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8 px-auto">
         {props.allBlogPostMeta.map(({ href, openGraphHref, title, summary }, index) => {
           return (
             <BlogPostCard

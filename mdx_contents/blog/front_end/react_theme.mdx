@@ -176,8 +176,8 @@ i.e. the `useEffect` hook will execute twice (one on initial hyrdation and anoth
 We will need another solution, which use only bare metal Javascript. In fact, I adopt the idea from [react.dev](https://react.dev/).
 The relevant portion of code can be seen on their github repository:
 
-- [`_document.tsx`](https://github.com/reactjs/react.dev/blob/main/src/pages/_document.tsx)
-- [`TopNav.tsx`](https://github.com/reactjs/react.dev/blob/main/src/components/Layout/TopNav/TopNav.tsx)
+- [\_document.tsx](https://github.com/reactjs/react.dev/blob/main/src/pages/_document.tsx)
+- [TopNav.tsx](https://github.com/reactjs/react.dev/blob/main/src/components/Layout/TopNav/TopNav.tsx)
 
 ## Step 1: Define theme manager
 
@@ -296,6 +296,8 @@ export default function ThemeToggler() {
   );
 }
 ```
+
+It works like a charm. My implementation for this website can be found [here](https://github.com/PhiDung-hub/philho.xyz/blob/main/src/components/ThemeToggler.tsx).
 
 # References
 
