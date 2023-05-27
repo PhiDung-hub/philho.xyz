@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 
 interface MenuProps {
   children?: React.ReactNode;
+  wrapperClassname?: string;
 }
 
 export default function Menu(props: MenuProps) {
@@ -26,7 +27,7 @@ export default function Menu(props: MenuProps) {
     <>
       {/* Closed Menu View */}
       {!menuOpen && (
-        <button onClick={toggleMenu} aria-label="Open menu">
+        <button onClick={toggleMenu} aria-label="Open menu" className={props.wrapperClassname}>
           <FiMenu size={30} />
         </button>
       )}

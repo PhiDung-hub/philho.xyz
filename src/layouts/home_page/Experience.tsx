@@ -39,7 +39,8 @@ function ChainUp() {
         </PortfolioBulletPoint>
         <PortfolioBulletPoint title="Blockkchain Development - ">
           <span>
-            Demonstrated expertise in recreating the exploitation flow of identified vulnerabilities using forge-foundry.
+            Demonstrated expertise in recreating the exploitation flow of identified vulnerabilities using
+            forge-foundry.
           </span>
         </PortfolioBulletPoint>
 

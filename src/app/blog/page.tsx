@@ -14,7 +14,7 @@ export default function Blog() {
   });
 
   return (
-    <div className="min-h-screen py-24 flex flex-col items-center justify-center">
+    <div className="min-h-screen pt-36 pb-24 flex flex-col items-center justify-center">
       <BlogPage.About />
       <BlogPage.BlogCards allBlogPostMeta={allBlogPostMeta} />
     </div>

@@ -2,3 +2,4 @@
 .contentlayer/
 .git/
 .vscode/
+pnpm-lock.yaml

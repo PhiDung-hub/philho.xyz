@@ -1,5 +1,7 @@
 export { default as ThemeToggler } from './ThemeToggler';
 export { default as SectionContainer } from './SectionContainer';
+export { default as SearchBar } from './SearchBar';
+export { default as SearchToggler } from './SearchToggler';
 export { default as ProjectCard } from './ProjectCard';
 export { default as BlogPostCard } from './BlogPostCard';
 export { default as Image } from './Image';

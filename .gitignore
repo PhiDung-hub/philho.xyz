@@ -48,3 +48,6 @@ public/**/*.Identifier
 
 # experiment with meili search
 search.mjs
+
+# lottie experiment
+public/icons_json
