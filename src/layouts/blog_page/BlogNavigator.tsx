@@ -9,8 +9,8 @@ type BlogNavigatorProps = {
   inverseDisplay?: boolean;
 };
 
-const previousIcon = <BiSkipPrevious size={40} className="inline mb-[2.5px]" viewBox="6 0 24 24" />;
-const nextIcon = <BiSkipNext size={40} className="inline mb-[2.5px]" viewBox="-6 0 24 24" />;
+const previousIcon = <BiSkipPrevious size={32} className="inline mb-[2.5px]" viewBox="6 0 24 24" />;
+const nextIcon = <BiSkipNext size={32} className="inline mb-[2.5px]" viewBox="-6 -1 24 24" />;
 
 export default function BlogNavigator({ inverseDisplay = false, ...props }: BlogNavigatorProps) {
   const [nextPost, previousPost] = findNextAndPreviousPost(props.activeSlug);
@@ -20,22 +20,22 @@ export default function BlogNavigator({ inverseDisplay = false, ...props }: Blog
       {previousPost ? (
         <>
           <div className="hidden md:flex justify-start">
-            <CustomLink href={previousPost.href}>
+            <CustomLink href={previousPost.href} wrapperClassname="hover:no-underline hover:animate-text-pulse">
               {inverseDisplay ? (
                 <>
-                  {previousPost.title}
-                  <div className="mb-2 text-2xl md:text-3xl font-semibold">
+                  <p className="text-3xl">{previousPost.title}</p>
+                  <div className="mb-2 text-2xl font-semibold">
                     {previousIcon}
                     Previous
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="mb-2 text-2xl md:text-3xl font-semibold">
+                  <div className="mb-2 text-2xl font-semibold">
                     {previousIcon}
                     Previous
                   </div>
-                  {previousPost.title}
+                  <p className="text-3xl">{previousPost.title}</p>
                 </>
               )}
             </CustomLink>
@@ -55,22 +55,22 @@ export default function BlogNavigator({ inverseDisplay = false, ...props }: Blog
       {nextPost && (
         <>
           <div className="hidden md:flex justify-end">
-            <CustomLink href={nextPost.href}>
+            <CustomLink href={nextPost.href} wrapperClassname="hover:no-underline hover:animate-text-pulse">
               {inverseDisplay ? (
                 <>
-                  {nextPost.title}
-                  <div className="flex justify-end mb-2 text-2xl md:text-3xl font-semibold">
+                  <p className="text-3xl">{nextPost.title}</p>
+                  <div className="flex justify-end mb-2 text-2xl font-semibold">
                     Next
                     {nextIcon}
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="flex justify-end mb-2 text-2xl md:text-3xl font-semibold">
+                  <div className="flex justify-end mb-2 text-2xl font-semibold">
                     Next
                     {nextIcon}
                   </div>
-                  {nextPost.title}
+                  <p className="text-3xl">{nextPost.title}</p>
                 </>
               )}
             </CustomLink>

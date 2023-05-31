@@ -18,12 +18,12 @@ export default function Hero() {
       <div className={`font-mono text-xl md:text-2xl animate-text-bounce p-5 w-full h-full text-center`}>
         <div>
           <p>
-            Hi, I&apos;m Phil<strong className="text-[1.75rem] ml-1">👋</strong>
+            <strong className="text-[1.75rem] mr-1">👋</strong>
+            It&apos;s Phil
           </p>
-          <p className="">
-            {' I'}{' '}
+          <p>
+            {'I '}
             <strong className="text-blue-700 dark:text-blue-400 font-bold animate-text-change animate-text-pulse"></strong>
-            {' technology related to '}
           </p>
         </div>
         <div className="text-rose-400 font-bold">DeFi | Web Simulations | System Design</div>
