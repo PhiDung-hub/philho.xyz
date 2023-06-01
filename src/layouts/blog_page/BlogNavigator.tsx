@@ -104,7 +104,6 @@ function findNextAndPreviousPost(slug: string) {
   const thisIndex = navigationInfo.findIndex((post) => {
     return slug === post.slug;
   });
-  console.log(thisIndex);
 
   const previousPost = thisIndex - 1 < 0 ? null : navigationInfo[thisIndex - 1];
   const nextPost = thisIndex + 1 >= navigationInfo.length ? null : navigationInfo[thisIndex + 1];
