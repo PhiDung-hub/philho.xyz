@@ -8,7 +8,7 @@
   @apply bg-gradient-to-b from-orange-50 to-white;
   scroll-behavior: smooth;
   transition: all 0.5s linear;
-  scrollbar-width: 8px;
+  scrollbar-width: 6px;
   scrollbar-color: var(--scrollbar-color);
   --bg-gradient: linear-gradient(to bottom, #fff8f1, white);
   --scrollbar-color: rgba(222, 150, 15, 0.9);
@@ -42,8 +42,8 @@ math {
 
 /******* Scollbar styling *********/
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-button {
