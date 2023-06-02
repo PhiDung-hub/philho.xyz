@@ -26,15 +26,12 @@ module.exports = {
       },
     ],
   },
-  ignorePatterns: ['!.tina', 'node_modules', 'dist', 'next'],
+  ignorePatterns: ['node_modules', 'dist', 'next'],
   settings: {
     'import/parsers': {
       '@typescrip-eslint/parser': ['.ts', '.tsx'],
     },
     'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true,
-      },
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       },

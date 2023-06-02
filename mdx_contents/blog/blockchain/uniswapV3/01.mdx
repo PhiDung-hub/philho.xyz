@@ -91,7 +91,7 @@ $$
 All the above formulas involves $\sqrt{P}$ and $L$, a natural approach is utilizing these 2 variables to manage liquidity and price for the AMM model.
 
 However, this wasn't always the case. During first days, V3 was using [`Babylonian.sqrt`](https://github.com/Uniswap/solidity-lib/blob/master/contracts/libraries/Babylonian.sol) algotihm to approximate reserve values.
-**uint256**, **uint128**, and **UQ128.128** ([Unsigned Q number](<https://en.wikipedia.org/wiki/Q_(number_format)>) was being used for liqiduity and price calculation,
+**uint256**, **uint128**, and **UQ128.128** ([Unsigned Q number](<https://en.wikipedia.org/wiki/Q_(number_format)>)) was being used for liqiduity and price calculation,
 as evidence in [PriceMath.sol](https://github.com/Uniswap/v3-core/blob/c09c892f59e08783e2415d1957c67979a4c7dccc/contracts/libraries/PriceMath.sol).
 
 [`SqrtPriceMath`](https://docs.uniswap.org/contracts/v3/reference/core/libraries/SqrtPriceMath) was first introduced on [commit 4724f148f5eb626d07d68e485a0a7a45103ee448](https://github.com/Uniswap/v3-core/commit/4724f148f5eb626d07d68e485a0a7a45103ee448) and regularly updated to use **UQ64.96** as of present.

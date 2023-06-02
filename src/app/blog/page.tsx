@@ -1,15 +1,15 @@
 import { BlogPage } from '~/layouts';
+import { type CardType } from '~/components';
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 import React from 'react';
-import type { BlogPostCardType } from '~/components';
 
 export default function Blog() {
-  const allBlogPostMeta: BlogPostCardType[] = allBlogPosts.map((post: BlogPost) => {
+  const allBlogPostMeta: CardType[] = allBlogPosts.map((post: BlogPost) => {
     return {
       href: `/blog/${post.slug}`,
       openGraphHref: `/${post.image}`,
       title: post.title,
-      summary: post.summary,
+      desc: post.summary,
     };
   });
 

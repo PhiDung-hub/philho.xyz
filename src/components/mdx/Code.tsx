@@ -1,5 +1,4 @@
 'use client';
-/* eslint-disable react/display-name */
 
 import { FaCopy } from 'react-icons/fa';
 import { BsBookmarkCheckFill } from 'react-icons/bs';

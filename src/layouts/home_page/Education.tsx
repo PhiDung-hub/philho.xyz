@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProjectCard, SectionContainer } from '~/components';
+import { Card, SectionContainer } from '~/components';
 import {
   PortfolioSectionHeader,
   PortfolioBulletPoint,
@@ -60,23 +60,26 @@ function NTUCourseworkProject() {
       <div className="w-full text-center font-semibold text-base sm:text-xl md:text-2xl">Coursework Project</div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8 mx-auto">
-        <ProjectCard
+        <Card
           href="https://onestop-e-cycle.vercel.app/"
           openGraphHref="/projects/e-cycle.jpg"
-          header="E-CYCLE"
+          title="E-CYCLE"
           desc="Web application to assist with E-waste recycling in Singapore. APIs are provided by SG goverment at data.gov.sg"
+          externalRef
         />
-        <ProjectCard
+        <Card
           href="https://github.com/PhiDung-hub/basic_CV_techniques"
           openGraphHref="/projects/computer_vision.png"
-          header="Basic Computer Vision"
+          title="Basic Computer Vision"
           desc="A compilation of old school computer vision techniques, with detailed implementation and walkthrough examples."
+          externalRef
         />
-        <ProjectCard
+        <Card
           href="https://github.com/PhiDung-hub/TF_Probabilty"
           openGraphHref="/projects/probabilitic_ML.jpg"
-          header="Tensorflow Probibility"
+          title="Tensorflow Probibility"
           desc="An exploration of Tensorflow Probability library by constructing various probabilistic models for computer vision tasks."
+          externalRef
         />
       </div>
     </div>
