@@ -40,6 +40,95 @@ Key contracts in the repository include:
 The `UniswapV3Factory` and `UniswapV3PoolDeployer` contracts are relatively simple and do not provide details about the protocol specification. Hence, we will not discuss them in this series.
 Our main focus will be on the `UniswapV3Pool` contract, and this article will explain the processes of position minting and token swapping.
 
+## UniswapV3 pool
+
+The pool structure is as follows:
+
+```solidity
+contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
+  .....
+  address public immutable override factory;
+  address public immutable override token0;
+  address public immutable override token1;
+  uint24 public immutable override fee;
+
+  int24 public immutable override tickSpacing;
+
+  uint128 public immutable override maxLiquidityPerTick;
+
+  struct Slot0 {
+    // the current price
+    uint160 sqrtPriceX96;
+    // the current tick
+    int24 tick;
+    // the most-recently updated index of the observations array
+    uint16 observationIndex;
+    // the current maximum number of observations that are being stored
+    uint16 observationCardinality;
+    // the next maximum number of observations to store, triggered in observations.write
+    uint16 observationCardinalityNext;
+    // the current protocol fee as a percentage of the swap fee taken on withdrawal
+    // represented as an integer denominator (1/x)%
+    uint8 feeProtocol;
+    // whether the pool is locked
+    bool unlocked;
+  }
+  Slot0 public override slot0;
+
+  uint256 public override feeGrowthGlobal0X128;
+  uint256 public override feeGrowthGlobal1X128;
+
+  // accumulated protocol fees in token0/token1 units
+  struct ProtocolFees {
+    uint128 token0;
+    uint128 token1;
+  }
+  ProtocolFees public override protocolFees;
+
+  uint128 public override liquidity;
+
+  mapping(int24 => Tick.Info) public override ticks;
+  mapping(int16 => uint256) public override tickBitmap;
+  mapping(bytes32 => Position.Info) public override positions;
+  Oracle.Observation[65535] public override observations;
+  .....
+  /// @dev Get the pool's balance of token0
+  /// @dev This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize check
+  function balance0() private view returns (uint256) {
+    (bool success, bytes memory data) = token0.staticcall(abi.encodeWithSelector(IERC20Minimal.balanceOf.selector, address(this)));
+    require(success && data.length >= 32);
+    return abi.decode(data, (uint256));
+  }
+
+  /// @dev Get the pool's balance of token1
+  /// @dev This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize check
+  function balance1() private view returns (uint256) {
+    (bool success, bytes memory data) = token1.staticcall(abi.encodeWithSelector(IERC20Minimal.balanceOf.selector, address(this)));
+    require(success && data.length >= 32);
+    return abi.decode(data, (uint256));
+  }
+   /// @dev Common checks for valid tick inputs.
+  function checkTicks(int24 tickLower, int24 tickUpper) private pure {
+    require(tickLower < tickUpper, 'TLU');
+    require(tickLower >= TickMath.MIN_TICK, 'TLM');
+    require(tickUpper <= TickMath.MAX_TICK, 'TUM');
+  }
+  .....
+}
+```
+
+A pool consists of:
+
+- A factory instance
+- A Pair of tokens (token0 and token1) and fee tier
+- liquidity and fee information
+- Ticks and Positions configuration as well as mappings.
+
+On top of that, it also provides utilities like:
+
+- Retrieve pool's balance of both tokens.
+- Check for tick validity.
+
 # Providing liquidity (position minting)
 
 This is the portion of minting code from the **UniswapV3Pool** contract.
@@ -87,22 +176,6 @@ function mint(
 
   emit Mint(msg.sender, recipient, tickLower, tickUpper, amount, amount0, amount1);
 }
-
-/// @dev Get the pool's balance of token0
-/// @dev This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize check
-function balance0() private view returns (uint256) {
-  (bool success, bytes memory data) = token0.staticcall(abi.encodeWithSelector(IERC20Minimal.balanceOf.selector, address(this)));
-  require(success && data.length >= 32);
-  return abi.decode(data, (uint256));
-}
-
-/// @dev Get the pool's balance of token1
-/// @dev This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize check
-function balance1() private view returns (uint256) {
-  (bool success, bytes memory data) = token1.staticcall(abi.encodeWithSelector(IERC20Minimal.balanceOf.selector, address(this)));
-  require(success && data.length >= 32);
-  return abi.decode(data, (uint256));
-}
 ```
 
 ## Minting flow
@@ -125,8 +198,8 @@ $$
 \Large{
   \begin{aligned}
 
-  \Delta Y &= L \times \Delta \sqrt{P} \quad (1) \\
-  \Delta X &= L \times \Delta \frac{1}{\sqrt{P}} \quad (2)
+  \Delta X &= L \times \Delta \frac{1}{\sqrt{P}} \quad (1) \\
+  \Delta Y &= L \times \Delta \sqrt{P} \quad (2)
 
   \end{aligned}
 }
@@ -187,7 +260,18 @@ function getAmount1Delta(
 }
 ```
 
-## Position minting - \_modifyPosition
+From the code:
+
+- `getAmount0Delta` calculate $\Delta X$, as per formula (1) stated above.
+- `getAmount1Delta` calculate $\Delta Y$, as per formula (2) stated above.
+
+## Position minting - \_updatePosition
+
+This `_updatePosition` function update the position state given an amount of liquidity change (`liquidityDelta`). It:
+
+1. Call `Tick.update(...)` (refer to [part 2 of this series](https://philho.xyz/blog/blockchain/uniswapV3/02#Tick-functions)) on the storage variable `ticks`, which consists of global ticks' state.
+2. Update tick bitmap, flipped state, and fee.
+3. Call `Position.update(...)` (refer to [part 2 of this series](https://philho.xyz/blog/blockchain/uniswapV3/02#Position)).
 
 ```solidity
 /// @dev Gets and updates a position with the given liquidity delta
@@ -362,15 +446,79 @@ function _modifyPosition(ModifyPositionParams memory params)
     }
   }
 }
-
 ```
 
 # Token Swapping
 
-The implementation of token swapping involves a substantial amount of code:
+Some utilities structs:
 
 ```solidity
-/// @inheritdoc IUniswapV3PoolActions
+// Contains cached information while performing steps of a swap
+struct SwapCache {
+  // the protocol fee for the input token
+  uint8 feeProtocol;
+  // liquidity at the beginning of the swap
+  uint128 liquidityStart;
+  // the timestamp of the current block
+  uint32 blockTimestamp;
+  // the current value of the tick accumulator, computed only if we cross an initialized tick
+  int56 tickCumulative;
+  // the current value of seconds per liquidity accumulator, computed only if we cross an initialized tick
+  uint160 secondsPerLiquidityCumulativeX128;
+  // whether we've computed and cached the above two accumulators
+  bool computedLatestObservation;
+}
+
+// The top level state of the swap, the results of which are recorded in storage at the end
+struct SwapState {
+  // the amount remaining to be swapped in/out of the input/output asset
+  int256 amountSpecifiedRemaining;
+  // the amount already swapped out/in of the output/input asset
+  int256 amountCalculated;
+  // current sqrt(price)
+  uint160 sqrtPriceX96;
+  // the tick associated with the current price
+  int24 tick;
+  // the global fee growth of the input token
+  uint256 feeGrowthGlobalX128;
+  // amount of input token paid as protocol fee
+  uint128 protocolFee;
+  // the current liquidity in range
+  uint128 liquidity;
+}
+
+// Information about each step in swapping token
+struct StepComputations {
+  // the price at the beginning of the step
+  uint160 sqrtPriceStartX96;
+  // the next tick to swap to from the current tick in the swap direction
+  int24 tickNext;
+  // whether tickNext is initialized or not
+  bool initialized;
+  // sqrt(price) for the next tick (1/0)
+  uint160 sqrtPriceNextX96;
+  // how much is being swapped in in this step
+  uint256 amountIn;
+  // how much is being swapped out
+  uint256 amountOut;
+  // how much fee is being paid in
+  uint256 feeAmount;
+}
+```
+
+The implementation of token swapping involves the following key steps:
+
+1. Input validation
+2. Initialize `SwapCache`, `SwapState`, and `Slot0`
+3. Perform swapping logic until `amountSpecified` is drained out, i.e. the swap is completed. consist of the following steps:
+   - Initialize `StepComputations`, get state of the next tick (a)
+   - Perform a swap step, update amount left, protocol fee, and price movement (slippage) if any. Note that swaps can be performed in reverse direction (`amountSpecified` < 0)
+     and a swap step can only exhausted the liquidity in current tick.
+   - Update tick state based on new price calculated (as well as liquidity if there is any liquidityNet).
+4. Update global price, ticks' state, liquidity, fee, and token amount (after the swap).
+5. Perform token transfer, token repayment (to the pool), and emit a `Swap` event.
+
+```solidity
 function swap(
   address recipient,
   bool zeroForOne,
@@ -378,6 +526,7 @@ function swap(
   uint160 sqrtPriceLimitX96,
   bytes calldata data
 ) external override noDelegateCall returns (int256 amount0, int256 amount1) {
+  /// START STEP 1: Input validation
   require(amountSpecified != 0, 'AS');
 
   Slot0 memory slot0Start = slot0;
@@ -389,9 +538,11 @@ function swap(
       : sqrtPriceLimitX96 > slot0Start.sqrtPriceX96 && sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO,
     'SPL'
   );
+  /// END STEP 1
 
   slot0.unlocked = false;
 
+  /// START STEP 2: Initialization
   SwapCache memory cache = SwapCache({
     liquidityStart: liquidity,
     blockTimestamp: _blockTimestamp(),
@@ -412,9 +563,12 @@ function swap(
     protocolFee: 0,
     liquidity: cache.liquidityStart
   });
+  /// END STEP 2
 
+  /// START STEP 3: swap until amountSpecified is drained
   // continue swapping as long as we haven't used the entire input/output and haven't reached the price limit
   while (state.amountSpecifiedRemaining != 0 && state.sqrtPriceX96 != sqrtPriceLimitX96) {
+    /// START STEP 3.a
     StepComputations memory step;
 
     step.sqrtPriceStartX96 = state.sqrtPriceX96;
@@ -434,7 +588,9 @@ function swap(
 
     // get the price for the next tick
     step.sqrtPriceNextX96 = TickMath.getSqrtRatioAtTick(step.tickNext);
+    /// END STEP 3.a
 
+    /// START STEP 3.b
     // compute values to swap to the target tick, price limit, or point where input/output amount is exhausted
     (state.sqrtPriceX96, step.amountIn, step.amountOut, step.feeAmount) = SwapMath.computeSwapStep(
       state.sqrtPriceX96,
@@ -464,7 +620,9 @@ function swap(
     // update global fee tracker
     if (state.liquidity > 0)
       state.feeGrowthGlobalX128 += FullMath.mulDiv(step.feeAmount, FixedPoint128.Q128, state.liquidity);
+    /// END STEP 3.b
 
+    /// START STEP 3.c
     // shift tick if we reached the next price
     if (state.sqrtPriceX96 == step.sqrtPriceNextX96) {
       // if the tick is initialized, run the tick transition
@@ -502,8 +660,11 @@ function swap(
       // recompute unless we're on a lower tick boundary (i.e. already transitioned ticks), and haven't moved
       state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
     }
+    /// END STEP 3.c
   }
+  /// END STEP 3
 
+  /// START STEP 4: Update global states after the swap
   // update tick and write an oracle entry if the tick change
   if (state.tick != slot0Start.tick) {
     (uint16 observationIndex, uint16 observationCardinality) = observations.write(
@@ -541,7 +702,10 @@ function swap(
   (amount0, amount1) = zeroForOne == exactInput
     ? (amountSpecified - state.amountSpecifiedRemaining, state.amountCalculated)
     : (state.amountCalculated, amountSpecified - state.amountSpecifiedRemaining);
+  /// END STEP 4
 
+
+  /// START STEP 5: Transfer, payment and emit swap event.
   // do the transfers and collect payment
   if (zeroForOne) {
     if (amount1 < 0) TransferHelper.safeTransfer(token1, recipient, uint256(-amount1));
@@ -559,9 +723,23 @@ function swap(
 
   emit Swap(msg.sender, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
   slot0.unlocked = true;
+  /// END STEP 5
 }
+```
 
-/// @inheritdoc IUniswapV3PoolActions
+## Flash
+
+Aside from swap, UniswapV3 also supports flash loan. This allows users to:
+
+1. Borrow (potentially unlimited) amount of tokens.
+2. Perform arbitrary action in between transactions, e.g. use the borrowed tokens to trade on other DEX.
+3. Repay the borrowed amount plus fee of the flash loan.
+
+Historically, flash loan was a default feature of UniswapV2. In V2, any swap can potentially be a flash swap as there is no need (or no way) to differentiate between them.
+V2 swap implmentation can be referenced [here](https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Pair.sol#L159).
+V2 swap fee is fixed and set at 3/1000, i.e $L_{new} \times 997 >= L_{old} \times 1000$
+
+```solidity
 function flash(
   address recipient,
   uint256 amount0,
@@ -607,8 +785,6 @@ function flash(
   emit Flash(msg.sender, recipient, amount0, amount1, paid0, paid1);
 }
 ```
-
-## Swapping flow
 
 # What's next
 

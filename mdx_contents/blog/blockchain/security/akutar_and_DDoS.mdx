@@ -712,9 +712,8 @@ For the specific example from Ethernaut lvl 20, we can:
 
 1. Guard from re-entrancy, [see](https://philho.xyz/blog/blockchain/reentrance_attack)
 2. Restrict `setWithdrawPartner` to:
-
-- contract owner (then choose trusted partner) OR
-- EOA only, e.g. [consensys note](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/extcodesize-checks/)
+   - contract owner (then choose trusted partner) OR
+   - EOA only, e.g. [consensys note](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/extcodesize-checks/)
 
 # Conclusion
 

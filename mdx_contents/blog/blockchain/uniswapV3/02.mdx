@@ -219,13 +219,13 @@ struct Info {
 
 A tick containing info about
 
-- liquidity grossed within this tick - `liquidityGross`, and net liquidity movement when tick is crossed from either side - `liquidityNet`.
-- initialized state indicating whether this tick is active - `initialized`.
-- `tickCumulativeOutside`, `secondsOutside`, `secondsPerLiquidityOutsideX128` keep track of accumulated within a selective range for each tick.
-  These values are not used within the contract, but are tracked for the benefit of external contracts that need
-  more finegrained information about the pool’s behavior, e.g. for purposes like liquidity mining.
-  For example, this is useful for Time Weighted Average (TWAP) Oracle implementations.
-  Their update schemes will be discussed in next part.
+1. liquidity grossed within this tick - `liquidityGross`, and net liquidity movement when tick is crossed from either side - `liquidityNet`.
+2. initialized state indicating whether this tick is active - `initialized`.
+3. `tickCumulativeOutside`, `secondsOutside`, `secondsPerLiquidityOutsideX128` keep track of accumulated within a selective range for each tick:
+   - These values are not used within the contract, but are tracked for the benefit of external contracts that need more finegrained
+     information about the pool’s behavior, e.g. for purposes like liquidity mining.
+   - An example is Time Weighted Average (TWAP) Oracle implementations.
+   - Their update schemes will be discussed in next part.
 
 ### Tick functions
 
