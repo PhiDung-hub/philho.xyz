@@ -4,7 +4,6 @@
  * usehooks.com: https://usehooks.com
  **/
 
-export { default as useClickAnywhere } from './useClickAnywhere';
 export { default as useDebounce } from './useDebounce';
 export { default as useHover } from './useHover';
 export { default as useLocalStorage } from './useLocalStorage';

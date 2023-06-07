@@ -13,14 +13,6 @@ export const BlogPost = defineDocumentType(() => ({
       description: 'Blog title',
       required: true,
     },
-    seriesName: {
-      type: 'string',
-      description: 'series that a blog post belongs to',
-    },
-    seriesIndex: {
-      type: 'number',
-      description: 'Index of this article in the current series',
-    },
     date: {
       type: 'string',
       description: 'Date of creation',
@@ -40,6 +32,19 @@ export const BlogPost = defineDocumentType(() => ({
       type: 'string',
       description: 'Open Graph image of the blog post',
       required: true,
+    },
+
+    seriesName: {
+      type: 'string',
+      description: 'Series that this blog post belongs to',
+    },
+    seriesIndex: {
+      type: 'number',
+      description: 'Index of this article in the current series',
+    },
+    categories: {
+      type: 'string',
+      description: 'Categories that a blog post belongs to'
     },
   },
   computedFields: {

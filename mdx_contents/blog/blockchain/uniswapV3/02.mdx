@@ -6,6 +6,7 @@ summary: Uniswap V3 - Explore tick and position structure in concentrated liquid
 image: 'blogs/blockchain/uniswapV3/cover.webp'
 seriesName: 'Uniswap V3'
 seriesIndex: 2
+categories: blockchain, DeFi
 type: BlogPost
 ---
 
@@ -59,9 +60,9 @@ Firstly, we need an efficient data structure to store ticks' state for access.
 Obviously, it's no good using all 887272 booleans storage variable for each position initialized as this will incur astronomical gas on Ethereum (as of current time).
 Therefore the strategy is using a simple (lazy) storage that:
 
-- Is a 16 (bits key) | 8 (bits value) bit map, each word is 256 bits since it's Ethereum standard.
-- An entry (or word) is accessed only if active, i.e. containing at least 1 active tick. $\Rightarrow$ very high utilization rate for most positions, since concentrated liquidity means tick only span within a contiguous range.
-- Each tick only takes 1 bits (instead of 1 byte if using Solidity boolean) $\Rightarrow$ 8 times saving.
+- Is a 16 (bits key) | 8 (bits value) bit map, each word is $2^8=256$ bits and it's Ethereum standard. So the capacity of this storage will be $256 \times [-2^{15}, 2^{15}-1]$
+- An entry (or word) is active only if accessed, i.e. containing at least 1 active tick. $\Rightarrow$ very high utilization rate for most positions, since concentrated liquidity means tick only span within a contiguous range.
+- Each tick takes only 1 bit (instead of 1 byte if using Solidity `boolean`) $\Rightarrow$ 8 times more efficient.
 
 ### How about the math?
 
@@ -155,8 +156,9 @@ A few notes:
 - function `nextInitializedTickWithinOneWord(...)` tends to round up toward negative infinity ticks. This means the $i^{th}$ tick is responsible for
   $tickPrice \in [i \times tickSpacing, (i+1) \times tickSpacing)$, which is expected.
 
-<Quote author="Uniswap V3 white-paper">
+Notes regarding `tickSpacing` of V3 protocol:
 
+<Quote author="Uniswap V3 white-paper">
 "...UNI governance also has the ability to add additional fee tiers.
 When it adds a new fee tier, it can also define the tickSpacing
 (see Section 6.1) corresponding to that fee tier. Once a fee tier is

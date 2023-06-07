@@ -6,6 +6,7 @@ summary: Uniswap V3 - Implement liquidity provision (minting) and DEX (token swa
 image: 'blogs/blockchain/uniswapV3/cover.webp'
 seriesName: 'Uniswap V3'
 seriesIndex: 3
+categories: blockchain, DeFi
 type: BlogPost
 ---
 
@@ -14,16 +15,14 @@ type: BlogPost
 We have discussed **Tick** and **Position** from the [previous section](https://philho.xyz/blog/blockchain/uniswapV3/02). Take notes of the following:
 
 1. Each tick:
-
-- is represented by `int24`.
-- is managed by a `16 | 8` bit map.
-- holds an `initialize` state, indicating whether the tick is active in the current position
-- contains information about liquidity, fee, and time spent.
+   - is represented by `int24`.
+   - is managed by a `16 | 8` bit map.
+   - holds an `initialize` state, indicating whether the tick is active in the current position
+   - contains information about liquidity, fee, and time spent.
 
 2. A position:
-
-- is **non-fungible**.
-- contains information about fee accrued for both token (within the pool).
+   - is **non-fungible**.
+   - contains information about fee accrued for both token (within the pool).
 
 # About Uniswap V3 core
 
@@ -117,17 +116,19 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
 }
 ```
 
-A pool consists of:
+Structure summary:
 
-- A factory instance
-- A Pair of tokens (token0 and token1) and fee tier
-- liquidity and fee information
-- Ticks and Positions configuration as well as mappings.
+1. A pool consists of
 
-On top of that, it also provides utilities like:
+   - A factory instance
+   - A Pair of tokens (token0 and token1) and fee tier
+   - liquidity and fee information
+   - Ticks and Positions configuration as well as mappings.
 
-- Retrieve pool's balance of both tokens.
-- Check for tick validity.
+2. On top of that, it also provides utilities like
+
+   - Retrieve pool's balance of both tokens (`balance0()` and `balance1()`).
+   - Check for tick validity (`checkTicks(...)`).
 
 # Providing liquidity (position minting)
 
@@ -368,10 +369,10 @@ We can finish the final piece of minting logic - `_modifyPosition` - which essen
 2. Call for `_updatePosition`.
 3. Given the liquidity delta from `_updatePosition`, calculate tokens owed to protocols for 3 cases:
 
-- If $currentTick < lowerTick$, all are **token 0** [price OUTSIDE (below) range].
-- If $lowerTick \leq currentTick \leq upperTick$, mix of **token 0** and **token 1** [price INSIDE range].
-  For this special case, also update state of external oracle (will be discussed in part 5.
-- If $currentTick > upperTick$, all are **token 1** [price OUTSIDE (above) range].
+   - If $currentTick < lowerTick$, all are **token 0** [price OUTSIDE (below) range].
+   - If $lowerTick \leq currentTick \leq upperTick$, mix of **token 0** and **token 1** [price INSIDE range].
+     For this special case, also update state of external oracle (will be discussed in part 5.
+   - If $currentTick > upperTick$, all are **token 1** [price OUTSIDE (above) range].
 
 ```solidity
 /// @dev Common checks for valid tick inputs.

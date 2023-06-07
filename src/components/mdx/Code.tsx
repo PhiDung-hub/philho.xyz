@@ -16,7 +16,6 @@ const CodeBlock: React.FC<DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTML
 
   const onCopy = async () => {
     setCopied(true);
-
     await navigator.clipboard.writeText(codeString);
   };
 

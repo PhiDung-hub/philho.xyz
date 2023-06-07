@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { SearchBar, SearchToggler, Menu, ThemeToggler } from '~/components';
+import { KBar, KBarToggler, Menu, ThemeToggler } from '~/components';
 import NextLink from 'next/link';
 import { clsxTailwindMerge } from '~/utils';
 
@@ -54,7 +54,7 @@ export default function NavigationBar() {
       className={`top-0 w-full transition-all duration-200 ease-in-out z-[999] 
         ${sticky == true ? 'sticky drop-shadow-md bg-gray-50 dark:bg-gray-800' : 'absolute bg-transparent h-32 pt-4'}`}
     >
-      <SearchBar>
+      <KBar>
         <div className="custom-container mx-auto py-4">
           {/* Desktop view */}
           <div className="hidden md:flex justify-between items-center">
@@ -67,7 +67,7 @@ export default function NavigationBar() {
                 <HoverLink key={`nav-item-${index}`} href={href} desc={desc} />
               ))}
             </div>
-            <SearchToggler wrapperClassname="pr-8" />
+            <KBarToggler wrapperClassname="pr-8" />
             <ThemeToggler />
           </div>
           {/***************/}
@@ -80,12 +80,12 @@ export default function NavigationBar() {
                 <HoverLink key={`nav-item-${index}`} href={href} desc={desc} wrapperClassname="pb-4" />
               ))}
             </Menu>
-            <SearchToggler wrapperClassname="pr-4" />
+            <KBarToggler wrapperClassname="pr-4" />
             <ThemeToggler />
           </div>
           {/***************/}
         </div>
-      </SearchBar>
+      </KBar>
     </nav>
   );
 }

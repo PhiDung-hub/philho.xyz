@@ -3,11 +3,33 @@ export { default as Quote } from './Quote';
 
 import { Image } from '~/components';
 import type { MDXComponents } from 'mdx/types';
-import { ReactNode, Children, isValidElement } from 'react';
+import { ReactNode, Children, isValidElement, cloneElement, createElement } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import CodeBlock from './Code';
 import Annotation from './Annotation';
 import Quote from './Quote';
+
+function replacePTagsWithSpans(node: ReactNode): ReactNode {
+  return Children.map(node, (child) => {
+    if (typeof child === 'string') {
+      return child;
+    }
+
+    if (isValidElement(child) && child.type === 'p') {
+      // Replace <p> with <span>
+      return createElement('span', child.props, child.props.children);
+    }
+
+    child = child as ReactNode;
+    if (isValidElement(child) && child.props && child.props.children) {
+      // Recursively call the function for nested children
+      const processedChild = replacePTagsWithSpans(child.props.children);
+      return cloneElement(child, child.props, processedChild);
+    }
+
+    return child;
+  });
+}
 
 const textToId = (children: ReactNode): string => {
   return (children as string).replace(' ', '-');
@@ -42,14 +64,14 @@ const CustomMDXComponents: MDXComponents = {
       {children}
     </a>
   ),
-  p: ({ children }) => <p className="py-2">{children}</p>,
+  // p: ({ children }) => <p className="py-2">{children}</p>,
   ul: ({ children }) => {
     const listItems = Children.map(children, (item, index) => {
       if (isValidElement(item) && item.type === 'li') {
         return (
           <li key={`${uuidv4()}-${index}`}>
             <span className="font-mono font-semibold">&bull; </span>
-            {item.props.children}
+            {replacePTagsWithSpans(item.props.children)}
           </li>
         );
       }
@@ -65,7 +87,7 @@ const CustomMDXComponents: MDXComponents = {
         return (
           <li key={`${uuidv4()}-${index}`}>
             <span className="font-mono">{liIndex}. </span>
-            {item.props.children}
+            {replacePTagsWithSpans(item.props.children)}
           </li>
         );
       }

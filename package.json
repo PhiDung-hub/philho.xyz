@@ -15,6 +15,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.24.2",
     "@mdx-js/react": "^2.3.0",
     "@react-spring/web": "^9.7.2",
     "@types/js-cookie": "^3.0.3",
@@ -28,8 +29,6 @@
     "clsx": "^1.2.1",
     "contentlayer": "^0.3.3",
     "dayjs": "^1.11.7",
-    "flowbite": "^1.6.5",
-    "flowbite-react": "^0.4.6",
     "image-size": "^1.0.2",
     "js-cookie": "^3.0.5",
     "kbar": "0.1.0-beta.40",

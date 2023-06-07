@@ -1,17 +1,11 @@
 import React from 'react';
 import { Image, SectionContainer } from '~/components';
-import { Tooltip } from '~/components/third_party/flowbite-react';
 
 export default function Skills() {
   return (
     <SectionContainer className="flex flex-col justify-center">
       <div className="pb-4 xl:pb-8">
-        <Tooltip
-          content="These are the technologies I have worked with, roughly ranked by familiarity"
-          className="max-w-[20rem]"
-        >
-          <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Stack</p>
-        </Tooltip>
+        <p className="text-4xl font-bold border-b-4 border-gray-500 p-2 inline">Tech Stack</p>
       </div>
 
       <div className="w-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 text-center py-8 px-12 sm:px-0">

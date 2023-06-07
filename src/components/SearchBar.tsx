@@ -1,141 +1,251 @@
 'use client';
+
+import { clsxTailwindMerge } from '~/utils';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { KBarAnimator, KBarProvider, KBarPortal, KBarPositioner, KBarSearch } from 'kbar';
-import { useMatches, KBarResults } from 'kbar';
-import './SearchBar.css';
-import { AiOutlineCode, AiOutlineFundProjectionScreen } from 'react-icons/ai';
-import { MdArticle } from 'react-icons/md';
-import { CgProfile } from 'react-icons/cg';
-import { IconType } from 'react-icons/lib';
+import {
+  useFloating,
+  useInteractions,
+  autoUpdate,
+  FloatingFocusManager,
+  FloatingPortal,
+  flip,
+  useClick,
+  useDismiss,
+  useRole,
+  useListNavigation,
+  size,
+  useId,
+} from '@floating-ui/react';
+import { SearchIcon } from '~/components/icons';
+import { BsThreeDots } from 'react-icons/bs';
+import { Selector } from '~/components';
 
-type SearchBarProps = {
-  children: React.ReactNode;
+export type indexTableEntry = {
+  key: string;
+  categories?: string[];
+  href?: string;
+  icon?: React.ReactElement;
+  shortcut?: string[];
 };
-
-type actionItemProps = {
-  id: string;
-  name: string;
-  shortcut: string[];
-  keywords: string;
-  section: string;
-  perform: () => any;
-  icon: React.ReactElement<IconType>;
+export type SearchBarProps = {
+  indexTable: indexTableEntry[];
+  className?: string;
+  allCategories?: string[];
 };
 
 export default function SearchBar(props: SearchBarProps) {
+  const [open, setOpen] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState('');
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+
+  const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
+    whileElementsMounted: autoUpdate,
+    open,
+    onOpenChange: setOpen,
+    middleware: [
+      flip({ padding: 10 }),
+      size({
+        apply({ rects, availableHeight, elements }) {
+          Object.assign(elements.floating.style, {
+            width: `${rects.reference.width}px`,
+            maxHeight: `${availableHeight}px`,
+          });
+        },
+        padding: 10,
+      }),
+    ],
+  });
+
+  const listRef = React.useRef<Array<HTMLElement | null>>([]);
+  const click = useClick(context, { event: 'mousedown' });
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: 'listbox' });
+  const listNav = useListNavigation(context, {
+    listRef,
+    activeIndex,
+    onNavigate: setActiveIndex,
+    virtual: true,
+    loop: true,
+  });
+
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([role, dismiss, listNav, click]);
+
+  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const value = event.target.value;
+    setInputValue(value);
+
+    if (value) {
+      setOpen(true);
+      setActiveIndex(0);
+    } else {
+      setOpen(false);
+    }
+  }
+
   const router = useRouter();
+  const handleEvent = (item: indexTableEntry, idx: number) => {
+    const { key, href } = item;
+    if (href) {
+      router.push(href);
+    }
+    setInputValue(key);
+    setOpen(false);
+    setActiveIndex(idx);
+  };
 
-  const actions: actionItemProps[] = [
-    {
-      id: 'home',
-      name: 'Home',
-      shortcut: ['h'],
-      keywords: 'go-home',
-      section: 'Go To',
-      perform: () => router.push('/'),
-      icon: <CgProfile size="1.5rem" />,
-    },
-    {
-      id: 'blogs',
-      name: 'Blogs',
-      shortcut: ['b'],
-      keywords: 'go-blogs',
-      section: 'Go To',
-      perform: () => router.push('/blog'),
-      icon: <MdArticle size="1.5rem" />,
-    },
-    {
-      id: 'source',
-      name: 'View Source',
-      shortcut: ['s'],
-      keywords: 'view-source',
-      section: 'General',
-      perform: () => window.open('https://github.com/PhiDung-hub/philho.xyz', '_blank'),
-      icon: <AiOutlineCode size="1.5rem" />,
-    },
-    {
-      id: 'projects',
-      name: 'Projects',
-      shortcut: ['p'],
-      keywords: 'go-projects',
-      section: 'Go To',
-      perform: () => router.push('/projects'),
-      icon: <AiOutlineFundProjectionScreen size="1.5rem" />,
-    },
-  ];
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
+
+  const onCategorySelectionChange = (category: string) => {
+    setSelectedCategory(category);
+  };
+
+  const items = props.indexTable?.filter((item) => {
+    // TODO: implements a custom search algorithm to replace simple `searchFilter`
+    const searchFilter = item.key.toLowerCase().startsWith(inputValue.toLowerCase());
+    const categoryFilter = selectedCategory ? item.categories?.includes(selectedCategory) : true;
+    return searchFilter && categoryFilter;
+  });
 
   return (
-    <KBarProvider actions={actions}>
-      <KBarPortal>
-        <KBarPositioner className="!pt-[20vh] box-border bg-black bg-opacity-80">
-          <KBarAnimator
-            className="bg-orange-50 dark:bg-gray-900 max-w-[80vw] md:max-w-[42rem] lg:max-w-[50rem] w-full 
-            rounded-lg overflow-hidden backdrop-filter backdrop-saturate-[300%] backdrop-blur-[25px] hide-scrollbar"
-          >
-            <div className="flex">
-              <KBarSearch
-                defaultPlaceholder="Searching ..."
-                className="flex-1 bg-orange-50 dark:bg-gray-900 pt-3 px-4 text-xl w-full box-border outline-none border-none m-0 text-primary"
-              />
-              <kbd
-                key={'$mod+K'}
-                className="rounded-[4px] py-2 px-3 bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-10"
-              >
-                ⌘+K
-              </kbd>
-            </div>
-            <RenderResults />
-          </KBarAnimator>
-        </KBarPositioner>
-      </KBarPortal>
-      {props.children}
-    </KBarProvider>
+    <div className={clsxTailwindMerge('flex items-center w-full', props.className)}>
+      <label className="sr-only">Search blog</label>
+      <div className="flex w-full">
+        <div className="flex-grow relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <SearchIcon className="text-gray-600 dark:text-gray-400" />
+          </div>
+          <input
+            type="text"
+            className={clsxTailwindMerge(
+              'outline-0 text-lg text-opacity-100 w-full py-2.5 pl-10',
+              'bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 dark:placeholder-gray-400',
+              props.allCategories ? 'rounded-l-lg' : 'rounded-lg',
+            )}
+            {...getReferenceProps({
+              ref: refs.setReference,
+              onChange,
+              value: inputValue,
+              placeholder: 'Search blog...',
+              'aria-autocomplete': 'list',
+              onKeyDown(event) {
+                if (event.key === 'Enter' && activeIndex != null && items[activeIndex]) {
+                  handleEvent(items[activeIndex], activeIndex);
+                }
+              },
+            })}
+          />
+          <FloatingPortal>
+            {open && (
+              <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
+                <div
+                  {...getFloatingProps({
+                    ref: refs.setFloating,
+                    style: {
+                      ...floatingStyles,
+                      overflowY: 'auto',
+                      borderRadius: '0.5rem',
+                      zIndex: 999999,
+                    },
+                  })}
+                  className="bg-gray-50 dark:bg-gray-700 my-1 border border-gray-300 dark:border-gray-600"
+                >
+                  {items.map((item, idx) => {
+                    const { key, icon, shortcut, categories } = item;
+                    const entry: ItemEntry = { key, icon, shortcut, categories };
+
+                    return (
+                      <ResultItem
+                        key={`Item-${item}-${idx}`}
+                        {...getItemProps({
+                          ref(node) {
+                            listRef.current[idx] = node;
+                          },
+                          onClick() {
+                            handleEvent(item, idx);
+                            refs.domReference.current?.focus();
+                          },
+                        })}
+                        active={activeIndex === idx}
+                        tabIndex={activeIndex === idx ? 0 : -1}
+                        entry={entry}
+                      />
+                    );
+                  })}
+                </div>
+              </FloatingFocusManager>
+            )}
+          </FloatingPortal>
+        </div>
+        {props.allCategories && (
+          <Selector
+            categories={props.allCategories}
+            className="h-full w-[8rem] md:w-[12rem] rounded-r-lg"
+            setSelectedCallback={onCategorySelectionChange}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 
-function RenderResults() {
-  const { results } = useMatches();
+export type ItemEntry = {
+  icon?: React.ReactElement;
+  key: string;
+  shortcut?: string[];
+  categories?: string[];
+};
+type ItemProps = {
+  entry: ItemEntry;
+  active: boolean;
+};
+const ResultItem = React.forwardRef<HTMLDivElement, ItemProps & React.HTMLProps<HTMLDivElement>>(function ResultItem(
+  { entry, active, ...rest },
+  ref,
+) {
+  const id = useId();
 
-  return (
-    <KBarResults
-      items={results}
-      onRender={({ item, active }) => {
-        if (typeof item === 'string') {
-          return <div className="uppercase font-bold text-xl p-4">{item}</div>;
-        } else {
-          return <ResultItem action={item} active={active} />;
-        }
-      }}
-    />
-  );
-}
-
-function ResultItem({ action, active }: { action: any; active: boolean }) {
   return (
     <div
-      className={`flex p-2 rounded-md items-center justify-between m-0 cursor-pointer ${
-        active ? 'bg-opacity-5 bg-black dark:bg-white dark:bg-opacity-5' : ''
-      }`}
+      ref={ref}
+      className={clsxTailwindMerge(
+        'flex p-2 items-center justify-between m-0 cursor-normal',
+        active ? 'bg-opacity-5 bg-black dark:!bg-opacity-5 dark:bg-white' : '',
+      )}
+      id={id}
+      {...rest}
+      style={{
+        ...rest.style,
+      }}
     >
       <div className="flex gap-2 items-center text-xl">
-        {action.icon ?? null}
-        <div className="flex flex-col">
-          <span>{action.name}</span>
-        </div>
+        {entry.icon ?? <BsThreeDots width={12} height={12} />}
+        <span>{entry.key}</span>
       </div>
-      {action.shortcut?.length ? (
-        <div className="grid grid-flow-col gap-2 text-lg" aria-hidden>
-          {action.shortcut.map((shortcut: string) => (
+      {entry.categories && (
+        <div className="hidden md:grid grid-flow-col gap-2 text-lg" aria-hidden>
+          {entry.categories.map((category: string, idx) => (
             <kbd
-              key={shortcut}
+              key={`item-category-key-${category}-${idx}`}
+              className="rounded-[4px] py-1 px-3 capitalize bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-10"
+            >
+              {category}
+            </kbd>
+          ))}
+        </div>
+      )}
+      {entry.shortcut && (
+        <div className="grid grid-flow-col gap-2 text-lg" aria-hidden>
+          {entry.shortcut.map((shortcut: string, idx) => (
+            <kbd
+              key={`search-key-${shortcut}-${idx}`}
               className="rounded-[4px] py-1 px-3 uppercase bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-10"
             >
               {shortcut}
             </kbd>
           ))}
         </div>
-      ) : null}
+      )}
     </div>
   );
-}
+});
