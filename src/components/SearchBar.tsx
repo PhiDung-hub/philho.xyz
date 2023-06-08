@@ -41,9 +41,9 @@ const FUZZY = new Fuzzy({
   intraContr: "'[a-z]{1,2}\\b",
   // 1 typos tolerance
   intraMode: 1,
-  // intraSub: 1,
-  // intraTrn: 1,
-  // intraDel: 1,
+  intraSub: 1,
+  intraTrn: 1,
+  intraDel: 1,
 });
 export default function SearchBar(props: SearchBarProps) {
   const [open, setOpen] = React.useState(false);
