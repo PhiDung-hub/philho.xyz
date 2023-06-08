@@ -54,27 +54,12 @@ const OPTS = {
   intraTrn: 0,
   intraDel: 0,
 
-  // can post-filter matches that are too far apart in distance or length
-  // (since intraIns is between each char, it can accum to nonsense matches)
-  intraFilt: (term, match, index) => true, // should this also accept WIP info?
-
   // final sorting fn
-  sort: (info, haystack, needle) => {
-    let {
-      idx,
-      chars,
-      terms,
-      interLft2,
-      interLft1,
-      //	interRgt2,
-      //	interRgt1,
-      start,
-      intraIns,
-      interIns,
-    } = info;
+  sort: (info, haystack, _ /* needle */) => {
+    let { idx, chars, terms, interLft2, interLft1, start, intraIns, interIns } = info;
 
     return idx
-      .map((v, i) => i)
+      .map((_, i) => i)
       .sort(
         (ia, ib) =>
           // most contig chars matched
@@ -276,8 +261,6 @@ export default function uFuzzy(opts) {
 
         let reTpl = '(?:' + variants.join('|') + ')' + contrs[pi];
 
-        //	console.log(reTpl);
-
         return reTpl;
       });
     } else {
@@ -413,8 +396,6 @@ export default function uFuzzy(opts) {
       let start = m.index + m[1].length;
 
       let idxAcc = start;
-      //	let span = m[0].length;
-
       let disc = false;
       let lft2 = 0;
       let lft1 = 0;
@@ -556,12 +537,6 @@ export default function uFuzzy(opts) {
 
         if (j > 0) inter += m[k - 1].length; // interFuzz
 
-        // TODO: group here is lowercased, which is okay for length cmp, but not more case-sensitive filts
-        if (!opts.intraFilt(term, group, idxAcc)) {
-          disc = true;
-          break;
-        }
-
         if (j < partsLen - 1) idxAcc += groupLen + m[k + 1].length;
       }
 
@@ -669,9 +644,6 @@ export default function uFuzzy(opts) {
       if (terms.length == 0) return [null, null, null];
     }
 
-    //	console.log(negs);
-    //	console.log(needle);
-
     if (outOfOrder) {
       // since uFuzzy is an AND-based search, we can iteratively pre-reduce the haystack by searching
       // for each term in isolation before running permutations on what's left.
@@ -711,9 +683,6 @@ export default function uFuzzy(opts) {
         }
       }
     }
-
-    // interOR
-    //	console.log(prepQuery(needle, 1, null, true));
 
     // non-ooo or ooo w/single term
     if (needles == null) {
@@ -797,6 +766,17 @@ function permute(arr) {
   return result;
 }
 
+uFuzzy.permute = (arr) => {
+  let idxs = permute([...Array(arr.length).keys()]).sort((a, b) => {
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return a[i] - b[i];
+    }
+    return 0;
+  });
+
+  return idxs.map((pi) => pi.map((i) => arr[i]));
+};
+
 const _mark = (part, matched) => (matched ? `<mark>${part}</mark>` : part);
 const _append = (acc, part) => acc + part;
 
@@ -817,14 +797,4 @@ function highlight(str, ranges, mark = _mark, accum = '', append = _append) {
   return accum;
 }
 
-uFuzzy.permute = (arr) => {
-  let idxs = permute([...Array(arr.length).keys()]).sort((a, b) => {
-    for (let i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return a[i] - b[i];
-    }
-    return 0;
-  });
-
-  return idxs.map((pi) => pi.map((i) => arr[i]));
-};
 uFuzzy.highlight = highlight;

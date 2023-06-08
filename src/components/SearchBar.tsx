@@ -1,6 +1,6 @@
 'use client';
 
-import { clsxTailwindMerge } from '~/utils';
+import { clsxTailwindMerge, Fuzzy } from '~/utils';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -18,7 +18,7 @@ import {
   useId,
 } from '@floating-ui/react';
 import { SearchIcon } from '~/components/icons';
-import { BsThreeDots, BsInfoSquareFill  } from 'react-icons/bs';
+import { BsThreeDots, BsInfoSquareFill } from 'react-icons/bs';
 import { Selector } from '~/components';
 
 export type indexTableEntry = {
@@ -35,6 +35,16 @@ export type SearchBarProps = {
   allCategories?: string[];
 };
 
+const FUZZY = new Fuzzy({
+  // case-insensitive regexps
+  intraChars: "[a-z\\d']",
+  intraContr: "'[a-z]{1,2}\\b",
+  // 1 typos tolerance
+  intraMode: 1,
+  intraSub: 1,
+  intraTrn: 1,
+  intraDel: 1,
+});
 export default function SearchBar(props: SearchBarProps) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
@@ -101,10 +111,25 @@ export default function SearchBar(props: SearchBarProps) {
     setSelectedCategory(category);
   };
 
-  const items = props.indexTable?.filter((item) => {
-    // TODO: implements a custom search algorithm to replace simple `searchFilter`
-    const searchFilter = item.key.toLowerCase().startsWith(inputValue.toLowerCase());
+  const keysWithDescription = props.indexTable.map((item) => {
+    const searchKey = item.key;
+    if (item.categories) {
+      searchKey.concat(...item.categories.map((cat) => '. ' + cat));
+    }
+    if (item.desc) {
+      searchKey.concat('. ' + item.desc);
+    }
+
+    return searchKey;
+  });
+  const match_indexes = FUZZY.filter(keysWithDescription, inputValue.toLowerCase());
+
+  const items = props.indexTable.filter((item, idx) => {
+    // const searchFilter = item.key.toLowerCase().startsWith(inputValue.toLowerCase());
+    const searchFilter = inputValue == '' || match_indexes?.includes(idx);
+
     const categoryFilter = selectedCategory ? item.categories?.includes(selectedCategory) : true;
+
     return searchFilter && categoryFilter;
   });
 
