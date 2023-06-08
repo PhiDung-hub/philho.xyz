@@ -41,9 +41,9 @@ const FUZZY = new Fuzzy({
   intraContr: "'[a-z]{1,2}\\b",
   // 1 typos tolerance
   intraMode: 1,
-  intraSub: 1,
-  intraTrn: 1,
-  intraDel: 1,
+  // intraSub: 1,
+  // intraTrn: 1,
+  // intraDel: 1,
 });
 export default function SearchBar(props: SearchBarProps) {
   const [open, setOpen] = React.useState(false);
@@ -112,12 +112,12 @@ export default function SearchBar(props: SearchBarProps) {
   };
 
   const keysWithDescription = props.indexTable.map((item) => {
-    const searchKey = item.key;
+    let searchKey = item.key;
     if (item.categories) {
-      searchKey.concat(...item.categories.map((cat) => '. ' + cat));
+      searchKey = item.categories.join(' ').concat(' ' + item.key);
     }
     if (item.desc) {
-      searchKey.concat('. ' + item.desc);
+      searchKey = searchKey.concat(' ' + item.desc);
     }
 
     return searchKey;
