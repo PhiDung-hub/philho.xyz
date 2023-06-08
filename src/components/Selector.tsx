@@ -6,7 +6,6 @@ import {
   useFloating,
   useInteractions,
   autoUpdate,
-  useTypeahead,
   FloatingFocusManager,
   FloatingPortal,
   offset,
@@ -20,7 +19,7 @@ import {
 import { clsxTailwindMerge } from '~/utils';
 
 export type SelectorProps = { categories: string[]; className?: string; setSelectedCallback?: any };
-const DEFAULT_SELECT = "__ALL__";
+const DEFAULT_SELECT = '__ALL__';
 
 export default function Selector(props: SelectorProps) {
   const [isSelect, setIsSelect] = React.useState<boolean>(false);
@@ -47,8 +46,6 @@ export default function Selector(props: SelectorProps) {
 
   const allCategories = [DEFAULT_SELECT, ...props.categories];
   const listRef = React.useRef<Array<HTMLElement | null>>([]);
-  const listContentRef = React.useRef(allCategories);
-  const isTypingRef = React.useRef(false);
   const click = useClick(context, { event: 'mousedown' });
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'listbox' });
@@ -59,28 +56,13 @@ export default function Selector(props: SelectorProps) {
     onNavigate: setActiveIndex,
     loop: true,
   });
-  const typeahead = useTypeahead(context, {
-    listRef: listContentRef,
-    activeIndex,
-    selectedIndex,
-    onMatch: isSelect ? setActiveIndex : setSelectedIndex,
-    onTypingChange(isTyping) {
-      isTypingRef.current = isTyping;
-    },
-  });
-  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([
-    dismiss,
-    role,
-    listNav,
-    typeahead,
-    click,
-  ]);
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav, click]);
 
   const handleSelect = (index: number) => {
     setSelectedIndex(index);
     setIsSelect(false);
     if (props.setSelectedCallback) {
-      const selectedCategory = allCategories[index] === DEFAULT_SELECT ? null: allCategories[index];
+      const selectedCategory = allCategories[index] === DEFAULT_SELECT ? null : allCategories[index];
       props.setSelectedCallback(selectedCategory);
     }
   };
@@ -92,7 +74,7 @@ export default function Selector(props: SelectorProps) {
       <button
         className={clsxTailwindMerge(
           'inline-flex items-center px-2 md:px-4 text-center bg-gray-50 dark:bg-gray-700',
-          'border border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600',
+          '!outline-0 border border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600',
           props.className,
         )}
         ref={refs.setReference}
@@ -114,11 +96,11 @@ export default function Selector(props: SelectorProps) {
           <FloatingFocusManager context={context} modal={false}>
             <div
               ref={refs.setFloating}
-              className="border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              className="!outline-0 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg"
               {...getFloatingProps()}
               style={{
                 ...floatingStyles,
-                outline: 0,
+                zIndex: 999999,
               }}
             >
               {allCategories.map((category, idx) => {
@@ -128,18 +110,17 @@ export default function Selector(props: SelectorProps) {
                     ref={(node) => {
                       listRef.current[idx] = node;
                     }}
-                    role="option"
                     tabIndex={idx === activeIndex ? 0 : -1}
+                    role="option"
                     aria-selected={idx === selectedIndex && idx === activeIndex}
-                    className="px-2 py-1 cursor-pointer capitalize hover:bg-opacity-5 hover:bg-black dark:hover:bg-white dark:hover:bg-opacity-5"
+                    className="px-2 py-1 cursor-pointer capitalize hover:bg-opacity-5 
+                    hover:bg-black dark:hover:bg-white dark:hover:bg-opacity-5"
                     {...getItemProps({
-                      // Handle pointer select.
                       onClick() {
                         handleSelect(idx);
                       },
-                      // Handle keyboard select.
                       onKeyDown(event) {
-                        if (event.key === 'Enter' || (event.key === ' ' && !isTypingRef.current)) {
+                        if (event.key === 'Enter') {
                           event.preventDefault();
                           handleSelect(idx);
                         }

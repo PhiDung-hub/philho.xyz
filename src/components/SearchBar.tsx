@@ -18,12 +18,13 @@ import {
   useId,
 } from '@floating-ui/react';
 import { SearchIcon } from '~/components/icons';
-import { BsThreeDots } from 'react-icons/bs';
+import { BsThreeDots, BsInfoSquareFill  } from 'react-icons/bs';
 import { Selector } from '~/components';
 
 export type indexTableEntry = {
   key: string;
   categories?: string[];
+  desc?: string;
   href?: string;
   icon?: React.ReactElement;
   shortcut?: string[];
@@ -130,6 +131,7 @@ export default function SearchBar(props: SearchBarProps) {
               'aria-autocomplete': 'list',
               onKeyDown(event) {
                 if (event.key === 'Enter' && activeIndex != null && items[activeIndex]) {
+                  event.preventDefault();
                   handleEvent(items[activeIndex], activeIndex);
                 }
               },
@@ -151,8 +153,8 @@ export default function SearchBar(props: SearchBarProps) {
                   className="bg-gray-50 dark:bg-gray-700 my-1 border border-gray-300 dark:border-gray-600"
                 >
                   {items.map((item, idx) => {
-                    const { key, icon, shortcut, categories } = item;
-                    const entry: ItemEntry = { key, icon, shortcut, categories };
+                    const { key, icon, shortcut, categories, desc } = item;
+                    const entry: ItemEntry = { key, icon, shortcut, categories, desc };
 
                     return (
                       <ResultItem
@@ -192,6 +194,7 @@ export default function SearchBar(props: SearchBarProps) {
 export type ItemEntry = {
   icon?: React.ReactElement;
   key: string;
+  desc?: string;
   shortcut?: string[];
   categories?: string[];
 };
@@ -218,13 +221,21 @@ const ResultItem = React.forwardRef<HTMLDivElement, ItemProps & React.HTMLProps<
         ...rest.style,
       }}
     >
-      <div className="flex gap-2 items-center text-xl">
-        {entry.icon ?? <BsThreeDots width={12} height={12} />}
-        <span>{entry.key}</span>
+      <div className="block">
+        <div className="flex gap-2 text-xl items-center">
+          {entry.icon ?? <BsThreeDots width={12} height={12} />}
+          <span>{entry.key}</span>
+        </div>
+        {entry.desc && (
+          <p className="flex gap-2 text-lg items-center">
+            <BsInfoSquareFill width={16} height={16} />
+            <span>{entry.desc.split(' ').slice(0, 6).join(' ')}...</span>
+          </p>
+        )}
       </div>
       {entry.categories && (
         <div className="hidden md:grid grid-flow-col gap-2 text-lg" aria-hidden>
-          {entry.categories.map((category: string, idx) => (
+          {entry.categories.slice(0, 3).map((category: string, idx) => (
             <kbd
               key={`item-category-key-${category}-${idx}`}
               className="rounded-[4px] py-1 px-3 capitalize bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-10"

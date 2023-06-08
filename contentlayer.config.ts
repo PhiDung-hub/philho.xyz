@@ -44,7 +44,7 @@ export const BlogPost = defineDocumentType(() => ({
     },
     categories: {
       type: 'string',
-      description: 'Categories that a blog post belongs to'
+      description: 'Categories that a blog post belongs to',
     },
   },
   computedFields: {
