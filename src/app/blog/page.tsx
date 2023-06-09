@@ -1,4 +1,4 @@
-import { About, BlogCards, buildBlogsIndex, buildBlogsMeta } from '~/layouts/blog_page';
+import { About, BlogView, buildBlogsIndex, buildBlogsMeta } from '~/layouts/blog_page';
 
 export default function Blog() {
   const allBlogPostMeta = buildBlogsMeta();
@@ -7,7 +7,7 @@ export default function Blog() {
   return (
     <div className="min-h-screen pt-36 pb-24 flex flex-col items-center justify-center">
       <About />
-      <BlogCards allBlogPostMeta={allBlogPostMeta} indexTable={indexTable} allCategories={allCategories} />
+      <BlogView allBlogPostMeta={allBlogPostMeta} indexTable={indexTable} allCategories={allCategories} />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { useMDXComponent } from 'next-contentlayer/hooks';
 import { allBlogPosts, type BlogPost } from 'contentlayer/generated';
 import { formatDate } from '~/utils';
 import MDXComponents from '~/components/mdx';
-import { FooterShareBar, TableOfContents, BlogNavigator } from '~/layouts/blog_page';
+import { FooterShareBar, TableOfContents, BlogNavigator } from '~/layouts/blog_page/slug';
 import { SectionContainer } from '~/components';
 
 export type BlogPostPageProps = {

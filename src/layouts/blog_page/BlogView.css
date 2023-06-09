@@ -1,0 +1,19 @@
+@tailwind utilities;
+
+@layer utilities {
+  .active-page {
+    @apply font-bold text-blue-500 dark:text-blue-300;
+  }
+
+  .page-item {
+    @apply font-semibold rounded-[4px] py-1 px-3 bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-10;
+  }
+
+  .previous-item {
+    @apply rounded-[4px] p-1 bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-10;
+  }
+
+  .next-item {
+    @apply rounded-[4px] p-1 bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-10;
+  }
+}
