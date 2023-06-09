@@ -248,13 +248,13 @@ const ResultItem = React.forwardRef<HTMLDivElement, ItemProps & React.HTMLProps<
     >
       <div className="block">
         <div className="flex gap-2 text-xl items-center">
-          {entry.icon ?? <BsThreeDots width={12} height={12} />}
+          {entry.icon ?? <BsThreeDots size={24} />}
           <span>{entry.key}</span>
         </div>
         {entry.desc && (
           <p className="flex gap-2 text-lg items-center">
-            <BsInfoSquareFill width={16} height={16} />
-            <span>{entry.desc.split(' ').slice(0, 6).join(' ')}...</span>
+            <BsInfoSquareFill size={16} className="mx-1" />
+            <span>{entry.desc.split(' ').slice(0, 7).join(' ')}...</span>
           </p>
         )}
       </div>

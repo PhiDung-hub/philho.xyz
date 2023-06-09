@@ -17,7 +17,7 @@ export function buildBlogsIndex() {
       key: post.title,
       desc: post.summary,
       categories,
-      icon: <MdArticle width={16} height={16} />,
+      icon: <MdArticle size={24} />,
     };
   });
   const uniqueCategories = new Set<string>();

@@ -10,7 +10,7 @@ export default function SearchToggler({ wrapperClassname }: { wrapperClassname?:
   };
   return (
     <div className={wrapperClassname}>
-      <button onClick={handleClick} className="flex">
+      <button onClick={handleClick} className="flex" aria-label="Mod+K-navigation-bar">
         <FcSearch size="2rem" />
       </button>
     </div>

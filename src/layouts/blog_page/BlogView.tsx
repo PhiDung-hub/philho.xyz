@@ -40,8 +40,8 @@ export default function BlogView({ ...props }: BlogCardsProps) {
       {pageCount > 1 && (
         <ReactPaginate
           breakLabel="..."
-          nextLabel={<BiSkipNext width={32} height={32} className="text-2xl" />}
-          previousLabel={<BiSkipPrevious width={32} height={32} className="text-2xl" />}
+          nextLabel={<BiSkipNext size={28} />}
+          previousLabel={<BiSkipPrevious size={28} />}
           onPageChange={handlePageClick}
           pageRangeDisplayed={3}
           marginPagesDisplayed={2}
