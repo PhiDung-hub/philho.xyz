@@ -30,14 +30,14 @@ export default function Hero() {
       </div>
 
       <div className="w-full mx-auto text-center md:flex flex-row p-12 sm:px-0 justify-center">
-        {cards.map(({ title, desc, href, style }, index) => (
-          <NextLink key={`tech-skill-${index}`} href={href} passHref>
+        {cards.map(({ title, desc, href }, index) => (
+          <NextLink key={`hero-item-${index}`} href={href} passHref>
             <div
-              className={`shadow-sm mb-4 md:m-0 py-2 px-4 md:px-8 mx-auto md:mx-8 xl:mx-12 rounded-lg w-[15rem] md:w-[20rem] md:h-[10rem]
-              font-semibold bg-blue-500 dark:bg-zinc-500 text-gray-50
-              md:hover:scale-[1.02] group ${style}`}
+              className={`shadow-sm mb-4 md:mb-0 mx-auto md:mx-8 xl:mx-12 py-2 px-4 md:px-8 rounded-lg w-[15rem] md:w-[20rem] md:h-[10rem]
+              font-semibold bg-blue-200 dark:bg-blue-500 dark:text-gray-50
+              md:hover:scale-[1.02] group shadow-orange-500 dark:shadow-rose-500`}
             >
-              <div className="text-amber-200 dark:text-amber-500 font-bold text-xl md:text-2xl group-hover:animate-text-pulse">
+              <div className="text-blue-500 dark:text-yellow-300 font-bold text-xl md:text-2xl group-hover:animate-text-pulse">
                 {title}
               </div>
               <div className="pt-2 text-sm md:text-base">{desc}</div>
@@ -52,14 +52,12 @@ export default function Hero() {
 const cards = [
   {
     title: 'Projects',
-    desc: 'Places where I play with new technology. Builder season!',
+    desc: "Places where I play with new techs and ideas. It's builder season, keep it on anons!",
     href: '/projects',
-    style: 'shadow-orange-500',
   },
   {
     title: 'Blog',
-    desc: 'Places where I keep track of my learning journey. Thoughts are occasionally found',
+    desc: 'Places where I track my learning journey. Sharing my thoughts and knowledges',
     href: '/blog',
-    style: 'shadow-orange-500',
   },
 ];
