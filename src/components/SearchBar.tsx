@@ -107,31 +107,33 @@ export default function SearchBar(props: SearchBarProps) {
 
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
 
-  const onCategorySelectionChange = (category: string) => {
-    setSelectedCategory(category);
-  };
-
-  const keysWithDescription = props.indexTable.map((item) => {
-    let searchKey = item.key;
-    if (item.categories) {
-      searchKey = item.categories.join(' ').concat(' ' + item.key);
-    }
-    if (item.desc) {
-      searchKey = searchKey.concat(' ' + item.desc);
-    }
-
-    return searchKey;
-  });
-  const match_indexes = FUZZY.filter(keysWithDescription, inputValue.toLowerCase());
-
-  const items = props.indexTable.filter((item, idx) => {
-    // const searchFilter = item.key.toLowerCase().startsWith(inputValue.toLowerCase());
-    const searchFilter = inputValue == '' || match_indexes?.includes(idx);
-
-    const categoryFilter = selectedCategory ? item.categories?.includes(selectedCategory) : true;
-
-    return searchFilter && categoryFilter;
-  });
+  const keysWithDescription = React.useMemo(
+    () =>
+      props.indexTable.map((item) => {
+        let searchKey = item.key;
+        if (item.categories) {
+          searchKey = item.categories.join(' ').concat(' ' + item.key);
+        }
+        if (item.desc) {
+          searchKey = searchKey.concat(' ' + item.desc);
+        }
+        return searchKey;
+      }),
+    [props.indexTable],
+  );
+  const match_indexes = React.useMemo(
+    () => FUZZY.filter(keysWithDescription, inputValue.toLowerCase()),
+    [keysWithDescription, inputValue],
+  );
+  const items = React.useMemo(
+    () =>
+      props.indexTable.filter((item, idx) => {
+        const searchFilter = inputValue == '' || match_indexes?.includes(idx);
+        const categoryFilter = selectedCategory ? item.categories?.includes(selectedCategory) : true;
+        return searchFilter && categoryFilter;
+      }),
+    [match_indexes, selectedCategory, inputValue, props.indexTable],
+  );
 
   return (
     <div className={clsxTailwindMerge('flex items-center w-full', props.className)}>
@@ -208,7 +210,7 @@ export default function SearchBar(props: SearchBarProps) {
           <Selector
             categories={props.allCategories}
             className="h-full w-[8rem] md:w-[12rem] rounded-r-lg"
-            setSelectedCallback={onCategorySelectionChange}
+            setSelectedCallback={(category: string) => setSelectedCategory(category)}
           />
         )}
       </div>

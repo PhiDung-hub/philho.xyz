@@ -21,7 +21,10 @@ export default function BlogView({ ...props }: BlogCardsProps) {
 
   const isXl = useMediaQuery('(min-width: 1280px)');
   const isMd = useMediaQuery('(min-width: 768px)');
-  const itemsPerPage = isXl ? 9 : isMd ? 4 : 3;
+  const itemsPerPage = React.useMemo(() => {
+    return isXl ? 9 : isMd ? 4 : 3;
+  }, [isMd, isXl]);
+
   const items = props.allBlogPostMeta;
   const endOffset = itemOffset + itemsPerPage;
   const currentItems = items.slice(itemOffset, endOffset);
