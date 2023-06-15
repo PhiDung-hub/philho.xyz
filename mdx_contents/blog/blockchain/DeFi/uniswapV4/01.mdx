@@ -1,0 +1,148 @@
+---
+title: UniswapV4 - An overview
+date: '2023-06-14T00:00:00Z'
+modifiedTime: '2023-06-14T00:00:00Z'
+summary: A brief overview of UniswapV4 - Singleton design, swap/donate hooks, flash accounting
+image: 'blogs/blockchain/uniswapV3/cover.webp'
+categories: blockchain, DeFi
+type: BlogPost
+---
+
+# Introducing Uniswap V4
+
+The official Uniswap blog made an announcement on June 13, 2023, revealing the public availability of Uniswap V4,
+which is being developed as an open-source project. Uniswap V4 continues to follow the concentrated liquidity model introduced in V3,
+but it introduces various improvements to facilitate additional customization and offer more precise control over routing and liquidity pool design.
+
+Before we continue, I suggest reading the [introduction blog post from Uniswap](https://blog.uniswap.org/uniswap-v4) to gather more in-depth knowledge about the advancements in Uniswap V4.
+The [draft white paper](https://github.com/Uniswap/v4-core/blob/main/whitepaper-v4-draft.pdf) is also available at the official v4-core repo.
+
+# 1. Native ETH
+
+A very exciting news of V4 is native ETH is available in trading pairs. This was the case for V1 but later versions (V2, V3)
+forced ETH to be wrapped in ERC20 (WETH) to make it convenient and less complex for protocol implementation.
+However, utilizing WETH incurred an additional cost of approximately 20K gas per trade.
+
+With the introduction of singleton design and flash accounting in V4, ETH pairs will now be enabled.
+The new library for token standard of V4 can be found at [CurrencyLibrary.sol](https://github.com/Uniswap/v4-core/blob/main/contracts/libraries/CurrencyLibrary.sol),
+which is a wrapper around raw ETH address and ERC20 interface.
+Further details on these concepts will be discussed in the upcoming sections.
+
+# 2. Singleton
+
+<Quote author="Uniswap V4 blog" className="my-2">
+  "In Uniswap v3, we deploy a new contract for every pool, making creating pools and performing multi-pool swaps more
+  expensive. In v4, we hold all the pools in one singleton contract, which will provide important gas savings because
+  swaps will no longer need to transfer tokens between pools held in different contracts. Early estimates show that v4
+  reduces pool creation gas costs by 99%."
+</Quote>
+
+Aside from singleton pattern, the pool design looks mostly similar to V3, evidently:
+
+- [V3 Pool](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L379) implements concentrated liquidity, which is discussed in details in [part 03 of my Uniswap V3 series](https://philho.xyz/blog/blockchain/DeFi/uniswapV3/03)
+- [V4 Pool](https://github.com/Uniswap/v4-core/blob/main/contracts/libraries/Pool.sol) will provides mostly similar functionalities.
+  But now it's no longer a standalone pool so global fields such as observation details, factory or token addresses, and other redundant specs will be shifted to `PoolManager`.
+  Thus all pools will now be managed by a single `PoolManager` instance hence the singleton design pattern.
+
+V4 Pool will now store the following states (definitions similar to V3, check out [my uniswap V3 series](https://philho.xyz/blog/blockchain/DeFi/uniswapV3/01) for more details):
+
+```solidity
+struct State {
+  Slot0 slot0;
+  uint256 feeGrowthGlobal0X128;
+  uint256 feeGrowthGlobal1X128;
+  uint128 liquidity;
+  mapping(int24 => TickInfo) ticks;
+  mapping(int16 => uint256) tickBitmap;
+  mapping(bytes32 => Position.Info) positions;
+}
+```
+
+## More details about PoolManager
+
+The PoolManager is still under active development, so a lot of change will be expected in the future.
+Nevertheless, a few important details can be seen from the current implementation (**June 15,2023** at the time of writing):
+
+1. [IPoolManager](https://github.com/Uniswap/v4-core/blob/main/contracts/interfaces/IPoolManager.sol), the pool manager interface, inherit ERC1155 - an alternative NFT standard to ERC721 - that supports fungible tokens within unique categories.
+   Think of it as different items in a household equipment store, there can be multiple pots or cookers and each have their own unique ID.
+   But essentially a pot is mostly (99%) the same as another pot.
+2. Each pool is identified by their pool key:
+   - Pool key is defined as:
+     ```solidity
+     /// @notice Returns the key for identifying a pool
+     struct PoolKey {
+      /// @notice The lower currency of the pool, sorted numerically
+      Currency currency0;
+      /// @notice The higher currency of the pool, sorted numerically
+      Currency currency1;
+      /// @notice The pool swap fee, capped at 1_000_000.
+      /// The upper 4 bits determine if the hook sets any fees.
+      uint24 fee;
+      /// @notice Ticks that involve positions must be a multiple of tick spacing
+      int24 tickSpacing;
+      /// @notice The hooks of the pool
+      IHooks hooks;
+     }
+     ```
+     The pool ID is then determined by `bytes32.wrap(keccak256(abi.encode(poolKey)))`, view source at: [PoolId.sol](https://github.com/Uniswap/v4-core/blob/main/contracts/libraries/PoolId.sol)
+
+# 3. Flash Accounting
+
+<Quote author="Uniswap V4 draft paper" className="my-2">
+"The singleton design complements another architectural change in v4: flash accounting. In previous versions of the
+Uniswap Protocol, each operation (such as swapping or adding liquidity to a pool) ended by transferring tokens. In v4,
+each operation updates an internal net balance, known as a delta, only making external transfers at the end of the
+lock. The new take() and settle() functions can be used to borrow or deposit funds to the pool, respectively. By
+requiring that no tokens are owed to the pool manager or to the caller by the end of the call, the pool’s solvency is
+enforced.
+
+Flash accounting simplifies complex pool operations, such as atomic swapping and adding. When combined with
+the singleton model, it also simplifies multi-hop trades.
+
+In the current execution environment, the flash accounting
+architecture is expensive because it requires storage updates at every balance change. Even though the contract
+guarantees that internal accounting data is never actually serialized to storage, users will still pay those same
+costs once the storage refund cap is exceeded [5]. But, because balances must be 0 by the end of the transaction,
+accounting for these balances can be implemented with transient storage, as specified by EIP-1153 [4]"
+
+</Quote>
+
+So flash accounting essentially reduces redundant transfers, making the protocol more efficient for sophisticated use cases.
+The internal net balance is updated by `_accountDelta(...)` which stores the currency change in a Lock State.
+This delta will be settled at the end of the block. Details implementation can be found [here](https://github.com/Uniswap/v4-core/blob/c019b0b3592c58271f4569da81ca1c340c004343/contracts/PoolManager.sol#L179).
+
+# 4. Hooks
+
+A major change in customizability of V4 is hooks.
+
+<Quote>
+"Hooks are externally deployed contracts that execute some developerdefined logic at a specified point in a pool’s execution. These hooks
+allow integrators to create a concentrated liquidity pool with flexible and customizable execution.
+
+Hooks can modify pool parameters, or add new features and
+functionality.
+
+...
+
+We envision that future independent whitepapers will be drafted
+for selected hook designs, as many will be as complex as protocols
+themselves.
+"
+
+</Quote>
+
+For now, some example hooks implementation can be view at [v4-periphery contracts](https://github.com/Uniswap/v4-periphery/tree/main/contracts/hooks/examples).
+With added functionalities from hooks, the swap flow will now be very flexible:
+
+1. Invoke before swap hook (v4-periphery or custom)
+2. Calculate token delta and swap fees, and update accounting states
+3. Invoke after swap hook (v4-periphery or custom)
+
+Details implementation at [https://github.com/Uniswap/v4-core/blob/c019b0b3592c58271f4569da81ca1c340c004343/contracts/PoolManager.sol#L262](https://github.com/Uniswap/v4-core/blob/c019b0b3592c58271f4569da81ca1c340c004343/contracts/PoolManager.sol#L262)
+
+
+# What's next
+
+There will be a Uniswap V4 series once the protocol is mature enough.
+In the meantime, have fun building!
+

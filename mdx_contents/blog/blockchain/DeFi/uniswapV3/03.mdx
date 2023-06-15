@@ -12,7 +12,7 @@ type: BlogPost
 
 # Recap
 
-We have discussed **Tick** and **Position** from the [previous section](https://philho.xyz/blog/blockchain/uniswapV3/02). Take notes of the following:
+We have discussed **Tick** and **Position** from the [previous section](https://philho.xyz/blog/blockchain/DeFi/uniswapV3/02). Take notes of the following:
 
 1. Each tick:
 
@@ -194,7 +194,7 @@ Essentially, minting contains 4 steps:
 ## Liquidity Delta calculation
 
 When the protocol adds liquidity to a transaction, it is necessary to calculate the amount of tokens that corresponds to the added liquidity.
-This calculation is based on the formula derived in [part 1](https://philho.xyz/blog/blockchain/uniswapV3/02)
+This calculation is based on the formula derived in [part 1](https://philho.xyz/blog/blockchain/DeFi/uniswapV3/01)
 
 $$
 \Large{
@@ -271,9 +271,9 @@ From the code:
 
 This `_updatePosition` function update the position state given an amount of liquidity change (`liquidityDelta`). It:
 
-1. Call `Tick.update(...)` (refer to [part 2 of this series](https://philho.xyz/blog/blockchain/uniswapV3/02#Tick-functions)) on the storage variable `ticks`, which consists of global ticks' state.
+1. Call `Tick.update(...)` (refer to [part 2 of this series](https://philho.xyz/blog/blockchain/DeFi/uniswapV3/02#Tick-functions)) on the storage variable `ticks`, which consists of global ticks' state.
 2. Update tick bitmap, flipped state, and fee.
-3. Call `Position.update(...)` (refer to [part 2 of this series](https://philho.xyz/blog/blockchain/uniswapV3/02#Position)).
+3. Call `Position.update(...)` (refer to [part 2 of this series](https://philho.xyz/blog/blockchain/DeFi/uniswapV3/02#Position)).
 
 ```solidity
 /// @dev Gets and updates a position with the given liquidity delta

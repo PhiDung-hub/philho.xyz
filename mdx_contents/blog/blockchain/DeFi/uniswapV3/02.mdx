@@ -12,7 +12,7 @@ type: BlogPost
 
 # Recap
 
-These concepts has been discussed in [previous part](https://philho.xyz/blog/blockchain/uniswapV3/01)
+These concepts has been discussed in [previous part](https://philho.xyz/blog/blockchain/DeFi/uniswapV3/01)
 
 $$
 \Large{
@@ -52,7 +52,7 @@ Tick bitmaps are responsible for packing ticks' initialized state (whether activ
 - **16 bits key** - `wordPosition = int16(tick >> 8)`
 - **8 bits value** - position of the tick within that word, `bitPos = uint8(tick % 256)`
 
-_**Note:** a tick is represented as an **int24** since they are bounded by [-887272, 887272] (discussed in [part 1](https://philho.xyz/blog/blockchain/uniswapV3/01#2.-Tick%20system) of this series)._
+_**Note:** a tick is represented as an **int24** since they are bounded by [-887272, 887272] (discussed in [part 1](https://philho.xyz/blog/blockchain/DeFi/uniswapV3/01#2.-Tick%20system) of this series)._
 
 ### Why 16 | 8 bit map?
 
