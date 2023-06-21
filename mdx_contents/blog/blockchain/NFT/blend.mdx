@@ -4,7 +4,7 @@ date: '2023-06-20T00:00:00Z'
 modifiedTime: '2023-06-21T00:00:00Z'
 summary: An overview of Blend, No 1 NFT Lending marketplace by Blur.io
 image: 'blogs/blockchain/NFT/blend/cover.webp'
-categories: blockchain, NFT-Fi, NFT lending
+categories: blockchain, NFT, NFT-Fi, NFT lending
 type: BlogPost
 ---
 
@@ -50,17 +50,17 @@ Blend solution is making the protocol:
 - **Perpetual** by allow the contract to be refinancing. The refinance process can be conducted **anytime** as a [Dutch auction](https://www.investopedia.com/terms/d/dutchauction.asp)
   (on interest rate) on the current loan. Note that there's a cap of 1000% APY for the Dutch auction, beyond this the debt will be considered as default.
 
-  **Example** You issue a loan of $4E \And 30\% APY$ for a Moon Bird to somebody. However, you see the bird can no longer fly
+  **Example** You issue a loan of **4ETH & 30% APY** for a Moon Bird to somebody. However, you see the bird can no longer fly
   so you wish to exists quickly before your borrower default. Since whole market expects NFT price to drop,
-  you start auctioning your loan at $4E \And 20\% APY$ (cheaper at lower APY) and $30 \% APY$ increase per hour.
-  While the auction reaches $4E 50\% APY$, somebody with higher risk appetite take over by paying you the current debt and becoming new lender.
+  you start auctioning your loan at **4ETH & 20% APY** (cheaper at lower APY) and **10% APY** increase per hour.
+  While the auction reaches **4ETH & 50% APY**, somebody with higher risk appetite take over by paying you the current debt and becoming new lender.
   You have successfully liquidiated your position.
 
 - **Liquidatable** by not implementing any auto-liquidation process, instead relying on refinancing auction.
   Certain thresholds are determined for the loan terms, such as:
 
-  - Auction duration is capped at 120 hour (or 5 days).
-  - Loan is considered default once auction expired (stop at max APY = 1000%)
+  - Auction duration is capped at **120 hour** (or 5 days).
+  - Loan is considered default once auction expired (stop at max **APY = 1000%**)
 
 And that is how Blend works.
 
