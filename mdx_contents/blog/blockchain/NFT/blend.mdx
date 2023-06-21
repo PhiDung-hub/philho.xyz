@@ -75,13 +75,13 @@ And that is how Blend works.
 
 - Blend audit by ChainLight: [Audit_v_1.1](https://drive.google.com/file/d/13rmzXIdy138gxPwiGNH8kk-yob4Bjzll/view)
 
-Given the verified source-code from etherscan, I created a repo that tracks current stage of Blend logic contracts at: [https://github.com/PhiDung-hub/Blend_clone](https://github.com/PhiDung-hub/Blend_clone)
+Given the verified source-code from etherscan, I created a repo that tracks current stage of Blend logic contracts at: [https://github.com/PhiDung-hub/Blur_Clone](https://github.com/PhiDung-hub/Blur_Clone)
 
 Now we will delve into Blend protocols implementations
 
 ## Structures
 
-Loan offer and exchange order structures can be viewed at [Structs.sol](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/lib/Structs.sol) and [ExchangeStructs.sol](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/lib/ExchangeStructs.sol), respectively.
+Loan offer and exchange order structures can be viewed at [Structs.sol](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/lib/Structs.sol) and [ExchangeStructs.sol](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/lib/ExchangeStructs.sol), respectively.
 
 ### The lending Marketplace
 
@@ -162,7 +162,7 @@ _Note:_ A direct implication is only active loans (or the ones that are auctione
 
 ## Interest rate calculations
 
-Details at: [CalculationHelpers.sol](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/CalculationHelpers.sol)
+Details at: [CalculationHelpers.sol](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/CalculationHelpers.sol)
 
 A few notes:
 
@@ -171,7 +171,7 @@ A few notes:
 - Max Yield (or auction liquidation threshold) is capped at $100,000 \ bips$ or $1,000 \% APY$.
 
 When a loan is refinanced, it undergoes a Dutch auction. However, the auction rate does not increase monotonically.
-Instead, the following scheme is adapted (see [calcRefinancingAuctionRate()](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/CalculationHelpers.sol#L35)):
+Instead, the following scheme is adapted (see [calcRefinancingAuctionRate()](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/CalculationHelpers.sol#L35)):
 
 $$
 \begin{aligned}
@@ -218,7 +218,7 @@ Auction rate (in %) variation with $R$ (in %) and $t$ (in hours) visualization i
 
 ## Blend protocol
 
-[Blend.sol](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/Blend.sol) implements 3 flows that govern different features of the platform
+[Blend.sol](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/Blend.sol) implements 3 flows that govern different features of the platform
 
 ### 1. Borrrow flow
 
@@ -278,7 +278,7 @@ function borrowerRefinance(
 
 - `startAuction()` - lender can start the auction anytime by specifying the lien information and identifier
 
-  - Note that the [liens](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/Blend.sol#L21) storage varialbe (`mapping(uint256 => bytes32)`) stores the actual lien hashing by an `uint256` key, hence lienId need to be specified
+  - Note that the [liens](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/Blend.sol#L21) storage varialbe (`mapping(uint256 => bytes32)`) stores the actual lien hashing by an `uint256` key, hence lienId need to be specified
   - emit event `StartAuction(uint256 lienId, address collection)`
 
 - `seize()` - allow lender to seize the NFT once borrower defaults the debt. Lien is considered default if auction expires (guaranteed after initial loan expires)
@@ -366,4 +366,4 @@ With these 3 functions, traders can speculate and profit from NFT price movement
 
 Considering that Blur protocol has only been live for less than two months, it is reasonable to expect future upgrades and the emergence of new use cases.
 As the protocol evolves, it will likely incorporate improvements and introduce additional functionalities.
-In the meantime, invest safe and have fun!
+In the meantime, play safe and have fun!
