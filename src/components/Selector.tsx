@@ -127,7 +127,7 @@ export default function Selector(props: SelectorProps) {
                       },
                     })}
                   >
-                    {category !== DEFAULT_SELECT ? category : 'CLEAR FILTER'}
+                    {category !== DEFAULT_SELECT ? category : <strong className="inline font-semibold">NO FILTER</strong>}
                     <span
                       aria-hidden
                       style={{

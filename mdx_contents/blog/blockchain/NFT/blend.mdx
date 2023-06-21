@@ -1,0 +1,164 @@
+---
+title: Blend - perpetual NFT lending protocol
+date: '2023-06-20T00:00:00Z'
+modifiedTime: '2023-06-21T00:00:00Z'
+summary: An overview of Blend, No 1 NFT Lending marketplace by Blur.io
+image: 'blogs/blockchain/NFT/blend/cover.webp'
+categories: blockchain, NFT, NFT-Fi
+type: BlogPost
+---
+
+# What's Blend?
+
+Blend, also known as Blur Lending, is a Peer-to-Peer Perpetual Lending Protocol designed specifically for Non-Fungible Tokens (NFTs).
+Since its inception on May 1st, 2023, Blend has rapidly established itself as a prominent player in the emerging "NFT-Fi" space.
+At of now (June 20th, 2023), it commands a significant share of over 90% in the NFT lending market.
+
+# How does Blend works?
+
+Specifications and a detailed walk through are available at [Paradigm blog](https://www.paradigm.xyz/2023/05/blend).
+Here, I will provide a high-level overview to give you a brief summary before we digest the actual implementations.
+
+## 1. Fixed-term borrowing
+
+If we would mimic traditional manner, it would happen in the following way:
+
+### The flow
+
+1. **Step 1** - Lender public an offer by signing it **off-chain**, at the same time, specifying:
+
+   - Expiration time
+   - Interest rate
+   - Desired collateral
+
+2. **Step 2** - Borrower who owns the desired collateral can choose their preferred loan and:
+
+   - fulfills the lender offer, i.e. submit an on-chain transaction, place a lien against their collateral (the NFT) and collect the borrowed amount.
+   - In case of defaults, i.e. borrower fails to clear the debt prior to expiration date, the lender has the right to seize collateralized assets.
+
+### So what?
+
+Given contracts being settled as above, these un-wanted circumstances will arise:
+
+1. Borrower (NFT owner) forgets about the loan due to lack UX mechanism for notifications $\Rightarrow$ beloved NFTs gone 4ever
+2. Lender wants to exist the position early or wish to change the loan terms, e.g. he foresee a potential L in the collateralized NFT collections.
+
+## 2. Perpetual protocol
+
+Blend solution is making the protocol:
+
+- **Perpetual** by allow the contract to be refinancing. The refinance process can be conducted **anytime** as a [Dutch auction](https://www.investopedia.com/terms/d/dutchauction.asp)
+  (on interest rate) on the current loan. Note that there's a cap of 1000% APY for the Dutch auction, beyond this the debt will be considered as default.
+
+  **Example** You issue a loan of $4E \And 30\% APY$ for a Moon Bird to somebody. However, you see the bird can no longer fly
+  so you wish to exists quickly before your borrower default. Since whole market expects NFT price to drop,
+  you start auctioning your loan at $4E \And 50\% APY$ (cheaper at lower APY) and $3 \% APY$ increase per hour.
+  If somebody take over, he/she needs to clear your borrower debt, which is $4ETH + Interest$
+
+- **Liquidatable** by not implementing any auto-liquidation process, instead relying on refinancing auction.
+  Certain thresholds are determined for the loan terms, such as:
+
+  - Auction duration is capped at 120 hour (or 5 days).
+  - Loan is considered default once auction expired (stop at max APY = 1000%)
+
+And that is how Blend works.
+
+# Smart contracts analysis
+
+[Blur.io](https://blur.io) is not yet open-source so only the following details are available:
+
+- Blend contracts (follows ERC1967 - upgradeable contracts)
+
+  - Proxy: [0x29469395eAf6f95920E59F858042f0e28D98a20B](https://etherscan.io/address/0x29469395eAf6f95920E59F858042f0e28D98a20B#code)
+  - Logic: [0x13244ef110692c1d8256c8dd4aa0a09bb5af0156](https://etherscan.io/address/0x13244ef110692c1d8256c8dd4aa0a09bb5af0156#code)
+
+- Blend audit by ChainLight: [Audit_v_1.1](https://drive.google.com/file/d/13rmzXIdy138gxPwiGNH8kk-yob4Bjzll/view)
+
+Given the verified source-code from etherscan, I created a repo that tracks current stage of Blend logic contracts at: [https://github.com/PhiDung-hub/Blend_clone](https://github.com/PhiDung-hub/Blend_clone)
+
+Now we will delve into Blend protocols implementations
+
+## Structures
+
+Loan offer and exchange order structures can be viewed at [Structs.sol](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/lib/Structs.sol) and [ExchangeStructs.sol](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/lib/ExchangeStructs.sol), respectively.
+
+### The lending Marketplace
+
+Blend allows user to buy/sell their loan and collect fees in a flexible manner. The order books is stored off-chain and managed by Blur.io backend.
+Therefore Blend using [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signature as an on-chain proof and every order input requires a salt identifier and `r, s, v` proof.
+
+On top of that, Blend contracts require external oracle to fetch chain data so the signature of the oracle is also included.
+
+Given all that, we have:
+
+```solidity
+struct Fee {
+  uint16 rate;
+  address recipient;
+}
+
+struct Order {
+  address trader;
+  Side side;
+  address matchingPolicy;
+  address collection;
+  uint256 tokenId;
+  uint256 amount;
+  address paymentToken;
+  uint256 price;
+  uint256 listingTime;
+  uint256 expirationTime;
+  Fee[] fees;
+  uint256 salt;
+  bytes extraParams;
+}
+
+struct Input {
+  Order order;
+  uint8 v;
+  bytes32 r;
+  bytes32 s;
+  bytes extraSignature;
+  SignatureVersion signatureVersion;
+  uint256 blockNumber;
+}
+```
+
+### Loan Offer
+
+```solidity
+struct LoanOffer {
+  address lender;
+  ERC721 collection;
+  uint256 totalAmount;
+  uint256 minAmount;
+  uint256 maxAmount;
+  uint256 auctionDuration;
+  uint256 salt;
+  uint256 expirationTime;
+  uint256 rate;
+  address oracle;
+}
+
+struct LoanInput {
+  LoanOffer offer;
+  bytes signature;
+}
+```
+
+Loan offer is identified by a unique salt and submitted to the exhange (Blend) along with a (EIP-712) signature.
+
+Lender can specified their desired interest rate, and number of NFTs they want to give loan to. Since the offer can be partially filled, e.g. you giving out a loan of
+8ETH for 2 Birdies but there can be 2 borrowers, so the loan offer keep track of `totalAmount` - portion give out for a particular loan, `minAmount`, and `maxAmount`
+
+In summary, a high level overview of the loan flow is:
+
+1. Lender place offer through Blur.io UI, and deposit ETH into a BlurPool.
+2. Blur backend (**off-chain**) aggregate order book data and reveal offers to potential borrowers (NFT owners).
+3. Owner can accept a loan offer by completing an **on-chain** transaction, effectively starting the loan.
+
+_Note:_ A direct implication is only active loans (or the ones that are auctioned) are visible to external parties, else needs to be accessed via Blur API (not public yet).
+
+## Interest rate calculations
+
+Like all marketplace, Blend use bips - $1 \over 10,000$ - as a basis point for interest rate calculations. Each bips corresponding to $0.01 \% APY$
