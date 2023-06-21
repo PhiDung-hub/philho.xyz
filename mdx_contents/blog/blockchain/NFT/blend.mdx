@@ -63,7 +63,7 @@ Blend solution is making the protocol:
 
 And that is how Blend works.
 
-# Smart contracts analysis
+# Deeper analysis
 
 [Blur.io](https://blur.io) is not yet open-source so only the following details are available:
 
@@ -161,4 +161,60 @@ _Note:_ A direct implication is only active loans (or the ones that are auctione
 
 ## Interest rate calculations
 
-Like all marketplace, Blend use bips - $1 \over 10,000$ - as a basis point for interest rate calculations. Each bips corresponding to $0.01 \% APY$
+Details at: [CalculationHelpers.sol](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/CalculationHelpers.sol)
+
+A few notes:
+
+- To conveniently interact with ETH, arithmetics are done in Fixed point $10^{18}$ by [SignedWadMath.sol](https://github.com/transmissions11/solmate/blob/main/src/utils/SignedWadMath.sol)
+- Like all marketplace, Blend use bips - $1 \over 10,000$ - as a basis point for interest rate calculations. Each bips corresponding to $0.01 \% APY$
+- Max Yield (or auction liquidation threshold) is capped at $100,000 \ bips$ or $1,000 \% APY$.
+
+When a loan is refinanced, it undergoes a Dutch auction. However, the auction rate does not increase monotonically.
+Instead, the following scheme is adapted (see [calcRefinancingAuctionRate()](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/CalculationHelpers.sol#L35)):
+
+$$
+\begin{aligned}
+
+\text{Given that }
+& T \text{ - The auction duration, in seconds} \\
+& R \text{ - Interest rate specified by old terms, in bips}
+
+\end{aligned}
+$$
+
+$$
+C_0 =
+\begin{cases}
+  R < 15,000, & 500 + 2R - R^2/15000  \\
+  Else, & 500 + R
+\end{cases}
+$$
+
+Then the auction rate with time is:
+
+$$
+AuctionRate_{t} =
+\begin{cases}
+  t < \frac{1}{5} T, & C_0 \cdot \frac{5t}{T} \\
+  t < \frac{4}{5} T, & 9,000 \cdot \frac{5t}{3T} + C_0 - 3,000 \\
+  t < T, & 10,000 - \frac{100,000 - (C_0 + 9,000)}{t - 4T/5} \cdot t\\
+  Else, & 100,000 &
+\end{cases}
+$$
+
+Intuitively, the rate comprises of 3 linear functions that:
+
+1. **Quickly** increase during $0 \rightarrow T/5$ - "early bird" period.
+2. \*Gradually\*\* increase during $1T/5 \rightarrow 4T/5$ - attract most buyer.
+3. **Rapidly** increase from $4T/5$ until expiration - "last offer" period.
+
+Auction rate (in %) variation with $R$ (in %) and $t$ (in hours) visualization is available at [https://www.desmos.com/calculator/urasr71dhb](https://www.desmos.com/calculator/urasr71dhb)
+
+- X-axis in time in hours and Y-axis is rate in %
+- Red line is new APY in %
+- Black line is the **refinancing premium** if Debt value at the time of refinancing is 60,000 unit, e.g ETH.
+  This show how much the lender would benefit (or loss) if the contracts were refinanced at time $t$.
+
+## Blend marketplace
+
+To be updated ...

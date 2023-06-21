@@ -49,7 +49,14 @@ export default function Card({ href, openGraphHref, title, desc, wrapperClassnam
           )}
           onClick={() => setClick(true)}
         >
-          <Image src={openGraphHref} alt="Open Graph Image" width={350} height={200} fill={false} className="rounded-t-md" />
+          <Image
+            src={openGraphHref}
+            alt="Open Graph Image"
+            width={350}
+            height={200}
+            fill={false}
+            className="rounded-t-md"
+          />
           <div className="py-2 px-4">
             <p className="text-lg text-center font-semibold text-blue-700 dark:text-blue-200 group-hover:animate-text-pulse">
               {title}
