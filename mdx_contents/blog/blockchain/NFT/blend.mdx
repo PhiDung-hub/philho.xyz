@@ -4,7 +4,7 @@ date: '2023-06-20T00:00:00Z'
 modifiedTime: '2023-06-21T00:00:00Z'
 summary: An overview of Blend, No 1 NFT Lending marketplace by Blur.io
 image: 'blogs/blockchain/NFT/blend/cover.webp'
-categories: blockchain, NFT, NFT-Fi
+categories: blockchain, NFT-Fi, NFT lending
 type: BlogPost
 ---
 
@@ -52,8 +52,9 @@ Blend solution is making the protocol:
 
   **Example** You issue a loan of $4E \And 30\% APY$ for a Moon Bird to somebody. However, you see the bird can no longer fly
   so you wish to exists quickly before your borrower default. Since whole market expects NFT price to drop,
-  you start auctioning your loan at $4E \And 50\% APY$ (cheaper at lower APY) and $3 \% APY$ increase per hour.
-  If somebody take over, he/she needs to clear your borrower debt, which is $4ETH + Interest$
+  you start auctioning your loan at $4E \And 20\% APY$ (cheaper at lower APY) and $30 \% APY$ increase per hour.
+  While the auction reaches $4E 50\% APY$, somebody with higher risk appetite take over by paying you the current debt and becoming new lender.
+  You have successfully liquidiated your position.
 
 - **Liquidatable** by not implementing any auto-liquidation process, instead relying on refinancing auction.
   Certain thresholds are determined for the loan terms, such as:
@@ -176,8 +177,8 @@ $$
 \begin{aligned}
 
 \text{Given that }
-& T \text{ - The auction duration, in seconds} \\
-& R \text{ - Interest rate specified by old terms, in bips}
+& T \text{ - The auction duration, \textbf{in seconds}} \\
+& R \text{ - Interest rate specified by old terms, \textbf{in \%}}
 
 \end{aligned}
 $$
@@ -185,8 +186,8 @@ $$
 $$
 C_0 =
 \begin{cases}
-  R < 15,000, & 500 + 2R - R^2/15000  \\
-  Else, & 500 + R
+  R < 150, & 5 + 2R - R^2/150  \\
+  Else, & 5 + R
 \end{cases}
 $$
 
@@ -196,9 +197,9 @@ $$
 AuctionRate_{t} =
 \begin{cases}
   t < \frac{1}{5} T, & C_0 \cdot \frac{5t}{T} \\
-  t < \frac{4}{5} T, & 9,000 \cdot \frac{5t}{3T} + C_0 - 3,000 \\
-  t < T, & 10,000 - \frac{100,000 - (C_0 + 9,000)}{t - 4T/5} \cdot t\\
-  Else, & 100,000 &
+  t < \frac{4}{5} T, & 90 \cdot \frac{5t}{3T} + C_0 - 30 \\
+  t < T, & 1,000 - \frac{1,000 - (C_0 + 90)}{t - 4T/5} \cdot t\\
+  Else, & 1,000 &
 \end{cases}
 $$
 
@@ -212,9 +213,157 @@ Auction rate (in %) variation with $R$ (in %) and $t$ (in hours) visualization i
 
 - X-axis in time in hours and Y-axis is rate in %
 - Red line is new APY in %
-- Black line is the **refinancing premium** if Debt value at the time of refinancing is 60,000 unit, e.g ETH.
-  This show how much the lender would benefit (or loss) if the contracts were refinanced at time $t$.
+- Black line represents the **refinancing premium** given loan amount is 60,000 unit, e.g ETH,
+  illustrating lender benefit (or loss) if the contracts were refinanced at time $t$ vs doing nothing.
 
-## Blend marketplace
+## Blend protocol
 
-To be updated ...
+[Blend.sol](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/Blend.sol) implements 3 flows that govern different features of the platform
+
+### 1. Borrrow flow
+
+This flows contains 2 basic function:
+
+- `borrow()` - settle the loan offer by place a lien on borrower's NFT against the loan amount. This tranasaction determines the block where interest starts to accrue.
+- `repay()` - repay lender and return NFT to owner
+
+```solidity
+function borrow(
+  LoanOffer calldata offer,
+  bytes calldata signature,
+  uint256 loanAmount,
+  uint256 collateralId
+) external returns (uint256 lienId);
+
+function repay(Lien calldata lien, uint256 lienId) external;
+```
+
+### 2. Refinancing flow
+
+This flow describes different scenarios that lenders can start a Dutch auction to liquidate their positions.
+
+```solidity
+function startAuction(Lien calldata lien, uint256 lienId) external;
+
+function seize(LienPointer[] calldata lienPointers) external;
+
+function refinance(
+  Lien calldata lien,
+  uint256 lienId,
+  LoanOffer calldata offer,
+  bytes calldata signature
+) external;
+
+function refinanceAuction(
+  Lien calldata lien,
+  uint256 lienId,
+  uint256 rate
+) external;
+
+function refinanceAuctionByOther(
+  Lien calldata lien,
+  uint256 lienId,
+  LoanOffer calldata offer,
+  bytes calldata signature
+) external;
+
+function borrowerRefinance(
+  Lien calldata lien,
+  uint256 lienId,
+  uint256 loanAmount,
+  LoanOffer calldata offer,
+  bytes calldata signature
+) external;
+```
+
+- `startAuction()` - lender can start the auction anytime by specifying the lien information and identifier
+
+  - Note that the [liens](https://github.com/PhiDung-hub/Blend_clone/blob/main/src/Blend.sol#L21) storage varialbe (`mapping(uint256 => bytes32)`) stores the actual lien hashing by an `uint256` key, hence lienId need to be specified
+  - emit event `StartAuction(uint256 lienId, address collection)`
+
+- `seize()` - allow lender to seize the NFT once borrower defaults the debt. Lien is considered default if auction expires (guaranteed after initial loan expires)
+
+```solidity
+function _lienIsDefaulted(Lien calldata lien) internal view returns (bool) {
+  return lien.auctionStartBlock != 0 && lien.auctionStartBlock + lien.auctionDuration < block.number;
+}
+```
+
+- These provide different strategies that lender can refinance their position. All emit event
+  `Refinance(uint256 lienId, address collection, address newLender, uint256 newAmount, uint256 newRate, uint256 newAuctionDuration)
+`
+
+  - `refinance()` - Renew terms if the current borrower accept it (verify by signature). **Must be called by lender**. New APY must not be greater than current.
+  - `refinanceAuction()` - Renew the loan in an active auctiopn, effectively become the new lender.
+    New APY must be below active auction APY, in most case new rate equals to active auction APY. Must pay old lender debt.
+  - `refinanceAuctionByOther()` - Renew the loan that in an active auction to a new one. New loan must have the same duration and no worse APY.
+
+- `borrowerRefinance()` - borrower accepts a new loan offer. Old debt must be settled in this transaction. **Must be called by borrower**.
+
+### 3. Marketplace flows
+
+This flow provides traders different strategy to participate in the NFT bond market.
+
+```solidity
+function buyToBorrow(
+  LoanOffer calldata offer,
+  bytes calldata signature,
+  uint256 loanAmount,
+  Execution calldata execution
+) external returns (uint256 lienId);
+
+function buyToBorrowETH(
+  LoanOffer calldata offer,
+  bytes calldata signature,
+  uint256 loanAmount,
+  Execution calldata execution
+) external payable returns (uint256 lienId);
+
+function buyToBorrowLocked(
+  Lien calldata lien,
+  SellInput calldata sellInput,
+  LoanInput calldata loanInput,
+  uint256 loanAmount
+) external returns (uint256 lienId);
+
+function buyToBorrowLockedETH(
+  Lien calldata lien,
+  SellInput calldata sellInput,
+  LoanInput calldata loanInput,
+  uint256 loanAmount
+) external payable returns (uint256 lienId);
+
+function buyLocked(
+  Lien calldata lien,
+  SellOffer calldata offer,
+  bytes calldata signature
+) external;
+
+function buyLockedETH(
+  Lien calldata lien,
+  SellOffer calldata offer,
+  bytes calldata signature
+) external payable;
+
+function takeBid(
+  Lien calldata lien,
+  uint256 lienId,
+  Execution calldata execution
+) external;
+```
+
+- `buyToborrow()` - Buy an NFT on Blur marketplace and immediately using the purchased NFT to take a loan offer on Blend.
+  Borrower and lender must have some NFT deposited in [BlurPool](https://etherscan.io/address/0x02ab0463ca0c98de2d9b6649dcdb4ab667f12da7#code).
+- `buyLocked()` - Buy a locked NFT in a lien. Price must be greater than current debt => repay lender and send surplus to borrower.
+- `buyToBorrowLocked()` - Buy a locked NFT using `buyLocked()` then take another loan offer using the purchased NFT.
+
+Those functions that are post-fixed with `..ETH()` simply deposit into BlurPool and execute the base function.
+For example, `buyToBorrowETH()` deposit `msg.value` ETH into the BlurPool then call `buyToborrow()`
+
+With these 3 functions, traders can speculate and profit from NFT price movements without the liquidity risk of owning an NFT.
+
+# What's next?
+
+Considering that Blur protocol has only been live for less than two months, it is reasonable to expect future upgrades and the emergence of new use cases.
+As the protocol evolves, it will likely incorporate improvements and introduce additional functionalities.
+In the meantime, invest safe and have fun!
