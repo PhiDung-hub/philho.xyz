@@ -171,17 +171,19 @@ A few notes:
 - Max Yield (or auction liquidation threshold) is capped at $100,000 \ bips$ or $1,000 \% APY$.
 
 When a loan is refinanced, it undergoes a Dutch auction. However, the auction rate does not increase monotonically.
-Instead, the following scheme is adapted (see [calcRefinancingAuctionRate()](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/CalculationHelpers.sol#L35)):
+Instead, the following scheme is adapted (see [calcRefinancingAuctionRate()](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/CalculationHelpers.sol#L31)):
 
 $$
 \begin{aligned}
 
 \text{Given that }
-& T \text{ - The auction duration, \textbf{in seconds}} \\
+& T \text{ - The auction duration, \textbf{in hours}} \\
 & R \text{ - Interest rate specified by old terms, \textbf{in \%}}
 
 \end{aligned}
 $$
+
+The adjusted rate coefficient w.r.t to old rate, $C_0$ is defined by:
 
 $$
 C_0 =
@@ -191,14 +193,14 @@ C_0 =
 \end{cases}
 $$
 
-Then the auction rate with time is:
+Then the APY rate with time during auction is:
 
 $$
 AuctionRate_{t} =
 \begin{cases}
-  t < \frac{1}{5} T, & C_0 \cdot \frac{5t}{T} \\
+  t < \frac{1}{5} T, & C_0 \cdot \frac{t}{T/5} \\
   t < \frac{4}{5} T, & 90 \cdot \frac{5t}{3T} + C_0 - 30 \\
-  t < T, & 1,000 - \frac{1,000 - (C_0 + 90)}{t - 4T/5} \cdot t\\
+  t < T, & 1,000 + (1,000 - (C_0 + 90)) \cdot \frac{t - T}{T/5}\\
   Else, & 1,000 &
 \end{cases}
 $$
@@ -220,11 +222,11 @@ Auction rate (in %) variation with $R$ (in %) and $t$ (in hours) visualization i
 
 [Blend.sol](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/Blend.sol) implements 3 flows that govern different features of the platform
 
-### 1. Borrrow flow
+### 1. Borrow flow
 
 This flows contains 2 basic function:
 
-- `borrow()` - settle the loan offer by place a lien on borrower's NFT against the loan amount. This tranasaction determines the block where interest starts to accrue.
+- `borrow()` - settle the loan offer by place a lien on borrower's NFT against the loan amount. This transaction determines the block where interest starts to accrue.
 - `repay()` - repay lender and return NFT to owner
 
 ```solidity
@@ -276,10 +278,7 @@ function borrowerRefinance(
 ) external;
 ```
 
-- `startAuction()` - lender can start the auction anytime by specifying the lien information and identifier
-
-  - Note that the [liens](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/Blend.sol#L21) storage varialbe (`mapping(uint256 => bytes32)`) stores the actual lien hashing by an `uint256` key, hence lienId need to be specified
-  - emit event `StartAuction(uint256 lienId, address collection)`
+- `startAuction()` - lender can start the auction anytime by specifying the lien information and identifier. Note that the [liens](https://github.com/PhiDung-hub/Blur_Clone/blob/main/src/BlurLending/Blend.sol#L21) storage variable (`mapping(uint256 => bytes32)`) stores the actual lien hashing by an `uint256` key. Hence, `lienId` need to be specified
 
 - `seize()` - allow lender to seize the NFT once borrower defaults the debt. Lien is considered default if auction expires (guaranteed after initial loan expires)
 
@@ -289,12 +288,10 @@ function _lienIsDefaulted(Lien calldata lien) internal view returns (bool) {
 }
 ```
 
-- These provide different strategies that lender can refinance their position. All emit event
-  `Refinance(uint256 lienId, address collection, address newLender, uint256 newAmount, uint256 newRate, uint256 newAuctionDuration)
-`
+- These provide different strategies that lender can refinance their position.
 
   - `refinance()` - Renew terms if the current borrower accept it (verify by signature). **Must be called by lender**. New APY must not be greater than current.
-  - `refinanceAuction()` - Renew the loan in an active auctiopn, effectively become the new lender.
+  - `refinanceAuction()` - Renew the loan in an active auction, effectively become the new lender.
     New APY must be below active auction APY, in most case new rate equals to active auction APY. Must pay old lender debt.
   - `refinanceAuctionByOther()` - Renew the loan that in an active auction to a new one. New loan must have the same duration and no worse APY.
 
@@ -352,8 +349,9 @@ function takeBid(
 ) external;
 ```
 
+These functions requires borrower and lender to have some ETH deposited in [BlurPool](https://etherscan.io/address/0x02ab0463ca0c98de2d9b6649dcdb4ab667f12da7#code).
+
 - `buyToborrow()` - Buy an NFT on Blur marketplace and immediately using the purchased NFT to take a loan offer on Blend.
-  Borrower and lender must have some NFT deposited in [BlurPool](https://etherscan.io/address/0x02ab0463ca0c98de2d9b6649dcdb4ab667f12da7#code).
 - `buyLocked()` - Buy a locked NFT in a lien. Price must be greater than current debt => repay lender and send surplus to borrower.
 - `buyToBorrowLocked()` - Buy a locked NFT using `buyLocked()` then take another loan offer using the purchased NFT.
 
@@ -361,6 +359,11 @@ Those functions that are post-fixed with `..ETH()` simply deposit into BlurPool 
 For example, `buyToBorrowETH()` deposit `msg.value` ETH into the BlurPool then call `buyToborrow()`
 
 With these 3 functions, traders can speculate and profit from NFT price movements without the liquidity risk of owning an NFT.
+
+Final utility function is `takeBid()`, which:
+
+- allow borrower to sell his NFT (match with a bid on Blur marketplace) to payoff his debt (and end the loan).
+- Surplus/deficit amount from this trade must be transfer to borrower/lender accordingly.
 
 # What's next?
 

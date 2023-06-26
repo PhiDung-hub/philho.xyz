@@ -25,12 +25,12 @@ However, Uniswap V3 augment the liquidity model, i.e. introducing new concepts t
 
 ## 1. Liquidity Amount
 
-Let X, Y be the price of two tokens in a liquidity pool, respectively. In V3, the amount of liquidity $L$, represented by an **uint128** is defined as:
+Let X, Y be the price of two tokens in a liquidity pool, respectively. Let's define the amount of liquidity $L$, represented by an **uint128** in Solidity, is defined as:
 
 $$
 \tag{1}
 
-\Large{
+\large{
   L \overset{\Delta} = \sqrt{X \times Y}
 }
 $$
@@ -40,7 +40,7 @@ With same price defined as in V2 ($P = \dfrac{Y}{X}$), the following can be deri
 $$
 \tag{2}
 
-\Large{
+\large{
   \Delta Y = L \times \Delta \sqrt{P}
 }
 $$
@@ -48,7 +48,7 @@ $$
 $$
 \tag{3}
 
-\Large{
+\large{
   \Delta X = L \times \Delta \frac{1}{\sqrt{P}}
 }
 $$
@@ -89,23 +89,51 @@ $$
 
 ### Discussion: about Square root of price
 
-All the above formulas involves $\sqrt{P}$ and $L$, a natural approach is utilizing these 2 variables to manage liquidity and price for the AMM model.
+All the above formulas involves $\sqrt{P}$ and $L$, a reparameterization from $(X,Y) \rightarrow (\sqrt{P}, L)$ would be an efficient approach for AMM internal operations.
 
-However, this wasn't always the case. During first days, V3 was using [`Babylonian.sqrt`](https://github.com/Uniswap/solidity-lib/blob/master/contracts/libraries/Babylonian.sol) algotihm to approximate reserve values.
-**uint256**, **uint128**, and **UQ128.128** ([Unsigned Q number](<https://en.wikipedia.org/wiki/Q_(number_format)>)) was being used for liqiduity and price calculation,
-as evidence in [PriceMath.sol](https://github.com/Uniswap/v3-core/blob/c09c892f59e08783e2415d1957c67979a4c7dccc/contracts/libraries/PriceMath.sol).
+During first days (back in Beta), V3 was using [`Babylonian.sqrt`](https://github.com/Uniswap/solidity-lib/blob/master/contracts/libraries/Babylonian.sol) algotihm to approximate reserve values.
+**uint256**, **uint128**, and **UQ128.128** ([Unsigned Q number](<https://en.wikipedia.org/wiki/Q_(number_format)>)) was being used for liqiduity and price calculation (see [PriceMath.sol](https://github.com/Uniswap/v3-core/blob/c09c892f59e08783e2415d1957c67979a4c7dccc/contracts/libraries/PriceMath.sol)).
 
-[`SqrtPriceMath`](https://docs.uniswap.org/contracts/v3/reference/core/libraries/SqrtPriceMath) was first introduced on [commit 4724f148f5eb626d07d68e485a0a7a45103ee448](https://github.com/Uniswap/v3-core/commit/4724f148f5eb626d07d68e485a0a7a45103ee448) and regularly updated to use **UQ64.96** as of present.
-Using the new approach provides better granularity and higher precision compared to a linear approximation (using Babylonian sqrt) pricing model.
+[`SqrtPriceMath`](https://docs.uniswap.org/contracts/v3/reference/core/libraries/SqrtPriceMath) was first introduced on [commit 4724f148f5eb626d07d68e485a0a7a45103ee448](https://github.com/Uniswap/v3-core/commit/4724f148f5eb626d07d68e485a0a7a45103ee448).
+And **UQ64.96** was introduced to stores square root price, leading to more efficient storage and better precision compared to the model using old linear approximation (using Babylonian sqrt).
+
+### What's concentrated liquidity?
+
+Given that liquidity concept is defined. We can generalize it into all constant-function market makers (CFMMs) as follows:
+
+1. Given a bonding curve of two token reserve $X, Y$ as $F(X, Y)$ - the liquidity distribution.
+2. Divide the price range into a set of range $R$, where $R_k = \{ P \mid P \in (P_k, P_{k+1}) \}$. $R_k$ is protocol-dependent
+3. $F(X, Y)$ satisfies the piecewise constant distribution w.r.t price:
+   $$F_k(X, Y) \overset{\Delta} = L_k(P) \begin{cases} const, & P \in R_k  \\ 0, & Else \end{cases}$$
+4. The full liquidity distribution is then: $F(X, Y) = \sum_{k} L_k(P)$
+
+<Quote author="Uniswap V3 white-paper" className="my-2">
+
+"...We call liquidity concentrated to a finite range a position. A position only needs to maintain enough reserves to support trading within
+its range, and therefore can act like a constant product pool with larger reserves (we call these the virtual reserves) within that
+range.
+
+Specifically, a position only needs to hold enough of asset X to cover price movement to its upper bound,
+because upwards price movement corresponds to depletion of the X reserves.
+Similarly, it only needs to hold enough of asset Y to cover price movement to its lower bound.
+
+When the price exits a position’s range, the position’s liquidity is no longer active, and no longer earns fees.
+At that point, its liquidity is composed entirely of a single asset, because the reserves of the other asset must have been entirely depleted.
+If the price ever reenters the range, the liquidity becomes active again..."
+
+</Quote>
 
 ## 2. Tick system
+
+A tick system granularize the price space into quantum range, where the automated market maker (AMM) follows $X \cdot Y = L^2$ as in V2.
+Each tick represent a price range $R_k$ as defined in previous section.
 
 As the AMM operates on percentage, e.g. fee is 0.01% | 0.05% | 0.3%, and we traders love using ticks. Uniswap V3 implements a tick system that is:
 
 $$
 \tag{4}
 
-\Large{
+\large{
   Tick_{i} \overset{\Delta} = 1.0001^i \quad \text{[1 tick = 0.01\%]}
 }
 $$
@@ -143,13 +171,13 @@ and do nothing otherwise.
 ## 3. Liquidity curve
 
 With the tick system and liquidity amount defined in previous section. Let's _token0_ and _token1_ be 2 tokens in our liquidity pool.
-The liquidity density, i.e. the amount of liquidity within a price/tick range is:
+The liquidity density, i.e. the amount of liquidity within a price/tick range (as defined in section 1) is:
 
 $$
 \tag{5}
 
 \Large{
-  \lambda \overset{\Delta}= \frac {\delta Y}{\delta \sqrt{P}} \\
+  L_k(P) \overset{\Delta}= \frac {\delta L}{\delta \sqrt{P}} \\
 }
 $$
 
@@ -158,68 +186,20 @@ $$
 
 \text{where }
 &\delta \sqrt{P} \text{ - quantum (sqrt) price range, i.e. a tick for V3} \\
-&\delta Y \text{ - liquidity within the range, i.e. amount of token1 tradable within range} [\sqrt P, \sqrt P + \delta \sqrt P].
+&\delta L \text{ - amount of \textit{token1} tradable within range the range } [\sqrt P, \sqrt P + \delta \sqrt P].
 
 \end{aligned}
 $$
 
-Then liquidity curve is the $\lambda - P$ curve.
+Then liquidity curve is the $L(P)$ curve.
 
 ### Uniswap V2
 
-For V2, every liquidity provider is exposed to the whole $0 \rightarrow \infty$ range. Meaning liquidity is evenly distributed and $\lambda - P$ will be a straight line.
-
-For example, let take a liquidity pool with initial reserve of **100 token A** (token0) and **100 token B** (token1). The liquidity locked in first tick is
-
-$$
-\begin{aligned}
-
-\bullet \ \delta L
-&= \Delta_{0 \rightarrow 1} Y \\
-&= L \times \Delta_{0  \rightarrow 1} \sqrt{P} \\
-&= 100 \times (\sqrt{1.0001} - 1) \\
-&\approx 0.05  \\
-
-\bullet \ \delta \sqrt{P} &= \Delta_{0 \rightarrow 1} \sqrt{P} \\
-
-\end{aligned}
-$$
-
-<div className="py-1"></div>
-
-$$
-\large {
-  \Rightarrow
-  \lambda_{0 \rightarrow 1} = \frac {\Delta_{0 \rightarrow 1} Y} {\Delta_{0 \rightarrow 1} \sqrt{P}} = 100
-}
-$$
-
-In fact, $\lambda_{i \rightarrow i+1} = L \ \forall i$ as derived above. This mean liquidity is uniformly distributed for V2.
+For V2, every liquidity provider is exposed to the whole $P \in (0, \infty)$ range. Meaning liquidity is evenly distributed: $L(P) = const, \forall R_k$.
 
 ### Uniswap V3
 
-In V2, there was an issue with stable coin pools. Users expected to be able to swap stable coins with minimal slippage.
-However, in V2, the slippage for such swaps was quite high, around 0.8% for 1% of the total value locked (TVL) in the pool.
-This means that if someone wanted to swap $1M USDC for DAI in a pool that had a total value of $100M in both DAI and USDC,
-they would have to pay a staggering $80,000 in fees.
-
-This issue is solved by concentrated liquidity in V3.
-
-<Quote author="Uniswap V3 white-paper" className="my-2">
-
-"...We call liquidity concentrated to a finite range a position. A position only needs to maintain enough reserves to support trading within
-its range, and therefore can act like a constant product pool with larger reserves (we call these the virtual reserves) within that
-range.
-
-Specifically, a position only needs to hold enough of asset X to cover price movement to its upper bound,
-because upwards price movement corresponds to depletion of the X reserves.
-Similarly, it only needs to hold enough of asset Y to cover price movement to its lower bound.
-
-When the price exits a position’s range, the position’s liquidity is no longer active, and no longer earns fees.
-At that point, its liquidity is composed entirely of a single asset, because the reserves of the other asset must have been entirely depleted.
-If the price ever reenters the range, the liquidity becomes active again..."
-
-</Quote>
+Liquidity distribution $L(X, Y)$ of V3 arise the definition of virtual (what's it would look like as if in V2) vs real (what's actually present) reserve
 
 <div className="block md:flex justify-center align-center py-2">
   <Image
@@ -242,13 +222,9 @@ If the price ever reenters the range, the liquidity becomes active again..."
   />
 </div>
 
-If considering a curve bounded by 2 points $[a, b]$ as above figures.
-Virtual reserve is the reserve in the pool if we extended it to infinity, whereas real reserve is the actual token reserves available within specified range, i.e. $[a, b]$
+In short, Virtual reserve is the reserve in the pool if we extended it to infinity, whereas real reserve is the actual token reserves available within specified range, i.e. $[a, b]$
 
-Then "concentrated liquidity" essential mean splitting each tick into a virtual reserve and combine them to form the complete liquidity curve.
-Doing so will result in more efficient captical allocation $\rightarrow$ more fee earned and less slippage.
-
-In summary, the curve can be visualised as follow:
+As mentioned in section 1, V3 liquidity curve is a piecewise constant distribution and can be visualized as follows:
 
 <Image
   src="/blogs/blockchain/uniswapV3/liquidity_curve.webp"
@@ -258,6 +234,19 @@ In summary, the curve can be visualised as follow:
   alt="liquidty curve"
   caption="Liquidity curve [visualization from V3-whitepaper]"
 />
+
+From this, we can also derived the global reserve of both token given liquidity within each range using formula (2) and (3):
+
+$$
+\begin{aligned}
+X = & \sum_{i > k+1} L_i \cdot (\frac{1}{\sqrt{P_i}} - \frac{1}{\sqrt{P_{i+1}}}) + L_k \cdot (\frac{1}{\sqrt{P}} - \frac{1}{\sqrt{P_{k+1}}}) \\
+Y = & \sum_{i < k} L_i \cdot (\sqrt{P_{i+1}} - \sqrt{P_i}) + L_k \cdot (\sqrt{P} - \sqrt{P_k}) \\
+\end{aligned}
+\\
+\Large{
+  \forall p \in R_k
+}
+$$
 
 # What's next?
 
