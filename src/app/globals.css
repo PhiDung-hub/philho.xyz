@@ -3,15 +3,13 @@
 @tailwind utilities;
 
 :root {
-  @apply text-gray-900;
-  @apply bg-orange-50;
-  @apply bg-gradient-to-b from-orange-50 to-white;
+  @apply text-[#1F1F1F];
+  @apply bg-[#FAF5E7];
   scroll-behavior: smooth;
   transition: all 0.5s linear;
   scrollbar-width: 6px;
   scrollbar-color: var(--scrollbar-color);
-  --bg-gradient: linear-gradient(to bottom, #fff8f1, white);
-  --scrollbar-color: rgba(222, 150, 15, 0.9);
+  --scrollbar-color: rgba(205,178,72, 0.95);
 }
 
 .dark:root {
@@ -32,7 +30,7 @@ mtd {
 }
 
 math {
-  @apply text-yellow-700;
+  @apply text-[#303543];
 }
 
 .dark math {
