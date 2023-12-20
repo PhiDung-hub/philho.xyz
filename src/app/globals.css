@@ -4,7 +4,7 @@
 
 :root {
   @apply text-[#1F1F1F];
-  @apply bg-[#FAF5D7];
+  @apply bg-[#FAF5F1];
   scroll-behavior: smooth;
   transition: all 0.5s linear;
   scrollbar-width: 6px;
